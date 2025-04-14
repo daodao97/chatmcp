@@ -15,9 +15,12 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'dart:io';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:chatmcp/generated/app_localizations.dart';
+import 'package:app_links/app_links.dart';
+import 'dart:async';
 
 final GlobalKey<ScaffoldMessengerState> _scaffoldMessengerKey =
     GlobalKey<ScaffoldMessengerState>();
+final GlobalKey<NavigatorState> _navigatorKey = GlobalKey<NavigatorState>();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -98,8 +101,67 @@ void main() async {
   }
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  StreamSubscription<Uri>? _linkSubscription;
+  final AppLinks _appLinks = AppLinks();
+
+  @override
+  void initState() {
+    super.initState();
+    initDeepLinks();
+  }
+
+  @override
+  void dispose() {
+    _linkSubscription?.cancel();
+    super.dispose();
+  }
+
+  Future<void> initDeepLinks() async {
+    Logger.root.info('初始化深层链接处理...');
+
+    // 获取应用启动时的链接
+    try {
+      final appLinkUri = await _appLinks.getInitialLink();
+      if (appLinkUri != null) {
+        Logger.root.info('初始应用链接: $appLinkUri');
+        _handleAppLink(appLinkUri);
+      }
+    } catch (e) {
+      Logger.root.severe('获取初始应用链接错误: $e');
+    }
+
+    // 监听应用链接
+    _linkSubscription = _appLinks.uriLinkStream.listen((uri) {
+      Logger.root.info('接收到应用链接: $uri');
+      _handleAppLink(uri);
+    }, onError: (e) {
+      Logger.root.severe('应用链接流错误: $e');
+    });
+  }
+
+  void _handleAppLink(Uri uri) {
+    // 在这里处理链接，例如导航到特定页面
+    // 示例: 如果 URI 包含 "/chat/123"，则导航到具有 ID 123 的聊天页面
+    String path = uri.path;
+    if (path.startsWith('/chat/')) {
+      String chatId = path.substring('/chat/'.length);
+      // 这里可以根据实际情况进行路由导航
+      Logger.root.info('打开聊天 ID: $chatId');
+
+      // 显示一个 SnackBar 作为可视化确认
+      _scaffoldMessengerKey.currentState?.showSnackBar(
+        SnackBar(content: Text('通过链接打开聊天: $chatId')),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -108,6 +170,7 @@ class MyApp extends StatelessWidget {
         return MaterialApp(
           debugShowCheckedModeBanner: false,
           scaffoldMessengerKey: _scaffoldMessengerKey,
+          navigatorKey: _navigatorKey,
           title: 'ChatMcp',
           theme: ThemeData(
             useMaterial3: true,

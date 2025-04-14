@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:chatmcp/llm/model.dart';
 import 'package:chatmcp/llm/llm_factory.dart';
 import 'package:chatmcp/llm/base_llm_client.dart';
-import 'package:flutter/rendering.dart';
 import 'package:logging/logging.dart';
 import 'package:file_picker/file_picker.dart';
 import 'input_area.dart';
@@ -734,9 +733,6 @@ class _ChatPageState extends State<ChatPage> {
         // ...messageList.map((m) => m.copyWith(
         //       content: m.content?.replaceAll("done=\"true\"", ""),
         //     )),
-        ...messageList.where((m) =>
-            !m.content!.startsWith('<function') ||
-            !m.content!.startsWith('<call_function_result')),
       ],
       modelSetting: modelSetting,
     ));

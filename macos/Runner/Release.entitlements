@@ -32,5 +32,7 @@
 		<string>(allow process-fork)</string>
 		<string>(allow process-exec-interpreter)</string>
 	</array>
+	<key>com.apple.security.network.client</key>
+	<true/>
 </dict>
 </plist>
