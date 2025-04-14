@@ -733,6 +733,7 @@ class _ChatPageState extends State<ChatPage> {
         // ...messageList.map((m) => m.copyWith(
         //       content: m.content?.replaceAll("done=\"true\"", ""),
         //     )),
+        ...messageList,
       ],
       modelSetting: modelSetting,
     ));

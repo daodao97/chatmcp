@@ -89,9 +89,19 @@ class SSEClient implements McpClient {
               _processStateController.add(const ProcessState.running());
             } else {
               try {
-                final jsonData = jsonDecode(data);
-                final message = JSONRPCMessage.fromJson(jsonData);
-                _handleMessage(message);
+                if (data.trim().startsWith('/') ||
+                    data.trim().startsWith('http')) {
+                  final uri = Uri.parse(serverConfig.command);
+                  final baseUrl = uri.origin;
+                  _messageEndpoint = data.startsWith("http")
+                      ? data
+                      : baseUrl + (data.startsWith("/") ? data : "/$data");
+                  Logger.root.info('更新消息端点: $_messageEndpoint');
+                } else {
+                  final jsonData = jsonDecode(data);
+                  final message = JSONRPCMessage.fromJson(jsonData);
+                  _handleMessage(message);
+                }
               } catch (e, stack) {
                 Logger.root
                     .severe('Failed to parse server message: $e\n$stack');

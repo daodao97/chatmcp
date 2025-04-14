@@ -81,6 +81,7 @@ dependencies:
   flutter_switch: ^0.3.2
   flutter_popup: ^3.3.4
   app_links: ^6.4.0
+  dependency_validator: ^5.0.2
 
 dev_dependencies:
   flutter_test:
