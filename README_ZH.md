@@ -61,6 +61,13 @@ brew install node
 2. 从"MCP 服务器"页面安装 MCP 服务器
 3. 与 MCP 服务器开始对话
 
+- stdio mcp server
+![](./docs/mcp_stdio.png)
+
+- sse mcp server
+![](./docs//mcp_sse.png)
+
+
 ## 调试 
 
 - logs & data
@@ -106,12 +113,6 @@ rm -rf ~/.local/share/ChatMcp
 flutter pub get
 flutter run -d macos
 ```
-
-下载 [test.db](./assets/test.db) 用于测试 sqlite mcp 服务器
-
-![](./assets/test.png)
-
-`~/Library/Application Support/ChatMcp/mcp_server.json` 是 mcp 服务器的配置文件
 
 ## 功能特性
 
