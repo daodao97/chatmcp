@@ -85,12 +85,9 @@ class Markit extends StatelessWidget {
               ),
             ),
             isDark
-                ? PreConfig.darkConfig.copy(
-                    textStyle: const TextStyle(fontSize: 12),
-                    theme: githubTheme)
-                : PreConfig().copy(
-                    textStyle: const TextStyle(fontSize: 12),
-                    theme: githubTheme),
+                ? PreConfig.darkConfig
+                    .copy(textStyle: const TextStyle(fontSize: 12))
+                : PreConfig().copy(textStyle: const TextStyle(fontSize: 12)),
             DetailConfig(),
           ],
         ),

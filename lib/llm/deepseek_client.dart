@@ -25,7 +25,7 @@ class DeepSeekClient extends BaseLLMClient {
   Future<LLMResponse> chatCompletion(CompletionRequest request) async {
     final body = {
       'model': request.model,
-      'messages': chatMessageToDeepSeekMessage(request.messages),
+      'messages': chatMessageToOpenAIMessage(request.messages),
     };
     if (request.modelSetting != null) {
       body['temperature'] = request.modelSetting!.temperature;
@@ -87,7 +87,7 @@ class DeepSeekClient extends BaseLLMClient {
   Stream<LLMResponse> chatStreamCompletion(CompletionRequest request) async* {
     final body = {
       'model': request.model,
-      'messages': chatMessageToDeepSeekMessage(request.messages),
+      'messages': chatMessageToOpenAIMessage(request.messages),
       'stream': true,
     };
     if (request.modelSetting != null) {
@@ -255,15 +255,4 @@ class DeepSeekClient extends BaseLLMClient {
       return [];
     }
   }
-}
-
-List<Map<String, dynamic>> chatMessageToDeepSeekMessage(
-    List<ChatMessage> messages) {
-  final openaiMessages = chatMessageToOpenAIMessage(messages);
-  final lastMessage = openaiMessages.last;
-  if (lastMessage['role'] == 'assistant') {
-    lastMessage['role'] = 'user';
-    openaiMessages[openaiMessages.length - 1] = lastMessage;
-  }
-  return openaiMessages;
 }

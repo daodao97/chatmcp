@@ -23,25 +23,35 @@ class LatexSyntax extends m.InlineSyntax {
     bool isInline = true;
     const blockSyntax = '\$\$';
     const inlineSyntax = '\$';
+
     if (matchValue.startsWith(blockSyntax) &&
         matchValue.endsWith(blockSyntax) &&
-        (matchValue != blockSyntax)) {
+        (matchValue != blockSyntax) &&
+        matchValue.length > 4) {
       content = matchValue.substring(2, matchValue.length - 2).trim();
       isInline = false;
     } else if (matchValue.startsWith(inlineSyntax) &&
         matchValue.endsWith(inlineSyntax) &&
-        matchValue != inlineSyntax) {
+        matchValue != inlineSyntax &&
+        matchValue.length > 2) {
       content = matchValue.substring(1, matchValue.length - 1);
-    } else if (matchValue.startsWith(r'\[') && matchValue.endsWith(r'\]')) {
+    } else if (matchValue.startsWith(r'\[') &&
+        matchValue.endsWith(r'\]') &&
+        matchValue.length > 4) {
       content = matchValue.substring(2, matchValue.length - 2);
       isInline = false;
-    } else if (matchValue.startsWith(r'\(') && matchValue.endsWith(r'\)')) {
+    } else if (matchValue.startsWith(r'\(') &&
+        matchValue.endsWith(r'\)') &&
+        matchValue.length > 4) {
       content = matchValue.substring(2, matchValue.length - 2);
       isInline = true;
-    } else if (matchValue.startsWith('[') && matchValue.endsWith(']')) {
+    } else if (matchValue.startsWith('[') &&
+        matchValue.endsWith(']') &&
+        matchValue.length > 2) {
       content = matchValue.substring(1, matchValue.length - 1);
       isInline = false;
     }
+
     m.Element el = m.Element.text(_latexTag, matchValue);
     el.attributes['content'] = content;
     el.attributes['isInline'] = '$isInline';

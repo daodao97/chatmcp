@@ -5,6 +5,7 @@ import 'package:markdown/markdown.dart' as m;
 import 'package:chatmcp/utils/color.dart';
 import 'package:flutter/services.dart';
 import 'package:chatmcp/generated/app_localizations.dart';
+import 'package:flutter_highlight/flutter_highlight.dart';
 
 import 'mermaid_diagram_view.dart' show MermaidDiagramView;
 import 'html_view.dart';
@@ -149,9 +150,14 @@ class _CodeBlockState extends State<_CodeBlock>
           //     child: previewWidget!,
           //   ),
           if (_isSupportPreview && _isPreviewVisible) previewWidget!,
-          Gap(size: 20),
-          if (!_isPreviewVisible) ...buildCodeBlockList(),
-          Gap(size: 20),
+          // if (!_isPreviewVisible) ...buildCodeBlockList(),
+          if (!_isPreviewVisible)
+            HighlightView(
+              widget.code,
+              language: widget.language,
+              theme: widget.preConfig.theme,
+              padding: const EdgeInsets.only(top: 5),
+            ),
         ],
       ),
     );

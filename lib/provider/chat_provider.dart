@@ -30,6 +30,18 @@ class ChatProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> updateChatTitle(String title) async {
+    if (_activeChat == null) {
+      return;
+    }
+    final chatDao = ChatDao();
+    await chatDao.update(Chat(title: title), _activeChat!.id!.toString());
+    await loadChats();
+    if (_activeChat?.id == _activeChat!.id) {
+      setActiveChat(_activeChat!);
+    }
+  }
+
   Future<void> createChat(
       Chat chat, List<llm_model.ChatMessage> messages) async {
     final chatDao = ChatDao();
