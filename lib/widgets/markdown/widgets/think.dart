@@ -68,7 +68,7 @@ class _ThinkWidgetState extends State<ThinkWidget> {
       }
       Duration duration =
           DateTime.parse(endTime).difference(DateTime.parse(startTime));
-      durationTips = t.seconds(duration.inSeconds);
+      durationTips = " ${t.seconds(duration.inSeconds)}";
     }
 
     if (widget.isClosed) {

@@ -720,7 +720,9 @@ class _ChatPageState extends State<ChatPage> {
       _isWating = true;
     });
 
-    final List<ChatMessage> messageList = _prepareMessageList();
+    List<ChatMessage> messageList = _prepareMessageList();
+    messageList = messageMerge(messageList);
+
     Logger.root.info('start process llm response: $messageList');
 
     final modelSetting = ProviderManager.settingsProvider.modelSetting;
@@ -746,12 +748,7 @@ class _ChatPageState extends State<ChatPage> {
           content: systemPrompt,
           role: MessageRole.system,
         ),
-        // ...messageList.map((m) => m.copyWith(
-        //       content: m.content?.replaceAll("done=\"true\"", ""),
-        //     )),
-        ...messageList.where((m) =>
-            !m.content!.startsWith('<function') ||
-            !m.content!.startsWith('<call_function_result')),
+        ...messageList,
       ],
       modelSetting: modelSetting,
     ));
@@ -775,6 +772,29 @@ class _ChatPageState extends State<ChatPage> {
 
     _reorderMessages(messageList);
     return messageList;
+  }
+
+  List<ChatMessage> messageMerge(List<ChatMessage> messageList) {
+    final newMessages = [messageList.first];
+
+    for (final message in messageList.sublist(1)) {
+      if (newMessages.last.role == message.role) {
+        newMessages.last = newMessages.last.copyWith(
+          content: '${newMessages.last.content}\n\n${message.content}',
+        );
+      } else {
+        newMessages.add(message);
+      }
+    }
+
+    if (newMessages.last.role != MessageRole.user) {
+      newMessages.add(ChatMessage(
+        content: 'continue',
+        role: MessageRole.user,
+      ));
+    }
+
+    return newMessages;
   }
 
   void _reorderMessages(List<ChatMessage> messageList) {

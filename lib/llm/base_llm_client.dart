@@ -106,7 +106,6 @@ abstract class BaseLLMClient {
     final model = ProviderManager.chatModelProvider.currentModel;
     final providerSetting =
         ProviderManager.settingsProvider.getProviderSetting(model.providerId);
-    print("providerSetting: ${providerSetting.toJson()}");
     return providerSetting.genTitleModel != null &&
             providerSetting.genTitleModel!.isNotEmpty
         ? providerSetting.genTitleModel!
@@ -129,8 +128,6 @@ The title should summarize the main topic. Return only the title without any exp
 Conversation:
 $conversationText""",
       );
-
-      print("genTitleModel: ${getGenTitleModel()}");
 
       final response = await chatCompletion(CompletionRequest(
         model: getGenTitleModel(),
