@@ -59,6 +59,12 @@ brew install node
 2. Install MCP Server from `MCP Server` Page
 3. Chat with MCP Server
 
+- stdio mcp server
+![](./docs/mcp_stdio.png)
+
+- sse mcp server
+![](./docs//mcp_sse.png)
+
 ## Debug 
 
 - logs & data
@@ -104,12 +110,6 @@ rm -rf ~/.local/share/ChatMcp
 flutter pub get
 flutter run -d macos
 ```
-
-download [test.db](./assets/test.db) to test sqlite mcp server
-
-![](./assets/test.png)
-
-`~/Library/Application Support/ChatMcp/mcp_server.json` is the configuration file for the mcp server
 
 ## Features
 

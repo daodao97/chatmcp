@@ -288,13 +288,12 @@ class _McpServerState extends State<McpServer> {
                 isLoading: _serverLoading[serverName] == true,
               ),
               const Gap(size: 10),
-              if (serverConfig['type'] != 'inmemory')
-                _buildActionButton(
-                  icon: CupertinoIcons.pencil,
-                  tooltip: l10n.edit,
-                  onPressed: () =>
-                      _showEditDialog(context, serverName, provider, null),
-                ),
+              _buildActionButton(
+                icon: CupertinoIcons.pencil,
+                tooltip: l10n.edit,
+                onPressed: () =>
+                    _showEditDialog(context, serverName, provider, null),
+              ),
               const Gap(size: 10),
               _buildActionButton(
                 icon: CupertinoIcons.delete,
@@ -551,6 +550,7 @@ class _McpServerState extends State<McpServer> {
                     FormBuilderDropdown<String>(
                       name: 'type',
                       initialValue: resultType,
+                      enabled: _selectedTab != "inmemory",
                       decoration: InputDecoration(
                         labelText: l10n.serverType,
                         border: OutlineInputBorder(
@@ -615,6 +615,7 @@ class _McpServerState extends State<McpServer> {
                     const SizedBox(height: 16),
                     FormBuilderTextField(
                       name: 'command',
+                      enabled: resultType != 'inmemory',
                       initialValue: resultCommand,
                       decoration: InputDecoration(
                         labelText: l10n.command,
