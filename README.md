@@ -47,12 +47,23 @@ sudo apt-get install libsqlite3-0 libsqlite3-dev
 
 Make sure you have installed `uvx` or `npx` in your system
 
+### MacOS
 ```bash
 # uvx
 brew install uv
 
 # npx
 brew install node 
+```
+
+### Linux 
+```bash
+# uvx
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# npx (using apt)
+sudo apt update
+sudo apt install nodejs npm
 ```
 
 1. Configure Your LLM API Key and Endpoint in `Setting` Page
