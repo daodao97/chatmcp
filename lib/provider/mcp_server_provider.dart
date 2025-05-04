@@ -85,12 +85,18 @@ class McpServerProvider extends ChangeNotifier {
       if (contents.trim().isEmpty) {
         Logger.root.warning(
             'Configuration file ($configPath) is empty. Returning default configuration.');
-        return {'mcpServers': <String, dynamic>{}};
+        return {
+          'mcpServers': <String, dynamic>{},
+          'mcpServerMarket': <dynamic>[],
+        };
       }
 
       final Map<String, dynamic> data = json.decode(contents);
       if (data['mcpServers'] == null) {
         data['mcpServers'] = <String, dynamic>{};
+      }
+      if (data['mcpServerMarket'] == null) {
+        data['mcpServerMarket'] = <dynamic>[];
       }
       // 遍历data['mcpServers']，直接设置installed为true，
       for (var server in data['mcpServers'].entries) {
@@ -115,14 +121,18 @@ class McpServerProvider extends ChangeNotifier {
         }
       }
       return {
-        'mcpServers': <String, dynamic>{}
+        'mcpServers': <String, dynamic>{},
+        'mcpServerMarket': <dynamic>[],
       }; // Return default on format error
     } catch (e, stackTrace) {
       // Catch other potential errors
       final configPath = await _configFilePath;
       Logger.root.severe(
           'Failed to read configuration file ($configPath): $e, stackTrace: $stackTrace');
-      return {'mcpServers': <String, dynamic>{}};
+      return {
+        'mcpServers': <String, dynamic>{},
+        'mcpServerMarket': <dynamic>[],
+      };
     }
   }
 
@@ -156,7 +166,12 @@ class McpServerProvider extends ChangeNotifier {
 
     // 如果有新增服务器，保存配置
     if (needSave) {
-      await saveServers({'mcpServers': serverConfig});
+      // 保留原有的 mcpServerMarket 字段
+      final configToSave = {
+        'mcpServers': serverConfig,
+        'mcpServerMarket': allServerConfig['mcpServerMarket'],
+      };
+      await saveServers(configToSave);
     }
 
     // 过滤得到所有内存类型服务器
@@ -389,12 +404,72 @@ class McpServerProvider extends ChangeNotifier {
     return clients;
   }
 
-  String mcpServerMarket =
-      "https://raw.githubusercontent.com/daodao97/chatmcp/refs/heads/main/assets/mcp_server_market.json";
-
+  // 从mcpServerMarket中加载服务器
   Future<Map<String, dynamic>> loadMarketServers() async {
     try {
-      final response = await http.get(Uri.parse(mcpServerMarket));
+      final file = File(await _configFilePath);
+      final String contents = await file.readAsString();
+      final Map<String, dynamic> data = json.decode(contents);
+      
+      final List<dynamic>? marketConfigs = data['mcpServerMarket'] as List<dynamic>?;
+      if (marketConfigs == null) {
+        Logger.root.warning('No market configs found in config file');
+        return {'mcpServers': <String, dynamic>{}};
+      }
+
+      final Map<String, dynamic> allServers = {};
+
+      for (var marketConfig in marketConfigs) {
+        try {
+          if (marketConfig['type'] == 'local') {
+            final Map<String, dynamic>? servers = marketConfig['mcpServers'] as Map<String, dynamic>?;
+            if (servers != null) {
+              allServers.addAll(servers);
+            }
+          } else if (marketConfig['type'] == 'remote') {
+            final String? url = marketConfig['url'] as String?;
+            if (url != null) {
+              try {
+                final Map<String, dynamic> servers = await loadMarketRemoteServers(url);
+                allServers.addAll(servers);
+              } catch (e) {
+                Logger.root.warning('Failed to load remote servers from $url: $e');
+              }
+            }
+          }
+        } catch (e) {
+          Logger.root.warning('Failed to process market config: $e');
+          continue;
+        }
+      }
+
+      // 获取本地已安装的mcp服务器
+      final localInstalledServers = await _loadServers();
+      final Map<String, dynamic> processedServers = {};
+      
+      // 创建新的Map来存储处理后的数据
+      for (var server in allServers.entries) {
+        final bool isInstalled = localInstalledServers['mcpServers']?[server.key] != null;
+        processedServers[server.key] = {
+          ...server.value,
+          'installed': isInstalled,
+        };
+      }
+
+      return {
+        'mcpServers': processedServers,
+      };
+    } catch (e, stackTrace) {
+      Logger.root.severe('Failed to load local market servers: $e, stackTrace: $stackTrace');
+      return {
+        'mcpServers': <String, dynamic>{},
+      };
+    }
+  }
+
+  Future<Map<String, dynamic>> loadMarketRemoteServers(String url) async {
+    try {
+      final response = await http.get(Uri.parse(url));
       if (response.statusCode == 200) {
         Logger.root
             .info('Successfully loaded market servers: ${response.body}');
@@ -403,40 +478,28 @@ class McpServerProvider extends ChangeNotifier {
         final Map<String, dynamic> servers =
             jsonData['mcpServers'] as Map<String, dynamic>;
 
-        var sseServers = <String, dynamic>{};
+        var serverMap = <String, dynamic>{};
 
         // For mobile platforms, only keep servers with commands starting with http
         if (Platform.isIOS || Platform.isAndroid) {
           for (var server in servers.entries) {
             if (server.value['command'] != null &&
                 server.value['command'].toString().startsWith('http')) {
-              sseServers[server.key] = server.value;
+              serverMap[server.key] = server.value;
             }
           }
         } else {
-          sseServers = servers;
+          serverMap = servers;
         }
 
-        // 获取本地已安装的mcp服务器
-        final localInstalledServers = await _loadServers();
-        //遍历sseServers，如果本地已安装的mcp服务器中存在，则将sseServers中的该服务器设置为已安装
-        for (var server in sseServers.entries) {
-          if (localInstalledServers['mcpServers'][server.key] != null) {
-            server.value['installed'] = true;
-          } else {
-            server.value['installed'] = false;
-          }
-        }
-
-        return {
-          'mcpServers': sseServers,
-        };
+        return serverMap;
       }
-      throw Exception('Failed to load market servers: ${response.statusCode}');
+      // 打印日志不要直接报错
+      Logger.root.severe('Failed to load remote market servers: ${response.statusCode}');
+      return <String, dynamic>{};
     } catch (e, stackTrace) {
-      Logger.root
-          .severe('Failed to load market servers: $e, stackTrace: $stackTrace');
-      throw Exception('Failed to load market servers: $e');
+      Logger.root.severe('Failed to load remote market servers: $e, stackTrace: $stackTrace');
+      return <String, dynamic>{};
     }
   }
 }
