@@ -1,4 +1,5 @@
 import 'package:chatmcp/components/widgets/base.dart';
+import 'package:chatmcp/widgets/ink_icon.dart';
 import 'package:flutter/material.dart';
 import 'package:chatmcp/provider/provider_manager.dart';
 import './model_selector.dart';
@@ -16,6 +17,7 @@ import 'package:chatmcp/widgets/markdown/markit_widget.dart';
 import 'package:chatmcp/widgets/browser/browser.dart';
 import 'package:chatmcp/utils/event_bus.dart';
 import 'package:chatmcp/page/layout/widgets/chat_setting.dart';
+import 'package:flutter_popup/flutter_popup.dart';
 
 class TopToolbar extends StatelessWidget {
   final bool hideSidebar;
@@ -41,6 +43,9 @@ class TopToolbar extends StatelessWidget {
       showDialog(
         context: context,
         builder: (context) => Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8.0),
+          ),
           child: SizedBox(
             width: MediaQuery.of(context).size.width * 0.8,
             height: MediaQuery.of(context).size.height * 0.8,
@@ -53,67 +58,101 @@ class TopToolbar extends StatelessWidget {
 
   Widget _buildMoreMenu(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    return PopupMenuButton<String>(
-      iconSize: 18,
-      icon: const Icon(CupertinoIcons.ellipsis_vertical),
-      itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-        if (ProviderManager.chatProvider.activeChat != null)
-          PopupMenuItem<String>(
-            value: 'share',
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Icon(CupertinoIcons.share, size: 18),
-                const SizedBox(width: 8),
-                CText(text: l10n.share),
-              ],
-            ),
-          ),
-        PopupMenuItem<String>(
-          value: 'config',
-          onTap: () => _onShowChatSetting(context),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Icon(CupertinoIcons.slider_horizontal_3, size: 18),
-              const SizedBox(width: 8),
-              CText(text: l10n.modelConfig),
-            ],
-          ),
+
+    return CustomPopup(
+      showArrow: true,
+      arrowColor: AppColors.getLayoutBackgroundColor(context),
+      backgroundColor: AppColors.getLayoutBackgroundColor(context),
+      content: Container(
+        constraints: const BoxConstraints(
+          maxWidth: 200,
         ),
-        if (kIsDebug)
-          PopupMenuItem<String>(
-            value: 'debug',
-            child: Row(
-              children: [
-                const Icon(CupertinoIcons.ant, size: 18),
-                const SizedBox(width: 8),
-                CText(text: l10n.debug),
-              ],
-            ),
-          ),
-      ],
-      onSelected: (String value) {
-        switch (value) {
-          case 'share':
-            emit(ShareEvent(false));
-            break;
-          case 'debug':
-            Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (context) => Scaffold(
-                  appBar: AppBar(
-                    title: Text(l10n.webSearchTest),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (ProviderManager.chatProvider.activeChat != null)
+              InkWell(
+                onTap: () {
+                  emit(ShareEvent(false));
+                  Navigator.of(context).pop();
+                },
+                child: Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  child: Row(
+                    children: [
+                      const Icon(CupertinoIcons.share, size: 18),
+                      const SizedBox(width: 12),
+                      Text(
+                        l10n.share,
+                        style: TextStyle(
+                          color: AppColors.getThemeTextColor(context),
+                        ),
+                      ),
+                    ],
                   ),
-                  body: const MarkitTestPage(),
                 ),
               ),
-            );
-            break;
-        }
-      },
+            InkWell(
+              onTap: () {
+                _onShowChatSetting(context);
+              },
+              child: Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                child: Row(
+                  children: [
+                    const Icon(CupertinoIcons.slider_horizontal_3, size: 18),
+                    const SizedBox(width: 12),
+                    Text(
+                      l10n.modelConfig,
+                      style: TextStyle(
+                        color: AppColors.getThemeTextColor(context),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            if (kIsDebug)
+              InkWell(
+                onTap: () {
+                  Navigator.of(context).pop();
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => Scaffold(
+                        appBar: AppBar(
+                          title: Text(l10n.webSearchTest),
+                        ),
+                        body: const MarkitTestPage(),
+                      ),
+                    ),
+                  );
+                },
+                child: Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  child: Row(
+                    children: [
+                      const Icon(CupertinoIcons.ant, size: 18),
+                      const SizedBox(width: 12),
+                      Text(
+                        l10n.debug,
+                        style: TextStyle(
+                          color: AppColors.getThemeTextColor(context),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+          ],
+        ),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 12),
+        child: const Icon(CupertinoIcons.ellipsis_vertical, size: 18),
+      ),
     );
   }
 
@@ -161,30 +200,25 @@ class TopToolbar extends StatelessWidget {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             if (hideSidebar && kIsDesktop)
-                              IconButton(
-                                iconSize: 18,
-                                icon: Icon(
-                                  CupertinoIcons.sidebar_right,
-                                  color: AppColors.getSidebarToggleIconColor(),
-                                ),
-                                onPressed: onToggleSidebar,
+                              InkIcon(
+                                icon: CupertinoIcons.sidebar_right,
+                                color: AppColors.getSidebarToggleIconColor(),
+                                onTap: onToggleSidebar,
                               ),
                             Flexible(
                               child: ConstrainedBox(
                                 constraints: const BoxConstraints(minWidth: 50),
                                 child: Row(
                                   children: [
-                                    if (kIsMobile)
-                                      IconButton(
-                                        iconSize: 18,
-                                        icon: const Icon(
-                                          Icons.menu,
-                                        ),
-                                        onPressed: () {
+                                    if (kIsAndroid) ...[
+                                      Gap(size: 12),
+                                      InkIcon(
+                                        icon: CupertinoIcons.sidebar_left,
+                                        onTap: () {
                                           Scaffold.of(context).openDrawer();
                                         },
                                       ),
-                                    Gap(size: 4),
+                                    ],
                                     const ModelSelector(),
                                   ],
                                 ),
@@ -196,14 +230,16 @@ class TopToolbar extends StatelessWidget {
                       Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          if (ProviderManager.chatProvider.activeChat != null)
-                            IconButton(
-                              iconSize: 18,
-                              icon: const Icon(CupertinoIcons.add),
-                              onPressed: () {
+                          if (ProviderManager.chatProvider.activeChat !=
+                              null) ...[
+                            Gap(size: 12),
+                            InkIcon(
+                              icon: CupertinoIcons.add,
+                              onTap: () {
                                 ProviderManager.chatProvider.clearActiveChat();
                               },
                             ),
+                          ],
                           _buildMoreMenu(context),
                         ],
                       ),

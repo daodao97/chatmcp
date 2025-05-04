@@ -20,6 +20,8 @@ final bool kIsDesktop =
 
 final bool kIsMobile = Platform.isAndroid || Platform.isIOS;
 
+final bool kIsAndroid = Platform.isAndroid;
+
 Future<Directory> getAppDir(String appName) async {
   if (kIsDesktop) {
     final Directory appDir;

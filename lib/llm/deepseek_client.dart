@@ -101,7 +101,7 @@ class DeepSeekClient extends BaseLLMClient {
     }
 
     try {
-      Logger.root.info('deepseek request chat stream completion');
+      Logger.root.info('deepseek request chat stream completion: $body');
       final request =
           http.Request('POST', Uri.parse('$baseUrl/chat/completions'));
       request.headers.addAll(_headers);

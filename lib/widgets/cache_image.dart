@@ -100,6 +100,9 @@ class CacheImage extends StatelessWidget {
     showDialog(
       context: context,
       builder: (context) => Dialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8.0),
+        ),
         child: Stack(
           children: [
             CachedNetworkImage(

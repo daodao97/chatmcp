@@ -544,6 +544,9 @@ class _McpServerState extends State<McpServer> {
         barrierDismissible: false,
         builder: (BuildContext dialogContext) {
           return AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8.0),
+            ),
             title: Text(
               'MCP Server - ${serverName.isEmpty ? l10n.addProvider : serverName}',
               style: const TextStyle(
@@ -929,7 +932,9 @@ class _McpServerState extends State<McpServer> {
                     });
                   }
 
-                  Navigator.pop(dialogContext, true);
+                  if (dialogContext.mounted) {
+                    Navigator.pop(dialogContext, true);
+                  }
                 },
                 style: TextButton.styleFrom(
                   foregroundColor: Theme.of(context).colorScheme.primary,
@@ -942,9 +947,6 @@ class _McpServerState extends State<McpServer> {
                 ),
               ),
             ],
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
             backgroundColor: Theme.of(context).colorScheme.surface,
           );
         },
@@ -969,6 +971,9 @@ class _McpServerState extends State<McpServer> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8.0),
+        ),
         title: Text(l10n.confirmDelete),
         content: Text(l10n.confirmDeleteServer(serverName)),
         actions: [
@@ -997,6 +1002,9 @@ class _McpServerState extends State<McpServer> {
     return showDialog(
       context: context,
       builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8.0),
+        ),
         title: Text(l10n.error),
         content: Text(message),
         actions: [

@@ -151,30 +151,30 @@ class _McpToolsState extends State<McpTools> {
           ),
           child: MouseRegion(
             cursor: SystemMouseCursors.click,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Consumer<ServerStateProvider>(
-                    builder: (context, stateProvider, _) {
-                      return Row(
-                        children: [
-                          Icon(
-                            CupertinoIcons.hammer,
-                            size: 14,
-                            color: Theme.of(context).iconTheme.color,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Consumer<ServerStateProvider>(
+                  builder: (context, stateProvider, _) {
+                    return Row(
+                      children: [
+                        Icon(
+                          CupertinoIcons.hammer,
+                          size: 14,
+                          color: Theme.of(context).iconTheme.color,
+                        ),
+                        if (stateProvider.enabledCount > 0) ...[
+                          const Gap(size: 4),
+                          Text(
+                            '${stateProvider.enabledCount}',
+                            style: TextStyle(fontSize: 12),
                           ),
-                          if (stateProvider.enabledCount > 0) ...[
-                            const Gap(size: 4),
-                            Text('${stateProvider.enabledCount}'),
-                          ],
                         ],
-                      );
-                    },
-                  ),
-                ],
-              ),
+                      ],
+                    );
+                  },
+                ),
+              ],
             ),
           ),
         );
