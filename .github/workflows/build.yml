@@ -19,7 +19,7 @@ jobs:
             apk_build: true
           - os: macos-latest
             output_path: build/macos/Build/Products/Release/chatmcp.app
-            asset_name: chatmcp-macos-x64.dmg
+            asset_name: chatmcp-macos.dmg
             build_target: macos
             apk_build: false
           - os: windows-latest
