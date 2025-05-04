@@ -5,7 +5,7 @@
         {
             "type": "local",
             "mcpServers": {
-                "sqlite-lcl": {
+                "sqlite": {
                     "command": "uvx",
                     "args": [
                         "mcp-server-sqlite",
