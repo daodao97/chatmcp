@@ -34,8 +34,10 @@ class TopToolbar extends StatelessWidget {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => const SafeArea(
-            child: ChatSetting(),
+          builder: (context) => Scaffold(
+            body: SafeArea(
+              child: const ChatSetting(),
+            ),
           ),
         ),
       );
@@ -49,7 +51,10 @@ class TopToolbar extends StatelessWidget {
           child: SizedBox(
             width: MediaQuery.of(context).size.width * 0.8,
             height: MediaQuery.of(context).size.height * 0.8,
-            child: const ChatSetting(),
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: const ChatSetting(),
+            ),
           ),
         ),
       );

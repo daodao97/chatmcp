@@ -23,7 +23,17 @@ class _McpServerState extends State<McpServer> {
   final TextEditingController _searchController = TextEditingController();
   String _selectedTab = 'Installed';
   int _refreshCounter = 0;
-  final Map<String, bool> _serverLoading = {};
+  Map<String, bool> _serverLoading = {};
+
+  // 验证URL是否合法
+  bool isValidUrl(String urlString) {
+    try {
+      final uri = Uri.parse(urlString);
+      return uri.scheme.isNotEmpty && uri.host.isNotEmpty;
+    } catch (e) {
+      return false;
+    }
+  }
 
   @override
   void dispose() {
@@ -894,13 +904,21 @@ class _McpServerState extends State<McpServer> {
                       (values['args'] as String).trim().split(RegExp(r'\s+'));
                   final envStr = values['env'] as String;
 
-                  if ((Platform.isIOS || Platform.isAndroid) &&
-                      type != 'sse' &&
-                      type != 'streamable' &&
-                      !command.trim().startsWith('http')) {
-                    showErrorDialog(dialogContext,
-                        'Mobile only supports mcp sse and streamable servers');
-                    return;
+                  bool isMobile = Platform.isIOS || Platform.isAndroid;
+                  bool isRemote = type == 'sse' || type == 'streamable';
+                  bool isUrl = isValidUrl(command.trim());
+
+                  if (isMobile) {
+                    if (type == "stdio") {
+                      showErrorDialog(dialogContext,
+                          'Mobile only supports mcp sse and streamable servers');
+                      return;
+                    }
+                    if (isRemote && !isUrl) {
+                      showErrorDialog(
+                          dialogContext, 'Server command must be a valid URL');
+                      return;
+                    }
                   }
 
                   final env = Map<String, String>.fromEntries(

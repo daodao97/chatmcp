@@ -49,7 +49,7 @@ class _ChatPageState extends State<ChatPage> {
   bool mobile = kIsMobile;
 
   List<RunFunctionEvent> _runFunctionEvents = [];
-  bool _isRunningFunction = false;
+  bool _isRunningFunction = true;
 
   @override
   void initState() {
@@ -1074,12 +1074,49 @@ class _ChatPageState extends State<ChatPage> {
     }
   }
 
+  Widget _buildFunctionRunning() {
+    if (_isRunningFunction) {
+      return Container(
+        padding: const EdgeInsets.symmetric(vertical: 8),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            SizedBox(
+              width: 16,
+              height: 16,
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                valueColor: AlwaysStoppedAnimation<Color>(
+                  Theme.of(context).primaryColor,
+                ),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Text(
+              AppLocalizations.of(context)!.functionRunning,
+              style: TextStyle(
+                fontSize: 14,
+                color: Theme.of(context)
+                    .textTheme
+                    .bodyMedium
+                    ?.color
+                    ?.withAlpha((0.7 * 255).round()),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+    return const SizedBox.shrink();
+  }
+
   @override
   Widget build(BuildContext context) {
     if (mobile) {
       return Column(
         children: [
           _buildMessageList(),
+          _buildFunctionRunning(),
           InputArea(
             disabled: _isLoading,
             isComposing: _isComposing,
@@ -1098,38 +1135,7 @@ class _ChatPageState extends State<ChatPage> {
           child: Column(
             children: [
               _buildMessageList(),
-              // loading icon
-              if (_isRunningFunction)
-                Container(
-                  padding: const EdgeInsets.symmetric(vertical: 8),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      SizedBox(
-                        width: 16,
-                        height: 16,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          valueColor: AlwaysStoppedAnimation<Color>(
-                            Theme.of(context).primaryColor,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Text(
-                        AppLocalizations.of(context)!.functionRunning,
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Theme.of(context)
-                              .textTheme
-                              .bodyMedium
-                              ?.color
-                              ?.withOpacity(0.7),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+              _buildFunctionRunning(),
               InputArea(
                 disabled: _isLoading,
                 isComposing: _isComposing,
