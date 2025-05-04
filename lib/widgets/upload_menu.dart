@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:chatmcp/generated/app_localizations.dart';
+import 'package:chatmcp/widgets/ink_icon.dart';
 
 class UploadMenu extends StatelessWidget {
   final bool disabled;
@@ -65,11 +66,12 @@ class UploadMenu extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var t = AppLocalizations.of(context)!;
-    return IconButton(
-      icon: const Icon(Icons.attach_file),
-      onPressed: disabled ? null : () => _showUploadOptions(context),
-      tooltip: t.uploadFile,
+    return InkIcon(
+      icon: CupertinoIcons.paperclip,
+      onTap: disabled ? null : () => _showUploadOptions(context),
+      disabled: disabled,
+      hoverColor: Theme.of(context).hoverColor,
+      tooltip: AppLocalizations.of(context)!.uploadFile,
     );
   }
 }

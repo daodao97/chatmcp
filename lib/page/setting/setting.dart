@@ -43,7 +43,7 @@ class _SettingPageState extends State<SettingPage> {
           bottom: TabBar(
             indicatorSize: TabBarIndicatorSize.tab,
             indicatorWeight: 5,
-            labelStyle: const TextStyle(fontSize: 14),
+            labelStyle: const TextStyle(fontSize: 12),
             tabs: tabs
                 .map((tab) => Tab(
                       icon: Icon(tab.icon),

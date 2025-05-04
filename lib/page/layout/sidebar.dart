@@ -1,3 +1,4 @@
+import 'package:chatmcp/widgets/ink_icon.dart';
 import 'package:flutter/material.dart';
 import '../setting/setting.dart';
 import 'package:provider/provider.dart';
@@ -22,12 +23,11 @@ class SidebarPanel extends StatelessWidget {
             ChatHistoryList(chatProvider: chatProvider),
             if (kIsDesktop) ...[
               Positioned(
-                top: 0,
-                right: 0,
-                child: IconButton(
-                  iconSize: 18,
-                  icon: const Icon(CupertinoIcons.sidebar_left),
-                  onPressed: onToggle,
+                top: 8,
+                right: 8,
+                child: InkIcon(
+                  icon: CupertinoIcons.sidebar_left,
+                  onTap: onToggle,
                 ),
               ),
             ],
@@ -203,14 +203,17 @@ class SidebarToolbar extends StatelessWidget {
       left: 0,
       right: 0,
       child: Container(
-        height: 40,
+        // height: 40,
         padding: const EdgeInsets.symmetric(horizontal: 4),
         child: Row(
           children: [
             _buildSettingsButton(context),
+            const Gap(size: 4),
             _buildSelectModeButton(),
             if (chatProvider.isSelectMode) ...[
+              const Gap(size: 4),
               _buildSelectAllButton(),
+              const Gap(size: 4),
               _buildDeleteButton(context),
             ],
           ],
@@ -220,20 +223,18 @@ class SidebarToolbar extends StatelessWidget {
   }
 
   Widget _buildSettingsButton(BuildContext context) {
-    return IconButton(
-      iconSize: 18,
-      icon: const Icon(CupertinoIcons.settings),
-      onPressed: () => _showSettingsDialog(context),
+    return InkIcon(
+      icon: CupertinoIcons.settings,
+      onTap: () => _showSettingsDialog(context),
     );
   }
 
   Widget _buildSelectModeButton() {
-    return IconButton(
-      iconSize: 18,
-      icon: Icon(chatProvider.isSelectMode
+    return InkIcon(
+      icon: chatProvider.isSelectMode
           ? CupertinoIcons.clear
-          : CupertinoIcons.trash),
-      onPressed: () {
+          : CupertinoIcons.trash,
+      onTap: () {
         if (chatProvider.isSelectMode) {
           chatProvider.exitSelectMode();
         } else {
@@ -244,17 +245,16 @@ class SidebarToolbar extends StatelessWidget {
   }
 
   Widget _buildSelectAllButton() {
-    return IconButton(
-      iconSize: 18,
-      icon: const Icon(CupertinoIcons.checkmark_square),
-      onPressed: () => chatProvider.toggleSelectAll(),
+    return InkIcon(
+      icon: CupertinoIcons.checkmark_square,
+      onTap: () => chatProvider.toggleSelectAll(),
     );
   }
 
   Widget _buildDeleteButton(BuildContext context) {
     var t = AppLocalizations.of(context)!;
-    return ElevatedButton(
-      onPressed: chatProvider.selectedChats.isNotEmpty
+    return InkWell(
+      onTap: chatProvider.selectedChats.isNotEmpty
           ? () => _showDeleteConfirmDialog(context)
           : null,
       child: CText(
@@ -279,10 +279,10 @@ class SidebarToolbar extends StatelessWidget {
         context: context,
         builder: (context) => Dialog(
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(14.0),
+            borderRadius: BorderRadius.circular(8.0),
           ),
           child: ClipRRect(
-            borderRadius: BorderRadius.circular(14.0),
+            borderRadius: BorderRadius.circular(8.0),
             child: SizedBox(
               width: MediaQuery.of(context).size.width * 0.8,
               height: MediaQuery.of(context).size.height * 0.8,
@@ -301,6 +301,9 @@ class SidebarToolbar extends StatelessWidget {
       builder: (context) => AlertDialog(
         title: Text(l10n.confirmDelete),
         content: Text(l10n.confirmDeleteSelected),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8.0),
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),

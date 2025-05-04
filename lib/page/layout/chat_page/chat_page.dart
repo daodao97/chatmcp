@@ -123,6 +123,9 @@ class _ChatPageState extends State<ChatPage> {
       }
     }
 
+    // 在异步操作后检查组件是否仍然挂载
+    if (!mounted) return false;
+
     // 否则显示授权对话框
     var t = AppLocalizations.of(context)!;
     return await showDialog<bool>(
@@ -130,6 +133,9 @@ class _ChatPageState extends State<ChatPage> {
           barrierDismissible: false,
           builder: (BuildContext context) {
             return AlertDialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8.0),
+              ),
               title: Text(t.functionCallAuth),
               content: SingleChildScrollView(
                 child: ListBody(
@@ -921,6 +927,9 @@ class _ChatPageState extends State<ChatPage> {
                 const SizedBox(width: 8),
                 Text(AppLocalizations.of(context)!.error),
               ],
+            ),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8.0),
             ),
             content: SingleChildScrollView(
               child: Column(

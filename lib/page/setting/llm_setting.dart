@@ -478,6 +478,9 @@ class _KeysSettingsState extends State<KeysSettings> {
         final TextEditingController providerController =
             TextEditingController();
         return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8.0),
+          ),
           title: Text(l10n.addProvider),
           content: TextField(
             controller: providerController,
@@ -540,6 +543,9 @@ class _KeysSettingsState extends State<KeysSettings> {
       builder: (context) {
         final TextEditingController modelController = TextEditingController();
         return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8.0),
+          ),
           title: Text(l10n.addModel),
           content: TextField(
             controller: modelController,
