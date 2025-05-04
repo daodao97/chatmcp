@@ -79,29 +79,89 @@ class _McpServerState extends State<McpServer> {
                   const SizedBox(height: 16),
 
                   // 标签选择和操作按钮
-                  Row(
-                    children: [
-                      _buildFilterChip(l10n.all),
-                      const SizedBox(width: 12),
-                      _buildFilterChip(l10n.installed),
-                      const SizedBox(width: 12),
-                      _buildFilterChip("inmemory"),
-                      const Spacer(),
-                      _buildActionButton(
-                        icon: CupertinoIcons.add,
-                        tooltip: l10n.addProvider,
-                        onPressed: () {
-                          final provider = ProviderManager.mcpServerProvider;
-                          _showEditDialog(context, '', provider, null);
-                        },
-                      ),
-                      const SizedBox(width: 8),
-                      _buildActionButton(
-                        icon: CupertinoIcons.refresh,
-                        tooltip: l10n.refresh,
-                        onPressed: () => setState(() {}),
-                      ),
-                    ],
+                  LayoutBuilder(
+                    builder: (context, constraints) {
+                      // 在宽屏设备上使用Row实现两边对齐
+                      if (constraints.maxWidth > 500) {
+                        // 设定一个合理的宽度阈值
+                        return Row(
+                          children: [
+                            Wrap(
+                              spacing: 12,
+                              children: [
+                                _buildFilterChip(l10n.all),
+                                _buildFilterChip(l10n.installed),
+                                _buildFilterChip("inmemory"),
+                              ],
+                            ),
+                            const Spacer(),
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                _buildActionButton(
+                                  icon: CupertinoIcons.add,
+                                  tooltip: l10n.addProvider,
+                                  onPressed: () {
+                                    final provider =
+                                        ProviderManager.mcpServerProvider;
+                                    _showEditDialog(
+                                        context, '', provider, null);
+                                  },
+                                ),
+                                const SizedBox(width: 8),
+                                _buildActionButton(
+                                  icon: CupertinoIcons.refresh,
+                                  tooltip: l10n.refresh,
+                                  onPressed: () => setState(() {}),
+                                ),
+                              ],
+                            ),
+                          ],
+                        );
+                      } else {
+                        // 在窄屏设备上继续使用Wrap自动换行
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Wrap(
+                                  spacing: 12,
+                                  children: [
+                                    _buildFilterChip(l10n.all),
+                                    _buildFilterChip(l10n.installed),
+                                    _buildFilterChip("inmemory"),
+                                  ],
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 12),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                _buildActionButton(
+                                  icon: CupertinoIcons.add,
+                                  tooltip: l10n.addProvider,
+                                  onPressed: () {
+                                    final provider =
+                                        ProviderManager.mcpServerProvider;
+                                    _showEditDialog(
+                                        context, '', provider, null);
+                                  },
+                                ),
+                                const SizedBox(width: 8),
+                                _buildActionButton(
+                                  icon: CupertinoIcons.refresh,
+                                  tooltip: l10n.refresh,
+                                  onPressed: () => setState(() {}),
+                                ),
+                              ],
+                            ),
+                          ],
+                        );
+                      }
+                    },
                   ),
                   const SizedBox(height: 16),
 
@@ -241,21 +301,30 @@ class _McpServerState extends State<McpServer> {
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Icon(
               serverActive
                   ? CupertinoIcons.checkmark
                   : CupertinoIcons.desktopcomputer,
               color: Theme.of(context).colorScheme.primary,
+              size: 20,
             ),
             const SizedBox(width: 12),
             Expanded(
-              child: Text(
-                serverName,
-                style: TextStyle(
-                  fontWeight: FontWeight.w600,
-                  fontSize: 15,
-                  color: Theme.of(context).colorScheme.onSurface,
+              child: Center(
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    serverName,
+                    style: TextStyle(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 15,
+                      color: Theme.of(context).colorScheme.onSurface,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
+                  ),
                 ),
               ),
             ),

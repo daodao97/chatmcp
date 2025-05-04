@@ -156,7 +156,7 @@ class _CodeBlockState extends State<_CodeBlock>
               widget.code,
               language: widget.language,
               theme: widget.preConfig.theme,
-              padding: const EdgeInsets.only(top: 5),
+              padding: const EdgeInsets.all(5),
             ),
         ],
       ),
