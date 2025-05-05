@@ -18,6 +18,7 @@ import 'package:chatmcp/widgets/browser/browser.dart';
 import 'package:chatmcp/utils/event_bus.dart';
 import 'package:chatmcp/page/layout/widgets/chat_setting.dart';
 import 'package:flutter_popup/flutter_popup.dart';
+import 'package:chatmcp/widgets/upgradge.dart';
 
 class TopToolbar extends StatelessWidget {
   final bool hideSidebar;
@@ -98,6 +99,10 @@ class TopToolbar extends StatelessWidget {
                   ),
                 ),
               ),
+            UpgradeNotice(
+              showCheckUpdate: true,
+              autoCheck: false,
+            ),
             InkWell(
               onTap: () {
                 _onShowChatSetting(context);
@@ -234,9 +239,17 @@ class TopToolbar extends StatelessWidget {
                       Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
+                          Container(
+                            constraints: BoxConstraints(
+                              maxWidth: MediaQuery.of(context).size.width < 400
+                                  ? 30
+                                  : 120,
+                            ),
+                            child: UpgradeNotice(),
+                          ),
                           if (ProviderManager.chatProvider.activeChat !=
                               null) ...[
-                            Gap(size: 12),
+                            Gap(size: 8),
                             InkIcon(
                               icon: CupertinoIcons.add,
                               onTap: () {

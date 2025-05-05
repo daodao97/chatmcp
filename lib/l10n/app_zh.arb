@@ -131,5 +131,14 @@
     "serverType": "服务类型",
     "reset": "重置",
     "start": "启动",
-    "stop": "停止"
+    "stop": "停止",
+    "newVersionFound": "发现新版本 {version}",
+    "newVersionAvailable": "发现新版本",
+    "updateNow": "立即更新",
+    "updateLater": "稍后更新",
+    "ignoreThisVersion": "忽略此版本",
+    "releaseNotes": "更新内容：",
+    "openUrlFailed": "无法打开链接",
+    "checkingForUpdates": "正在检查更新...",
+    "checkUpdate": "检查更新"
 }

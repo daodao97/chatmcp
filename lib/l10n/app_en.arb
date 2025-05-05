@@ -147,5 +147,14 @@
     "serverType": "Server Type",
     "reset": "Reset",
     "start": "Start",
-    "stop": "stop"
+    "stop": "stop",
+    "newVersionFound": "New version {version} available",
+    "newVersionAvailable": "New version available",
+    "updateNow": "Update Now",
+    "updateLater": "Update Later",
+    "ignoreThisVersion": "Ignore This Version",
+    "releaseNotes": "Release Notes:",
+    "openUrlFailed": "Failed to open URL",
+    "checkingForUpdates": "Checking for updates...",
+    "checkUpdate": "Update Check"
 }

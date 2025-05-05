@@ -470,4 +470,33 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get stop => 'stop';
+
+  @override
+  String newVersionFound(Object version) {
+    return 'New version $version available';
+  }
+
+  @override
+  String get newVersionAvailable => 'New version available';
+
+  @override
+  String get updateNow => 'Update Now';
+
+  @override
+  String get updateLater => 'Update Later';
+
+  @override
+  String get ignoreThisVersion => 'Ignore This Version';
+
+  @override
+  String get releaseNotes => 'Release Notes:';
+
+  @override
+  String get openUrlFailed => 'Failed to open URL';
+
+  @override
+  String get checkingForUpdates => 'Checking for updates...';
+
+  @override
+  String get checkUpdate => 'Update Check';
 }

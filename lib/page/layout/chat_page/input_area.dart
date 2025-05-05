@@ -351,7 +351,8 @@ class _InputAreaState extends State<InputArea> {
                       ],
                     ],
                   ),
-                if (!widget.disabled)
+                if (!widget.disabled) ...[
+                  const Spacer(),
                   InkIcon(
                     icon: Icons.arrow_circle_up,
                     color: Theme.of(context).iconTheme.color,
@@ -366,7 +367,7 @@ class _InputAreaState extends State<InputArea> {
                     },
                     tooltip: "send",
                   )
-                else ...[
+                ] else ...[
                   const Spacer(),
                   InkIcon(
                     icon: CupertinoIcons.stop,

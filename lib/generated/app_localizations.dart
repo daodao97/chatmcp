@@ -976,6 +976,60 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'stop'**
   String get stop;
+
+  /// No description provided for @newVersionFound.
+  ///
+  /// In en, this message translates to:
+  /// **'New version {version} available'**
+  String newVersionFound(Object version);
+
+  /// No description provided for @newVersionAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'New version available'**
+  String get newVersionAvailable;
+
+  /// No description provided for @updateNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Update Now'**
+  String get updateNow;
+
+  /// No description provided for @updateLater.
+  ///
+  /// In en, this message translates to:
+  /// **'Update Later'**
+  String get updateLater;
+
+  /// No description provided for @ignoreThisVersion.
+  ///
+  /// In en, this message translates to:
+  /// **'Ignore This Version'**
+  String get ignoreThisVersion;
+
+  /// No description provided for @releaseNotes.
+  ///
+  /// In en, this message translates to:
+  /// **'Release Notes:'**
+  String get releaseNotes;
+
+  /// No description provided for @openUrlFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to open URL'**
+  String get openUrlFailed;
+
+  /// No description provided for @checkingForUpdates.
+  ///
+  /// In en, this message translates to:
+  /// **'Checking for updates...'**
+  String get checkingForUpdates;
+
+  /// No description provided for @checkUpdate.
+  ///
+  /// In en, this message translates to:
+  /// **'Update Check'**
+  String get checkUpdate;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

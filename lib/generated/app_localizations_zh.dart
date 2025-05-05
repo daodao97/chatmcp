@@ -470,4 +470,33 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get stop => '停止';
+
+  @override
+  String newVersionFound(Object version) {
+    return '发现新版本 $version';
+  }
+
+  @override
+  String get newVersionAvailable => '发现新版本';
+
+  @override
+  String get updateNow => '立即更新';
+
+  @override
+  String get updateLater => '稍后更新';
+
+  @override
+  String get ignoreThisVersion => '忽略此版本';
+
+  @override
+  String get releaseNotes => '更新内容：';
+
+  @override
+  String get openUrlFailed => '无法打开链接';
+
+  @override
+  String get checkingForUpdates => '正在检查更新...';
+
+  @override
+  String get checkUpdate => '检查更新';
 }
