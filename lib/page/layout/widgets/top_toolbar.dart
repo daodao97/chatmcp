@@ -207,7 +207,6 @@ class TopToolbar extends StatelessWidget {
                             if (hideSidebar && kIsDesktop)
                               InkIcon(
                                 icon: CupertinoIcons.sidebar_right,
-                                color: AppColors.getSidebarToggleIconColor(),
                                 onTap: onToggleSidebar,
                               ),
                             Flexible(

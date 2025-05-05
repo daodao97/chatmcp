@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:chatmcp/utils/color.dart';
 
 class InkIcon extends StatelessWidget {
   final IconData icon;
@@ -8,6 +9,7 @@ class InkIcon extends StatelessWidget {
   final String? tooltip;
   final Color? color;
   final double? size;
+  final String? text;
   const InkIcon({
     super.key,
     required this.icon,
@@ -17,27 +19,36 @@ class InkIcon extends StatelessWidget {
     this.tooltip,
     this.color,
     this.size = 16,
+    this.text,
   });
 
   @override
   Widget build(BuildContext context) {
-    Widget iconWidget = InkWell(
-      onTap: disabled ? null : onTap,
-      hoverColor: hoverColor ?? Colors.grey.shade200,
-      borderRadius: BorderRadius.circular(4),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
-        child: Icon(icon, size: size, color: color),
+    final Widget iconWidget = Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: disabled ? null : onTap,
+        hoverColor: hoverColor ?? AppColors.getInkIconHoverColor(context),
+        borderRadius: BorderRadius.circular(4),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+          child: Row(
+            children: [
+              Icon(icon, size: size, color: color),
+              if (text != null) Text(text!),
+            ],
+          ),
+        ),
       ),
     );
 
-    if (tooltip != null) {
-      iconWidget = Tooltip(
-        message: tooltip!,
-        child: iconWidget,
-      );
+    if (tooltip == null) {
+      return iconWidget;
     }
 
-    return iconWidget;
+    return Tooltip(
+      message: tooltip!,
+      child: iconWidget,
+    );
   }
 }

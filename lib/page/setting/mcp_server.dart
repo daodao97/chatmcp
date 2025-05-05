@@ -350,8 +350,8 @@ class _McpServerState extends State<McpServer> {
                     ? CupertinoIcons.stop
                     : CupertinoIcons.play,
                 tooltip: provider.mcpServerIsRunning(serverName)
-                    ? l10n.edit
-                    : l10n.edit,
+                    ? l10n.stop
+                    : l10n.start,
                 onPressed: () async {
                   if (provider.mcpServerIsRunning(serverName)) {
                     await provider.stopMcpServer(serverName);

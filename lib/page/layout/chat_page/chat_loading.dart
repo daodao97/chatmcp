@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:chatmcp/utils/color.dart';
 
 class ChatLoading extends StatefulWidget {
   const ChatLoading({super.key});
@@ -43,14 +44,14 @@ class _ChatLoadingState extends State<ChatLoading>
         animation: _animation,
         builder: (context, child) {
           return Padding(
-            padding: const EdgeInsets.only(left: 4),
+            padding: const EdgeInsets.only(left: 8, bottom: 8),
             child: Align(
               alignment: Alignment.centerLeft,
               child: Container(
                 width: _animation.value,
                 height: _animation.value,
                 decoration: BoxDecoration(
-                  color: Theme.of(context).primaryColor,
+                  color: AppColors.getChatLoadingColor(context),
                   shape: BoxShape.circle,
                 ),
               ),

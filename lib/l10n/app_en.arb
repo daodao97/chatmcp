@@ -145,5 +145,7 @@
     "apiUrl": "API URL",
     "selectApiStyle": "Please select API style",
     "serverType": "Server Type",
-    "reset": "Reset"
+    "reset": "Reset",
+    "start": "Start",
+    "stop": "stop"
 }

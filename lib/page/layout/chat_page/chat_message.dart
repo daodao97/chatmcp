@@ -287,11 +287,6 @@ class ChatMessageContent extends StatelessWidget {
     final messages = <Widget>[];
 
     if (message.role == MessageRole.loading) {
-      // messages.add(MessageBubble(
-      //   message: ChatMessage(content: 'xx', role: MessageRole.loading),
-      //   position: position,
-      //   useTransparentBackground: useTransparentBackground,
-      // ));
       messages.add(const ChatLoading());
     }
 

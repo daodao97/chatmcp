@@ -117,7 +117,7 @@ class AppColors {
   static Color getMessageBubbleBackgroundColor(
       BuildContext context, bool isUserMessage) {
     return getThemeColor(context,
-        lightColor: AppColors.grey[100], darkColor: AppColors.grey[800]);
+        lightColor: AppColors.grey[100], darkColor: Colors.white12);
   }
 
   // 工具调用和工具结果文本颜色
@@ -267,5 +267,60 @@ class AppColors {
   // 链接颜色
   static Color getLinkColor() {
     return Colors.blue;
+  }
+
+  // 输入区域相关颜色
+  static Color getInputAreaBackgroundColor(BuildContext context) {
+    return getThemeColor(context,
+        lightColor: Colors.white, darkColor: Colors.grey.shade900);
+  }
+
+  static Color getInputAreaBorderColor(BuildContext context) {
+    return getThemeColor(context,
+        lightColor: Colors.grey.shade300, darkColor: Colors.grey.shade700);
+  }
+
+  static Color getInputAreaFileItemBackgroundColor(BuildContext context) {
+    return getThemeColor(context,
+        lightColor: Colors.grey.shade200,
+        darkColor: Colors.grey.shade800.withAlpha(100));
+  }
+
+  static Color getInputAreaHintTextColor(BuildContext context) {
+    return getThemeColor(context,
+        lightColor: Colors.grey.shade600, darkColor: Colors.grey.shade400);
+  }
+
+  static Color getInputAreaTextColor(BuildContext context) {
+    return getThemeColor(context,
+        lightColor: Colors.black87, darkColor: Colors.white);
+  }
+
+  static Color getInputAreaIconColor(BuildContext context) {
+    return getThemeColor(context,
+        lightColor: Colors.grey.shade600, darkColor: Colors.grey.shade400);
+  }
+
+  static Color getInputAreaFileIconColor(BuildContext context) {
+    return Theme.of(context).primaryColor.withOpacity(0.8);
+  }
+
+  // InkIcon相关颜色
+  static Color getInkIconHoverColor(BuildContext context) {
+    return getThemeColor(context,
+        lightColor: Colors.grey.shade200, darkColor: Colors.grey.shade700);
+  }
+
+  // 聊天加载相关颜色
+  static Color getChatLoadingColor(BuildContext context) {
+    return getThemeColor(context,
+        lightColor: Theme.of(context).primaryColor,
+        darkColor: Colors.white.withAlpha(50));
+  }
+
+  // 输入区域光标颜色
+  static Color getInputAreaCursorColor(BuildContext context) {
+    return getThemeColor(context,
+        lightColor: Colors.grey.shade400, darkColor: Colors.grey.shade400);
   }
 }

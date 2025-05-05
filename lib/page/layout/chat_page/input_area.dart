@@ -9,6 +9,7 @@ import 'package:chatmcp/widgets/upload_menu.dart';
 import 'package:chatmcp/generated/app_localizations.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:chatmcp/widgets/ink_icon.dart';
+import 'package:chatmcp/utils/color.dart';
 
 class SubmitData {
   final String text;
@@ -126,11 +127,10 @@ class _InputAreaState extends State<InputArea> {
     return Container(
       decoration: BoxDecoration(
         // color: Theme.of(context).cardColor,
-        color: isDarkMode ? Colors.grey.shade900 : Colors.white,
+        color: AppColors.getInputAreaBackgroundColor(context),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-            color: isDarkMode ? Colors.grey.shade700 : Colors.grey.shade300,
-            width: 1),
+            color: AppColors.getInputAreaBorderColor(context), width: 1),
       ),
       margin: const EdgeInsets.only(
           left: 12.0, right: 12.0, top: 2.0, bottom: 12.0),
@@ -160,14 +160,11 @@ class _InputAreaState extends State<InputArea> {
                       padding: const EdgeInsets.only(right: 8.0),
                       child: Container(
                         decoration: BoxDecoration(
-                          color: isDarkMode
-                              ? Colors.grey.shade800.withOpacity(0.7)
-                              : Colors.grey.shade200,
+                          color: AppColors.getInputAreaFileItemBackgroundColor(
+                              context),
                           borderRadius: BorderRadius.circular(8),
                           border: Border.all(
-                            color: isDarkMode
-                                ? Colors.grey.shade700
-                                : Colors.grey.shade300,
+                            color: AppColors.getInputAreaBorderColor(context),
                             width: 1,
                           ),
                         ),
@@ -183,9 +180,8 @@ class _InputAreaState extends State<InputArea> {
                                         ? Icons.image
                                         : Icons.insert_drive_file,
                                     size: 16,
-                                    color: Theme.of(context)
-                                        .primaryColor
-                                        .withOpacity(0.8),
+                                    color: AppColors.getInputAreaFileIconColor(
+                                        context),
                                   ),
                                   const SizedBox(width: 6),
                                   Text(
@@ -216,10 +212,8 @@ class _InputAreaState extends State<InputArea> {
                                   child: Icon(
                                     Icons.close,
                                     size: 14,
-                                    color: Theme.of(context)
-                                        .iconTheme
-                                        .color
-                                        ?.withOpacity(0.7),
+                                    color: AppColors.getInputAreaIconColor(
+                                        context),
                                   ),
                                 ),
                               ),
@@ -237,7 +231,7 @@ class _InputAreaState extends State<InputArea> {
                 const EdgeInsets.symmetric(horizontal: 12.0, vertical: 6.0),
             child: Container(
               decoration: BoxDecoration(
-                color: isDarkMode ? Colors.grey.shade900 : Colors.white,
+                color: AppColors.getInputAreaBackgroundColor(context),
               ),
               child: Focus(
                 onKeyEvent: (node, event) {
@@ -295,20 +289,17 @@ class _InputAreaState extends State<InputArea> {
                   keyboardType: TextInputType.multiline,
                   style: TextStyle(
                     fontSize: 14.0,
-                    // color: Theme.of(context).textTheme.bodyLarge?.color,
-                    color: isDarkMode ? Colors.white : Colors.black87,
+                    color: AppColors.getInputAreaTextColor(context),
                   ),
                   scrollPhysics: const BouncingScrollPhysics(),
                   decoration: InputDecoration(
                     hintText: l10n.askMeAnything,
                     hintStyle: TextStyle(
                       fontSize: 14.0,
-                      color: isDarkMode
-                          ? Colors.grey.shade400
-                          : Colors.grey.shade600,
+                      color: AppColors.getInputAreaHintTextColor(context),
                     ),
                     filled: true,
-                    fillColor: isDarkMode ? Colors.grey.shade900 : Colors.white,
+                    fillColor: AppColors.getInputAreaBackgroundColor(context),
                     hoverColor: Colors.transparent,
                     border: InputBorder.none,
                     contentPadding: const EdgeInsets.symmetric(
@@ -317,8 +308,8 @@ class _InputAreaState extends State<InputArea> {
                     ),
                     isDense: true,
                   ),
-                  cursorColor: Theme.of(context).primaryColor,
-                  mouseCursor: MaterialStateMouseCursor.textable,
+                  cursorColor: AppColors.getInputAreaCursorColor(context),
+                  mouseCursor: WidgetStateMouseCursor.textable,
                 ),
               ),
             ),
@@ -365,7 +356,10 @@ class _InputAreaState extends State<InputArea> {
                     icon: Icons.arrow_circle_up,
                     color: Theme.of(context).iconTheme.color,
                     onTap: () {
-                      if (widget.disabled) return;
+                      if (widget.disabled ||
+                          textController.text.trim().isEmpty) {
+                        return;
+                      }
                       widget.onSubmitted(
                           SubmitData(textController.text, _selectedFiles));
                       _afterSubmitted();

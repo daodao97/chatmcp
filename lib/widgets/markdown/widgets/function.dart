@@ -1,5 +1,6 @@
 import 'package:chatmcp/components/widgets/base.dart';
 import 'package:flutter/material.dart';
+import 'dart:convert';
 
 import 'package:markdown_widget/markdown_widget.dart';
 import 'package:chatmcp/utils/color.dart';
@@ -91,7 +92,12 @@ class _FunctionWidgetState extends State<FunctionWidget> {
                 color: AppColors.getPlayButtonColor(context),
               ),
               onPressed: () {
-                emit(RunFunctionEvent(widget.attributes['name'] ?? '', {}));
+                final content = widget.attributes['content'] ?? '';
+                final arguments = content.isEmpty
+                    ? <String, dynamic>{}
+                    : (jsonDecode(content) as Map).cast<String, dynamic>();
+                emit(RunFunctionEvent(
+                    widget.attributes['name'] ?? '', arguments));
               },
             ),
         ],

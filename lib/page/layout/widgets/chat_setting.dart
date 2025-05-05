@@ -293,12 +293,23 @@ class ChatSetting extends StatelessWidget {
   }) {
     final currentSettings = provider.modelSetting;
     provider.updateModelSettings(
-      temperature: temperature ?? currentSettings.temperature,
+      temperature: temperature != null
+          ? _roundToOneDecimal(temperature)
+          : currentSettings.temperature,
       maxTokens: maxTokens,
-      topP: topP ?? currentSettings.topP,
-      frequencyPenalty: frequencyPenalty ?? currentSettings.frequencyPenalty,
-      presencePenalty: presencePenalty ?? currentSettings.presencePenalty,
+      topP: topP != null ? _roundToOneDecimal(topP) : currentSettings.topP,
+      frequencyPenalty: frequencyPenalty != null
+          ? _roundToOneDecimal(frequencyPenalty)
+          : currentSettings.frequencyPenalty,
+      presencePenalty: presencePenalty != null
+          ? _roundToOneDecimal(presencePenalty)
+          : currentSettings.presencePenalty,
     );
+  }
+
+  /// 将double值四舍五入到小数点后一位
+  double _roundToOneDecimal(double value) {
+    return (value * 10).round() / 10;
   }
 
   Future<void> _resetModelSettings(SettingsProvider provider) async {

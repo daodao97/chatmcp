@@ -1,5 +1,6 @@
 import 'package:chatmcp/components/widgets/base.dart';
 import 'package:chatmcp/utils/color.dart';
+import 'package:chatmcp/widgets/ink_icon.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -149,33 +150,15 @@ class _McpToolsState extends State<McpTools> {
                             ),
                           ),
           ),
-          child: MouseRegion(
-            cursor: SystemMouseCursors.click,
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Consumer<ServerStateProvider>(
-                  builder: (context, stateProvider, _) {
-                    return Row(
-                      children: [
-                        Icon(
-                          CupertinoIcons.hammer,
-                          size: 14,
-                          color: Theme.of(context).iconTheme.color,
-                        ),
-                        if (stateProvider.enabledCount > 0) ...[
-                          const Gap(size: 4),
-                          Text(
-                            '${stateProvider.enabledCount}',
-                            style: TextStyle(fontSize: 12),
-                          ),
-                        ],
-                      ],
-                    );
-                  },
-                ),
-              ],
-            ),
+          child: Consumer<ServerStateProvider>(
+            builder: (context, stateProvider, _) {
+              return InkIcon(
+                icon: CupertinoIcons.hammer,
+                text: stateProvider.enabledCount > 0
+                    ? ' ${stateProvider.enabledCount}'
+                    : null,
+              );
+            },
           ),
         );
       },

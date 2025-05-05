@@ -124,7 +124,7 @@ class Markit extends StatelessWidget {
             ArtifactAntArtifactBlockSyntax(),
             FunctionBlockSyntax(),
             FunctionResultBlockSyntax(),
-            // FencedCodeBlockSyntax(),
+            FencedCodeBlockSyntax(),
           ],
         ),
       ),

@@ -464,4 +464,10 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get reset => '重置';
+
+  @override
+  String get start => '启动';
+
+  @override
+  String get stop => '停止';
 }

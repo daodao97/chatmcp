@@ -70,10 +70,10 @@ class _CodeBlock extends StatefulWidget {
   final String code;
   final String language;
   final bool isClosed;
-
   final PreConfig preConfig;
   final WidgetVisitor visitor;
   final List<String> splitContents;
+
   const _CodeBlock({
     required this.code,
     required this.language,
@@ -89,81 +89,112 @@ class _CodeBlock extends StatefulWidget {
 
 class _CodeBlockState extends State<_CodeBlock>
     with AutomaticKeepAliveClientMixin {
+  // 是否显示预览
   bool _isPreviewVisible = false;
+  // 是否支持预览
   bool _isSupportPreview = false;
-  Widget? previewWidget;
+  // 预览组件
+  Widget? _previewWidget;
+
+  // 支持预览的语言列表
+  static const List<String> _supportedLanguages = ['mermaid', 'html', 'svg'];
+  // HTML相关语言
+  static const List<String> _htmlLanguages = ['html', 'svg'];
+
   @override
   bool get wantKeepAlive => true;
-
-  final List<String> _supportedLanguages = ['mermaid', 'html', 'svg'];
-
-  final List<String> _htmlLanguages = ['html', 'svg'];
 
   @override
   void initState() {
     super.initState();
-    bool supportPreview = false;
-    if (_supportedLanguages.contains(widget.language)) {
-      supportPreview = true;
-      // 在初始化时创建预览组件
-      previewWidget = _buildPreviewWidget();
+    _initializePreviewState();
+  }
+
+  /// 初始化预览状态
+  void _initializePreviewState() {
+    final bool supportPreview = _supportedLanguages.contains(widget.language);
+
+    if (supportPreview) {
+      _previewWidget = _buildPreviewWidget();
     }
+
+    print('widget.isClosed: ${widget.isClosed}');
 
     setState(() {
       _isSupportPreview = supportPreview;
-      if (supportPreview && widget.isClosed) {
-        _isPreviewVisible = true;
-        print('widget.isClosed: ${widget.isClosed}');
-      }
+      // 如果支持预览且代码块已完成，则默认显示预览
+      _isPreviewVisible = supportPreview && widget.isClosed;
     });
   }
 
+  /// 构建预览组件
   Widget? _buildPreviewWidget() {
     if (widget.language == 'mermaid') {
       return MermaidDiagramView(
-        key: ValueKey(widget.code), // 使用基于内容的Key
+        key: ValueKey(widget.code),
         code: widget.code,
       );
     } else if (_htmlLanguages.contains(widget.language)) {
       return HtmlView(
-        key: ValueKey(widget.code), // 使用基于内容的Key
+        key: ValueKey(widget.code),
         html: widget.code,
       );
     }
     return null;
   }
 
+  /// 切换预览/代码视图
+  void _togglePreviewVisibility() {
+    setState(() {
+      _isPreviewVisible = !_isPreviewVisible;
+    });
+  }
+
+  /// 复制代码到剪贴板
+  void _copyCodeToClipboard(BuildContext context, AppLocalizations t) {
+    Clipboard.setData(ClipboardData(text: widget.code));
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(t.codeCopiedToClipboard),
+        duration: const Duration(seconds: 2),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    var t = AppLocalizations.of(context)!;
+    final t = AppLocalizations.of(context)!;
     super.build(context);
+
     return Container(
       width: double.infinity,
       decoration: widget.preConfig.decoration,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          buildToolBar(t),
-          // if (_isSupportPreview)
-          //   Offstage(
-          //     offstage: !_isPreviewVisible,
-          //     child: previewWidget!,
-          //   ),
-          if (_isSupportPreview && _isPreviewVisible) previewWidget!,
-          // if (!_isPreviewVisible) ...buildCodeBlockList(),
-          if (!_isPreviewVisible)
-            HighlightView(
-              widget.code,
-              language: widget.language,
-              theme: widget.preConfig.theme,
-              padding: const EdgeInsets.all(5),
-            ),
+          _buildToolBar(t),
+          _buildContentSection(),
         ],
       ),
     );
   }
 
-  Widget buildToolBar(AppLocalizations t) {
+  /// 构建内容区域（代码或预览）
+  Widget _buildContentSection() {
+    if (_isSupportPreview && _isPreviewVisible && _previewWidget != null) {
+      return _previewWidget!;
+    } else {
+      return HighlightView(
+        widget.code,
+        language: widget.language,
+        theme: widget.preConfig.theme,
+        padding: const EdgeInsets.all(5),
+      );
+    }
+  }
+
+  /// 构建工具栏
+  Widget _buildToolBar(AppLocalizations t) {
     return Container(
       height: 30,
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 0),
@@ -175,63 +206,65 @@ class _CodeBlockState extends State<_CodeBlock>
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Text(
-            widget.language.isEmpty ? 'text' : widget.language,
-            style: TextStyle(
-              color: AppColors.getCodeBlockLanguageTextColor(context),
-              fontSize: 12,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
+          _buildLanguageLabel(),
           const Spacer(),
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              GestureDetector(
-                child: const Icon(Icons.copy, size: 14),
-                onTap: () {
-                  Clipboard.setData(ClipboardData(text: widget.code));
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(t.codeCopiedToClipboard),
-                      duration: const Duration(seconds: 2),
-                    ),
-                  );
-                },
-              ),
-              if (_isSupportPreview) ...[
-                Gap(size: 8),
-                TextButton(
-                  style: TextButton.styleFrom(
-                    minimumSize: Size(20, 20),
-                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                    backgroundColor:
-                        AppColors.getCodePreviewButtonBackgroundColor(context),
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 8, vertical: 0),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(11),
-                    ),
-                  ),
-                  onPressed: () {
-                    setState(() {
-                      _isPreviewVisible = !_isPreviewVisible;
-                    });
-                  },
-                  child: Text(
-                    _isPreviewVisible ? 'Code' : 'Preview',
-                    style: const TextStyle(fontSize: 9, height: 1),
-                  ),
-                ),
-              ]
-            ],
-          ),
+          _buildToolbarActions(t),
         ],
       ),
     );
   }
 
+  /// 构建语言标签
+  Widget _buildLanguageLabel() {
+    return Text(
+      widget.language.isEmpty ? 'text' : widget.language,
+      style: TextStyle(
+        color: AppColors.getCodeBlockLanguageTextColor(context),
+        fontSize: 12,
+        fontWeight: FontWeight.bold,
+      ),
+    );
+  }
+
+  /// 构建工具栏操作按钮
+  Widget _buildToolbarActions(AppLocalizations t) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        GestureDetector(
+          child: const Icon(Icons.copy, size: 14),
+          onTap: () => _copyCodeToClipboard(context, t),
+        ),
+        if (_isSupportPreview) ...[
+          Gap(size: 8),
+          _buildPreviewToggleButton(),
+        ]
+      ],
+    );
+  }
+
+  /// 构建预览切换按钮
+  Widget _buildPreviewToggleButton() {
+    return TextButton(
+      style: TextButton.styleFrom(
+        minimumSize: Size(20, 20),
+        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+        backgroundColor: AppColors.getCodePreviewButtonBackgroundColor(context),
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 0),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(11),
+        ),
+      ),
+      onPressed: _togglePreviewVisibility,
+      child: Text(
+        _isPreviewVisible ? 'Code' : 'Preview',
+        style: const TextStyle(fontSize: 9, height: 1),
+      ),
+    );
+  }
+
+  /// 构建代码块列表
   List<Widget> buildCodeBlockList() {
     return List.generate(widget.splitContents.length, (index) {
       final currentContent = widget.splitContents[index];

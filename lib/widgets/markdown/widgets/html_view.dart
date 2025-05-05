@@ -16,7 +16,7 @@ class HtmlView extends StatefulWidget {
 }
 
 class _HtmlViewState extends State<HtmlView> {
-  double _height = 100;
+  double _height = 300;
   InAppWebViewController? controller;
   bool _hasError = false;
   int _retryCount = 0;
