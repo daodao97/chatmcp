@@ -15,7 +15,7 @@ Future<McpClient?> initializeMcpServer(
   // Create appropriate client based on configuration
   McpClient mcpClient;
 
-  // 首先检查类型字段
+  // First check the type field
   if (serverConfig.type.isNotEmpty) {
     switch (serverConfig.type) {
       case 'sse':
@@ -37,7 +37,7 @@ Future<McpClient?> initializeMcpServer(
         mcpClient = InMemoryClient(server: memoryServer);
         break;
       default:
-        // 降级为基于命令的逻辑
+        // Fallback to the command-based logic
         if (serverConfig.command.startsWith('http')) {
           mcpClient = SSEClient(serverConfig: serverConfig);
         } else {
@@ -45,7 +45,7 @@ Future<McpClient?> initializeMcpServer(
         }
     }
   } else {
-    // 降级为原来的逻辑
+    // Fallback to the original logic
     if (serverConfig.command.startsWith('http')) {
       mcpClient = SSEClient(serverConfig: serverConfig);
     } else {
@@ -68,7 +68,7 @@ Future<bool> verifyMcpServer(Map<String, dynamic> mcpServerConfig) async {
 
   McpClient mcpClient;
 
-  // 首先检查类型字段
+  // First check the type field
   if (serverConfig.type != null && serverConfig.type.isNotEmpty) {
     switch (serverConfig.type) {
       case 'sse':
@@ -81,7 +81,7 @@ Future<bool> verifyMcpServer(Map<String, dynamic> mcpServerConfig) async {
         mcpClient = StdioClient(serverConfig: serverConfig);
         break;
       default:
-        // 降级为基于命令的逻辑
+        // Fallback to the command-based logic
         if (serverConfig.command.startsWith('http')) {
           mcpClient = SSEClient(serverConfig: serverConfig);
         } else {
@@ -89,7 +89,7 @@ Future<bool> verifyMcpServer(Map<String, dynamic> mcpServerConfig) async {
         }
     }
   } else {
-    // 降级为原来的逻辑
+    // Fallback to the original logic
     if (serverConfig.command.startsWith('http')) {
       mcpClient = SSEClient(serverConfig: serverConfig);
     } else {
