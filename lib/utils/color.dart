@@ -47,7 +47,7 @@ class AppColors {
     return getThemeColor(
       context,
       lightColor: Colors.grey[200],
-      darkColor: Colors.white12,
+      darkColor: Colors.grey[900],
     );
   }
 

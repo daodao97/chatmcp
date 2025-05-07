@@ -959,6 +959,18 @@ class _McpServerState extends State<McpServer> {
                   if (dialogContext.mounted) {
                     Navigator.pop(dialogContext, true);
                   }
+
+                  // if server is running, restart it
+                  if (provider.mcpServerIsRunning(saveServerName)) {
+                    await provider.stopMcpServer(saveServerName);
+                    setState(() {
+                      _serverLoading[serverName] = true;
+                    });
+                    await provider.startMcpServer(saveServerName);
+                    setState(() {
+                      _serverLoading[serverName] = false;
+                    });
+                  }
                 },
                 style: TextButton.styleFrom(
                   foregroundColor: Theme.of(context).colorScheme.primary,

@@ -228,8 +228,8 @@ class _ModelSelectorPopupState extends State<ModelSelectorPopup> {
 
     return CustomPopup(
       showArrow: true,
-      arrowColor: AppColors.getLayoutBackgroundColor(context),
-      backgroundColor: AppColors.getLayoutBackgroundColor(context),
+      arrowColor: AppColors.getSidebarBackgroundColor(context),
+      backgroundColor: AppColors.getSidebarBackgroundColor(context),
       content: StatefulBuilder(
         builder: (BuildContext context, StateSetter popupSetState) {
           return Container(

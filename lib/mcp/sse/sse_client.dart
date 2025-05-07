@@ -281,7 +281,14 @@ class SSEClient implements McpClient {
         } else {
           // 记录成功响应
           if (response.body.isNotEmpty) {
-            Logger.root.info('HTTP response content: ${response.body}');
+            try {
+              // 使用utf8解码确保中文正确显示
+              Logger.root.info(
+                  'HTTP response content: ${utf8.decode(response.bodyBytes)}');
+            } catch (e) {
+              // 如果解码失败，回退到原始方式
+              Logger.root.info('HTTP response content: ${response.body}');
+            }
           }
         }
       } catch (e, stack) {
