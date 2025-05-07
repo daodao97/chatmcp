@@ -37,7 +37,7 @@ class _TabsState extends State<Tabs> {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        // 左侧选项卡列表
+        // Left option card list
         SizedBox(
           width: 200,
           child: ListView.builder(
@@ -69,7 +69,7 @@ class _TabsState extends State<Tabs> {
             },
           ),
         ),
-        // 右侧配置内容
+        // Right configuration content
         Expanded(
           child: widget.tabs[_selectedIndex].child ?? Container(),
         ),

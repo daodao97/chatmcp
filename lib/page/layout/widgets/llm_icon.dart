@@ -42,7 +42,7 @@ class ColorAwareSvg extends StatelessWidget {
   final double size;
   final Color color;
 
-  // 保存检测结果的静态缓存，避免重复检测
+  // Save the detection result static cache to avoid repeated detection
   static final Map<String, bool> _colorCache = {};
 
   const ColorAwareSvg({
@@ -52,30 +52,30 @@ class ColorAwareSvg extends StatelessWidget {
     required this.color,
   });
 
-  // 检测SVG是否包含非黑白颜色
+  // Detect if the SVG contains non-black and white colors
   Future<bool> _detectSvgHasColors(BuildContext context) async {
-    // 如果缓存中有结果，直接返回
+    // If the result is cached, return directly
     if (_colorCache.containsKey(assetName)) {
       return _colorCache[assetName]!;
     }
 
     try {
-      // 加载SVG文件内容
+      // Load the SVG file content
       final String svgString = await rootBundle.loadString(assetName);
 
-      // 检查是否包含颜色相关属性（简化版）
+      // Check if it contains color-related properties (simplified version)
       bool hasColor = false;
 
-      // 检查是否包含除了黑白之外的颜色
+      // Check if it contains colors other than black and white
       if (svgString.contains('fill="#') || svgString.contains('stroke="#')) {
-        // 排除纯黑色 (#000000) 和纯白色 (#FFFFFF)
+        // Exclude pure black (#000000) and pure white (#FFFFFF)
         hasColor = !svgString.contains('fill="#000000"') &&
             !svgString.contains('fill="#ffffff"') &&
             !svgString.contains('stroke="#000000"') &&
             !svgString.contains('stroke="#ffffff"');
       }
 
-      // 检查是否包含 rgb/rgba/hsl 颜色
+      // Check if it contains rgb/rgba/hsl colors
       if (!hasColor) {
         hasColor = svgString.contains('fill="rgb') ||
             svgString.contains('stroke="rgb') ||
@@ -86,7 +86,7 @@ class ColorAwareSvg extends StatelessWidget {
       _colorCache[assetName] = hasColor;
       return hasColor;
     } catch (e) {
-      // 出错时假设没有颜色
+      // When an error occurs, assume there is no color
       _colorCache[assetName] = false;
       return false;
     }
@@ -95,10 +95,10 @@ class ColorAwareSvg extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<bool>(
-      // 检测SVG是否有自定义颜色
+      // Detect if the SVG has custom colors
       future: _detectSvgHasColors(context),
       builder: (context, snapshot) {
-        // 加载中显示占位图
+        // Show placeholder when loading
         if (!snapshot.hasData) {
           return SizedBox(
             width: size,
@@ -107,7 +107,7 @@ class ColorAwareSvg extends StatelessWidget {
           );
         }
 
-        // 根据检测结果决定是否应用颜色滤镜
+        // Determine whether to apply color filter based on detection results
         final hasOwnColors = snapshot.data ?? false;
         return SvgPicture.asset(
           assetName,
@@ -117,7 +117,7 @@ class ColorAwareSvg extends StatelessWidget {
             CupertinoIcons.cloud,
             size: size,
           ),
-          // 如果SVG有自己的颜色，则不应用colorFilter
+          // If the SVG has its own colors, do not apply colorFilter
           colorFilter:
               hasOwnColors ? null : ColorFilter.mode(color, BlendMode.srcIn),
         );

@@ -13,7 +13,7 @@ import 'chat_message_action.dart';
 import 'package:chatmcp/generated/app_localizations.dart';
 import 'chat_loading.dart';
 
-// 文件附件组件
+// File attachment component
 class FileAttachment extends StatelessWidget {
   final String path;
   final String name;
@@ -99,7 +99,7 @@ class FileAttachment extends StatelessWidget {
   }
 }
 
-// 移动端长按菜单
+// Mobile long press menu
 class MessageLongPressMenu extends StatelessWidget {
   final ChatMessage message;
   final Function(ChatMessage) onRetry;

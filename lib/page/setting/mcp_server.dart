@@ -25,7 +25,7 @@ class _McpServerState extends State<McpServer> {
   int _refreshCounter = 0;
   Map<String, bool> _serverLoading = {};
 
-  // 验证URL是否合法
+  // Validate URL
   bool isValidUrl(String urlString) {
     try {
       final uri = Uri.parse(urlString);
@@ -53,7 +53,7 @@ class _McpServerState extends State<McpServer> {
               child: Column(
                 children: [
                   const SizedBox(height: 20),
-                  // 搜索框
+                  // Search box
                   Card(
                     elevation: 0,
                     color: Theme.of(context).colorScheme.surface,
@@ -88,12 +88,12 @@ class _McpServerState extends State<McpServer> {
                   ),
                   const SizedBox(height: 16),
 
-                  // 标签选择和操作按钮
+                  // Label selection and operation buttons
                   LayoutBuilder(
                     builder: (context, constraints) {
-                      // 在宽屏设备上使用Row实现两边对齐
+                      // Use Row to align both sides on wide screens
                       if (constraints.maxWidth > 500) {
-                        // 设定一个合理的宽度阈值
+                        // Set a reasonable width threshold
                         return Row(
                           children: [
                             Wrap(
@@ -129,7 +129,7 @@ class _McpServerState extends State<McpServer> {
                           ],
                         );
                       } else {
-                        // 在窄屏设备上继续使用Wrap自动换行
+                        // Continue using Wrap to automatically wrap on narrow screens
                         return Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -175,7 +175,7 @@ class _McpServerState extends State<McpServer> {
                   ),
                   const SizedBox(height: 16),
 
-                  // 服务器列表
+                  // Server list
                   Expanded(
                     child: FutureBuilder<Map<String, dynamic>>(
                       future: (_selectedTab == l10n.all

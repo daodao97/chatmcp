@@ -30,17 +30,17 @@ class ChatPage extends StatefulWidget {
 }
 
 class _ChatPageState extends State<ChatPage> {
-  // 状态变量
+  // Variable state
   bool _showCodePreview = false;
   Chat? _chat;
   List<ChatMessage> _messages = [];
-  bool _isComposing = false; // 是否正在输入
+  bool _isComposing = false; // Whether typing
   BaseLLMClient? _llmClient;
   String _currentResponse = '';
-  bool _isLoading = false; // 是否正在加载
-  String _parentMessageId = ''; // 父消息ID
-  bool _isCancelled = false; // 是否取消
-  bool _isWating = false; // 是否正在补全
+  bool _isLoading = false; // Whether loading
+  String _parentMessageId = ''; // Parent message ID
+  bool _isCancelled = false; // Whether cancelled
+  bool _isWating = false; // Whether waiting
 
   WidgetsToImageController toImagecontroller = WidgetsToImageController();
   // to save image bytes of widget
@@ -80,7 +80,7 @@ class _ChatPageState extends State<ChatPage> {
     super.dispose();
   }
 
-  // 初始化相关方法
+  // Initialize related methods
   void _initializeState() {
     _initializeLLMClient();
     _addListeners();
@@ -93,7 +93,7 @@ class _ChatPageState extends State<ChatPage> {
       _runFunctionEvents.add(event);
     });
 
-    // 显示授权对话框
+    // Show authorization dialog
     // if (mounted) {
     //   await _showFunctionApprovalDialog(event);
     // }
@@ -104,7 +104,7 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   Future<bool> _showFunctionApprovalDialog(RunFunctionEvent event) async {
-    // 检查工具名称的前缀以确定是哪个服务器的工具
+    // Check the prefix of the tool name to determine which server's tool
     final clientName =
         _findClientName(ProviderManager.mcpServerProvider.tools, event.name);
     if (clientName == null) return false;
@@ -117,16 +117,16 @@ class _ChatPageState extends State<ChatPage> {
       final config = servers[clientName] as Map<String, dynamic>? ?? {};
       final autoApprove = config['auto_approve'] as bool? ?? false;
 
-      // 如果设置了自动批准，直接返回true
+      // If auto-approval is set, return true directly
       if (autoApprove) {
         return true;
       }
     }
 
-    // 在异步操作后检查组件是否仍然挂载
+    // Check if the component is still mounted after the asynchronous operation
     if (!mounted) return false;
 
-    // 否则显示授权对话框
+    // Otherwise, show the authorization dialog
     var t = AppLocalizations.of(context)!;
     return await showDialog<bool>(
           context: context,
@@ -330,7 +330,7 @@ class _ChatPageState extends State<ChatPage> {
     return treeMessages;
   }
 
-  // 消息处理相关方法
+  // Message processing related methods
   Future<void> _initializeHistoryMessages() async {
     final activeChat = ProviderManager.chatProvider.activeChat;
     setState(() {
@@ -347,16 +347,16 @@ class _ChatPageState extends State<ChatPage> {
     }
     if (_chat?.id != activeChat?.id) {
       final messages = await _getHistoryTreeMessages();
-      // 找到最后一条用户消息的索引
+      // Find the index of the last user message
       final lastUserIndex =
           messages.lastIndexWhere((m) => m.role == MessageRole.user);
       String parentId = '';
 
-      // 如果找到用户消息，且其后有助手消息，则使用助手消息的ID
+      // If a user message is found and there is an assistant message after it, use the assistant message's ID
       if (lastUserIndex != -1 && lastUserIndex + 1 < messages.length) {
         parentId = messages[lastUserIndex + 1].messageId;
       } else if (messages.isNotEmpty) {
-        // 如果没有找到合适的消息，使用最后一条消息的ID
+        // If no suitable message is found, use the ID of the last message
         parentId = messages.last.messageId;
       }
 
@@ -369,7 +369,7 @@ class _ChatPageState extends State<ChatPage> {
     }
   }
 
-  // UI 构建相关方法
+  // UI build related methods
   Widget _buildMessageList() {
     if (_messages.isEmpty) {
       final l10n = AppLocalizations.of(context)!;
@@ -422,7 +422,7 @@ class _ChatPageState extends State<ChatPage> {
     });
   }
 
-  // 消息处理相关方法
+  // Message processing related methods
   void _handleTextChanged(String text) {
     setState(() {
       _isComposing = text.isNotEmpty;
@@ -580,7 +580,7 @@ class _ChatPageState extends State<ChatPage> {
     final content = lastMessage.content ?? '';
     if (content.isEmpty) return false;
 
-    // 使用正则表达式检查是否包含 <function name=*>*</function> 格式的标签
+    // Use regular expressions to check if the content contains <function name=*>*</function> format tags
     final RegExp functionTagRegex = RegExp(
         '<function\\s+name=["\']([^"\']*)["\']\\s*>(.*?)</function>',
         dotAll: true);
@@ -598,7 +598,7 @@ class _ChatPageState extends State<ChatPage> {
         final toolArgumentsMap = jsonc.decode(toolArguments);
         _onRunFunction(RunFunctionEvent(toolName, toolArgumentsMap));
       } catch (e) {
-        Logger.root.warning('解析工具参数失败: $e');
+        Logger.root.warning('Failed to parse tool parameters: $e');
       }
     }
 
@@ -609,7 +609,7 @@ class _ChatPageState extends State<ChatPage> {
     return await _checkNeedToolCallXml();
   }
 
-  // 消息提交处理
+  // Message submission processing
   Future<void> _handleSubmitted(SubmitData data,
       {bool addUserMessage = true}) async {
     setState(() {
@@ -624,11 +624,11 @@ class _ChatPageState extends State<ChatPage> {
     try {
       while (await _checkNeedToolCall()) {
         if (_runFunctionEvents.isNotEmpty) {
-          // 顺序处理每个函数调用
+          // Process each function call in order
           while (_runFunctionEvents.isNotEmpty) {
             final event = _runFunctionEvents.first;
 
-            // 等待用户授权
+            // Wait for user authorization
             final approved = await _showFunctionApprovalDialog(event);
 
             if (approved) {
@@ -863,19 +863,19 @@ class _ChatPageState extends State<ChatPage> {
     Logger.root.info('create new chat: $title');
   }
 
-  // messages parentMessageId 处理
+  // messages parentMessageId processing
   List<ChatMessage> _handleParentMessageId(List<ChatMessage> messages) {
     if (messages.isEmpty) return [];
 
-    // 找到最后一条用户消息的索引
+    // Find the index of the last user message
     int lastUserIndex =
         messages.lastIndexWhere((m) => m.role == MessageRole.user);
     if (lastUserIndex == -1) return messages;
 
-    // 获取从最后一条用户消息开始的所有消息
+    // Get all messages starting from the last user message
     List<ChatMessage> relevantMessages = messages.sublist(lastUserIndex);
 
-    // 如果消息数大于2，重置第二条之后消息的parentMessageId
+    // If the number of messages is greater than 2, reset the parentMessageId of the second message and subsequent messages
     if (relevantMessages.length > 2) {
       String secondMessageId = relevantMessages[1].messageId;
       for (int i = 2; i < relevantMessages.length; i++) {
@@ -904,7 +904,7 @@ class _ChatPageState extends State<ChatPage> {
   void _handleError(dynamic error, StackTrace stackTrace) {
     Logger.root.severe(error, stackTrace);
 
-    // 重置所有相关状态
+    // Reset all related states
     _resetState();
 
     if (mounted) {
@@ -954,7 +954,7 @@ class _ChatPageState extends State<ChatPage> {
     }
   }
 
-  // 处理分享事件
+  // Handle share events
   Future<void> _handleShare(ShareEvent event) async {
     if (_messages.isEmpty) return;
     await Future.delayed(const Duration(milliseconds: 100));

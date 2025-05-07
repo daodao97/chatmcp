@@ -102,7 +102,7 @@ abstract class MemoryServer {
           },
         };
       case 'ping':
-        result = {}; // 空对象
+        result = {}; // Empty object
       case 'resources/list':
         result = {
           'resources': [],
@@ -113,7 +113,7 @@ abstract class MemoryServer {
         };
       case 'resources/subscribe':
       case 'resources/unsubscribe':
-        result = {}; // 成功时返回空对象
+        result = {}; // Return an empty object when successful
       case 'prompts/list':
         result = {
           'prompts': [],

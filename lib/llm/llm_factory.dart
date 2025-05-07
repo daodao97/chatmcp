@@ -49,7 +49,7 @@ class LLMFactoryHelper {
       final setting = ProviderManager.settingsProvider.apiSettings.firstWhere(
           (element) => element.providerId == currentModel.providerId);
 
-      // 获取配置信息
+      // Get configuration information
       final apiKey = setting.apiKey;
       final baseUrl = setting.apiEndpoint;
 
@@ -60,12 +60,12 @@ class LLMFactoryHelper {
 
       provider ??= LLMProvider.values.byName(currentModel.apiStyle);
 
-      // 创建 LLM 客户端
+      // Create LLM client
       return LLMFactory.create(provider, apiKey: apiKey, baseUrl: baseUrl);
     } catch (e) {
-      // 如果找不到匹配的提供商，使用默认的OpenAI
+      // If no matching provider is found, use the default OpenAI
       Logger.root
-          .warning('未找到匹配的提供商配置: ${currentModel.providerId}，使用默认OpenAI配置');
+          .warning('No matching provider configuration found: ${currentModel.providerId}, using default OpenAI configuration');
 
       var openAISetting = ProviderManager.settingsProvider.apiSettings
           .firstWhere((element) => element.providerId == "openai",

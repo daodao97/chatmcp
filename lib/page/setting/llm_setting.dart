@@ -57,11 +57,11 @@ class _KeysSettingsState extends State<KeysSettings> {
   bool _isLoading = false;
   int _selectedProvider = 0;
   bool _hasChanges = false;
-  bool _obscureText = true; // 添加密码可见性状态
+  bool _obscureText = true; // Add password visibility state
 
   final List<LLMSettingControllers> _controllers = [];
 
-  // 记录每个卡片的展开状态
+  // Record the expanded state of each card
   final Map<int, bool> _expandedState = {};
 
   final List<LLMProviderSetting> _llmApiConfigs = [];
@@ -114,11 +114,11 @@ class _KeysSettingsState extends State<KeysSettings> {
       _controllers.clear();
     });
 
-    // 添加所有加载的设置
+    // Add all loaded settings
     for (var apiSetting in apiSettings) {
       setState(() {
         _llmApiConfigs.add(apiSetting);
-        // 为每个配置添加一个控制器
+        // Add a controller for each configuration
         _controllers.add(LLMSettingControllers(
           keyController: TextEditingController(text: apiSetting.apiKey),
           endpointController:
@@ -164,11 +164,11 @@ class _KeysSettingsState extends State<KeysSettings> {
     );
   }
 
-  // 构建移动端布局
+  // Build mobile layout
   Widget _buildMobileLayout() {
     return Column(
       children: [
-        // 配置卡片列表
+        // Configuration card list
         Expanded(
           child: ListView.separated(
             padding: const EdgeInsets.only(top: 4),
@@ -178,13 +178,13 @@ class _KeysSettingsState extends State<KeysSettings> {
           ),
         ),
         const SizedBox(height: 12),
-        // 底部按钮区域
+        // Bottom button area
         Column(
           children: [
-            // 保存按钮
+            // Save button
             _buildSaveButton(),
             const SizedBox(height: 12),
-            // 添加服务器按钮
+            // Add server button
             _buildAddServerButton(),
           ],
         ),
@@ -192,12 +192,12 @@ class _KeysSettingsState extends State<KeysSettings> {
     );
   }
 
-  // 构建提供商配置卡片
+  // Build provider configuration card
   Widget _buildProviderConfigCard(int index) {
     final config = _llmApiConfigs[index];
     final controllers = _controllers[index];
 
-    // 初始化展开状态，默认不展开
+    // Initialize the expanded state, default not expanded
     _expandedState[index] ??= false;
 
     return Card(
@@ -213,7 +213,7 @@ class _KeysSettingsState extends State<KeysSettings> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // 卡片头部（点击可折叠）
+          // Card header (clickable to collapse)
           InkWell(
             onTap: () {
               setState(() {
@@ -240,7 +240,7 @@ class _KeysSettingsState extends State<KeysSettings> {
               ),
             ),
           ),
-          // 展开的配置内容
+          // Expanded configuration content
           if (_expandedState[index] ?? false)
             Padding(
               padding: const EdgeInsets.fromLTRB(16.0, 0, 16.0, 16.0),
@@ -251,7 +251,7 @@ class _KeysSettingsState extends State<KeysSettings> {
     );
   }
 
-  // 构建提供商卡片头部
+  // Build provider card header
   Widget _buildProviderCardHeader(
       LLMProviderSetting config, LLMSettingControllers controllers) {
     return Row(
@@ -280,7 +280,7 @@ class _KeysSettingsState extends State<KeysSettings> {
     );
   }
 
-  // 构建保存按钮
+  // Build save button
   Widget _buildSaveButton() {
     final l10n = AppLocalizations.of(context)!;
     return SizedBox(
@@ -321,7 +321,7 @@ class _KeysSettingsState extends State<KeysSettings> {
     );
   }
 
-  // 构建添加服务器按钮
+  // Build add server button
   Widget _buildAddServerButton() {
     final l10n = AppLocalizations.of(context)!;
     return SizedBox(
@@ -346,7 +346,7 @@ class _KeysSettingsState extends State<KeysSettings> {
     );
   }
 
-  // 删除提供商的方法
+  // Delete provider method
   void _deleteProvider(LLMProviderSetting config) {
     setState(() {
       final index = _llmApiConfigs.indexOf(config);
@@ -361,18 +361,18 @@ class _KeysSettingsState extends State<KeysSettings> {
     });
   }
 
-  // 构建桌面端布局
+  // Build desktop layout
   Widget _buildDesktopLayout() {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // 左侧提供商列表
+        // Left provider list
         SizedBox(
           width: 180,
           child: _buildProviderList(),
         ),
         const SizedBox(width: 12),
-        // 右侧配置表单
+        // Right configuration form
         Expanded(
           child: _buildDesktopConfigSection(),
         ),
@@ -380,7 +380,7 @@ class _KeysSettingsState extends State<KeysSettings> {
     );
   }
 
-  // 构建提供商列表
+  // Build provider list
   Widget _buildProviderList() {
     return Card(
       elevation: 0,
@@ -413,7 +413,7 @@ class _KeysSettingsState extends State<KeysSettings> {
     );
   }
 
-  // 构建添加服务器列表项
+  // Build add server list item
   Widget _buildAddServerListTile() {
     final l10n = AppLocalizations.of(context)!;
     return SizedBox(
@@ -443,7 +443,7 @@ class _KeysSettingsState extends State<KeysSettings> {
     );
   }
 
-  // 构建桌面端配置区域
+  // Build desktop configuration area
   Widget _buildDesktopConfigSection() {
     return Column(
       children: [
@@ -569,7 +569,7 @@ class _KeysSettingsState extends State<KeysSettings> {
                 if (modelName.isNotEmpty) {
                   setState(() {
                     if (_controllers.isNotEmpty) {
-                      // 将模型添加到当前选中的提供商
+                      // Add model to the current selected provider
                       final controller = _controllers[_selectedProvider];
                       if (!controller.models.contains(modelName)) {
                         controller.models.add(modelName);
@@ -621,13 +621,13 @@ class _KeysSettingsState extends State<KeysSettings> {
   }
 
   Widget _buildProviderConfigForm(int index, {bool showTitle = true}) {
-    // 安全检查：确保索引有效且数组不为空
+    // Safety check: ensure the index is valid and the array is not empty
     if (_llmApiConfigs.isEmpty ||
         _controllers.isEmpty ||
         index < 0 ||
         index >= _llmApiConfigs.length ||
         index >= _controllers.length) {
-      // 返回一个空白界面或提示信息
+      // Return a blank interface or prompt information
       final l10n = AppLocalizations.of(context)!;
       return Center(
         child: Text(
@@ -648,7 +648,7 @@ class _KeysSettingsState extends State<KeysSettings> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // 提供商标题
+          // Provider title
           if (showTitle) ...[
             Row(
               children: [
@@ -738,12 +738,12 @@ class _KeysSettingsState extends State<KeysSettings> {
             maxLength: 50,
             buildCounter: (context,
                 {required currentLength, required isFocused, maxLength}) {
-              return null; // 隐藏字符计数器
+              return null; // Hide character counter
             },
           ),
           const SizedBox(height: 12),
 
-          // API 风格
+          // API style
           if (config.custom) ...[
             Text(
               l10n.apiStyle,
@@ -1018,7 +1018,7 @@ class _KeysSettingsState extends State<KeysSettings> {
                   final models = await llm.models();
                   setState(() {
                     _addModelsWithoutDuplicates(controllers, models);
-                    // 设置变更标志
+                    // Set the change flag
                     _hasChanges = true;
                   });
                 },
@@ -1058,7 +1058,7 @@ class _KeysSettingsState extends State<KeysSettings> {
                     _hasChanges = true;
 
                     _addModelsWithoutDuplicates(controllers, models);
-                    // 设置变更标志
+                    // Set the change flag
                     _hasChanges = true;
                   });
                 },
@@ -1066,7 +1066,7 @@ class _KeysSettingsState extends State<KeysSettings> {
             ],
           ),
 
-          // 模型列表
+          // Model list
 
           const SizedBox(height: 12),
 
@@ -1076,10 +1076,10 @@ class _KeysSettingsState extends State<KeysSettings> {
             const SizedBox(height: 12),
           ],
 
-          // 模型列表，直接显示所有模型
+          // Model list, display all models directly
           ...controllers.models.map((model) => _buildModelListItem(
               model, controllers.enabledModels.contains(model))),
-          const SizedBox(height: 8), // 底部留一些空间
+          const SizedBox(height: 8), // Leave some space at the bottom
         ],
       ),
     );
@@ -1152,12 +1152,12 @@ class _KeysSettingsState extends State<KeysSettings> {
 
   Widget _buildModelListItem(String modelName, bool isEnabled) {
     if (_selectedProvider < 0 || _selectedProvider >= _controllers.length) {
-      return const SizedBox(); // 防止索引错误
+      return const SizedBox(); // Prevent index error
     }
 
     final controllers = _controllers[_selectedProvider];
     final l10n = AppLocalizations.of(context)!;
-    // 检查模型是否在启用列表中
+    // Check if the model is in the enabled list
     bool modelEnabled = controllers.enabledModels.contains(modelName);
 
     return Container(
@@ -1193,10 +1193,10 @@ class _KeysSettingsState extends State<KeysSettings> {
               constraints: const BoxConstraints(),
               onPressed: () {
                 setState(() {
-                  // 从两个列表中删除模型
+                  // Delete model from two lists
                   controllers.models.remove(modelName);
                   controllers.enabledModels.remove(modelName);
-                  // 设置变更标志
+                  // Set the change flag
                   _hasChanges = true;
                 });
               },
@@ -1210,21 +1210,21 @@ class _KeysSettingsState extends State<KeysSettings> {
               value: modelEnabled,
               onToggle: (val) {
                 setState(() {
-                  // 更新模型启用状态
+                  // Update model enabled status
                   if (val) {
-                    // 启用模型
+                    // Enable model
                     if (!controllers.enabledModels.contains(modelName)) {
                       controllers.enabledModels.add(modelName);
-                      // 确保enabledModels按照models中的顺序排序
+                      // Ensure enabledModels is sorted in the order of models
                       controllers.enabledModels.sort((a, b) =>
                           controllers.models.indexOf(a) -
                           controllers.models.indexOf(b));
                     }
                   } else {
-                    // 禁用模型
+                    // Disable model
                     controllers.enabledModels.remove(modelName);
                   }
-                  // 设置变更标志
+                  // Set the change flag
                   _hasChanges = true;
                 });
               },
@@ -1271,7 +1271,7 @@ class _KeysSettingsState extends State<KeysSettings> {
                     ))
                 .toList());
 
-        // 重置变更状态
+        // Reset the change status
         if (mounted) {
           setState(() {
             _hasChanges = false;

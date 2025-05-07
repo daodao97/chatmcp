@@ -44,9 +44,9 @@ class _UpgradeNoticeState extends State<UpgradeNotice> {
   void initState() {
     super.initState();
 
-    // 如果启用了自动检查，则延迟初始检查并设置定时器
+    // If auto check is enabled, delay the initial check and set the timer
     if (widget.autoCheck) {
-      // 延迟初始检查，避免应用启动时的性能影响
+      // Delay the initial check to avoid performance impact on app startup
       Future.delayed(const Duration(seconds: 3), () {
         if (mounted) {
           _checkForUpdates();
@@ -64,7 +64,7 @@ class _UpgradeNoticeState extends State<UpgradeNotice> {
   }
 
   Future<void> _checkForUpdates() async {
-    // 防止多次同时检查
+    // Prevent multiple simultaneous checks
     if (_isChecking) return;
 
     setState(() {
@@ -72,15 +72,15 @@ class _UpgradeNoticeState extends State<UpgradeNotice> {
     });
 
     try {
-      // 获取本地存储
+      // Get local storage
       final prefs = await SharedPreferences.getInstance();
 
-      // 获取当前应用版本
+      // Get the current application version
       final packageInfo = await PackageInfo.fromPlatform();
       final currentVersion = packageInfo.version;
-      debugPrint('当前应用版本: $currentVersion');
+      debugPrint('Current application version: $currentVersion');
 
-      // 检查是否已经通知过用户
+      // Check if the user has been notified
       final lastNotifiedVersion = prefs.getString('last_shown_version');
       if (widget.showOnlyOnce &&
           lastNotifiedVersion != null &&
@@ -91,7 +91,7 @@ class _UpgradeNoticeState extends State<UpgradeNotice> {
         return;
       }
 
-      // 获取GitHub最新release版本
+      // Get the latest release version from GitHub
       final apiUrl =
           'https://api.github.com/repos/${widget.owner}/${widget.repo}/releases/latest';
 
@@ -107,7 +107,7 @@ class _UpgradeNoticeState extends State<UpgradeNotice> {
         final htmlUrl = data['html_url'] as String;
         final body = data['body'] as String?;
 
-        debugPrint('检测到GitHub最新版本: $latestVersion');
+        debugPrint('Detected GitHub latest version: $latestVersion');
 
         if (_isNewerVersion(currentVersion, latestVersion)) {
           if (mounted) {
@@ -118,35 +118,35 @@ class _UpgradeNoticeState extends State<UpgradeNotice> {
               _releaseNotes = body ?? '';
             });
 
-            // 记录最新通知的版本
+            // Record the latest notified version
             await prefs.setString('last_shown_version', latestVersion);
           }
         } else if (!widget.autoCheck && mounted) {
-          // 手动检查模式下，如果没有新版本也要显示提示
+          // In manual check mode, display a prompt even if there is no new version
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text("已是最新版本"),
+              content: Text("Already the latest version"),
               duration: const Duration(seconds: 2),
             ),
           );
         }
       } else {
-        debugPrint('GitHub API请求失败，状态码: ${response.statusCode}');
+        debugPrint('GitHub API request failed, status code: ${response.statusCode}');
         if (!widget.autoCheck && mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text("检查更新失败"),
+              content: Text("Check update failed"),
               duration: const Duration(seconds: 2),
             ),
           );
         }
       }
     } catch (e) {
-      debugPrint('检查更新出错: $e');
+      debugPrint('Check update error: $e');
       if (!widget.autoCheck && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text("检查更新失败"),
+            content: Text("Check update failed"),
             duration: const Duration(seconds: 2),
           ),
         );
@@ -165,7 +165,7 @@ class _UpgradeNoticeState extends State<UpgradeNotice> {
       final currentParts = current.split('.').map(int.parse).toList();
       final latestParts = latest.split('.').map(int.parse).toList();
 
-      // 确保两个列表的长度相同
+      // Ensure the two lists have the same length
       while (currentParts.length < 3) {
         currentParts.add(0);
       }
@@ -173,7 +173,7 @@ class _UpgradeNoticeState extends State<UpgradeNotice> {
         latestParts.add(0);
       }
 
-      // 逐位比较版本号
+      // Compare version numbers bit by bit
       for (var i = 0; i < 3; i++) {
         if (latestParts[i] > currentParts[i]) {
           return true;
@@ -184,7 +184,7 @@ class _UpgradeNoticeState extends State<UpgradeNotice> {
 
       return false;
     } catch (e) {
-      debugPrint('版本比较错误: $e');
+      debugPrint('Version comparison error: $e');
       return false;
     }
   }
@@ -204,7 +204,7 @@ class _UpgradeNoticeState extends State<UpgradeNotice> {
           }
         }
       } catch (e) {
-        debugPrint('打开URL错误: $e');
+        debugPrint('Open URL error: $e');
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -249,7 +249,7 @@ class _UpgradeNoticeState extends State<UpgradeNotice> {
     final bool isVeryNarrow = mediaQuery.size.width < 400;
     final bool isNarrow = mediaQuery.size.width < 600 && !isVeryNarrow;
 
-    // 如果有新版本，显示更新通知
+    // If there is a new version, display the update notification
     if (_hasNewVersion) {
       return GestureDetector(
         onTap: () => _showUpdateDialog(context),
@@ -290,7 +290,7 @@ class _UpgradeNoticeState extends State<UpgradeNotice> {
       );
     }
 
-    // 如果启用手动检查更新，且没有新版本，显示检查更新按钮
+    // If manual check update is enabled and there is no new version, display the check update button
     if (widget.showCheckUpdate) {
       return GestureDetector(
         onTap: _isChecking ? null : () => _checkForUpdates(),

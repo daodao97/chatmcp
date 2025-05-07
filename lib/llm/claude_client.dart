@@ -163,13 +163,13 @@ class ClaudeClient extends BaseLLMClient {
                 break;
               }
 
-              // 直接处理文本内容
+              // Handle text content directly
               if (delta['text'] != null) {
                 yield LLMResponse(content: delta['text']);
                 break;
               }
 
-              // 处理特定类型的 delta
+              // Handle specific types of delta
               if (delta['type'] == 'text_delta' && delta['text'] != null) {
                 yield LLMResponse(content: delta['text']);
               } else if (delta['type'] == 'input_json_delta') {

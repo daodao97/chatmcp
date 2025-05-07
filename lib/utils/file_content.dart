@@ -29,7 +29,7 @@ File platformFileToFile(PlatformFile platformFile) {
 
   debugPrint('fileType: $fileType');
 
-  // 判断是否为文本类型文件
+  // Determine if the file is a text type file
   bool isTextFile = fileType.startsWith('text/') ||
       fileType.startsWith('application/') &&
           (fileType.contains('json') ||
@@ -81,7 +81,7 @@ bool isTextFile(String fileType) {
               fileType.contains('x-httpd-php') ||
               fileType.contains('x-sh') ||
               fileType.contains('x-python')) ||
-      // 常见文本文件类型
+      // Common text file types
       fileType == 'json' ||
       fileType == 'javascript' ||
       fileType == 'xml' ||
@@ -100,7 +100,7 @@ bool isTextFile(String fileType) {
       fileType == 'scss' ||
       fileType == 'less' ||
       fileType == 'dart' ||
-      // 编程语言
+      // Programming languages
       fileType == 'java' ||
       fileType == 'c' ||
       fileType == 'cpp' ||
@@ -137,7 +137,7 @@ bool isTextFile(String fileType) {
       fileType == 'pm' ||
       fileType == 'r' ||
       fileType == 'rmd' ||
-      // 配置文件
+      // Configuration files
       fileType == 'env' ||
       fileType == 'ini' ||
       fileType == 'conf' ||
@@ -152,21 +152,21 @@ bool isTextFile(String fileType) {
       fileType == 'babelrc' ||
       fileType == 'npmrc' ||
       fileType == 'properties' ||
-      // 文档和标记语言
+      // Documentation and markup languages
       fileType == 'adoc' ||
       fileType == 'rst' ||
       fileType == 'tex' ||
       fileType == 'rtf' ||
       fileType == 'wiki' ||
       fileType == 'org' ||
-      // 数据文件
+      // Data files
       fileType == 'csv' ||
       fileType == 'tsv' ||
       fileType == 'svg' ||
       fileType == 'wat' ||
       fileType == 'wasm' ||
       fileType == 'log' ||
-      // 其他常见纯文本文件
+      // Other common text files
       fileType == 'lock' ||
       fileType == 'license' ||
       fileType == 'makefile' ||

@@ -84,7 +84,7 @@ class MyInAppBrowser extends InAppBrowser {
   @override
   Future onBrowserCreated() async {
     print("Browser Created!");
-    // 初始化无头浏览器用于获取正文
+    // Initialize headless browser for content extraction
     contentWebView = HeadlessInAppWebView(
       initialSettings: InAppWebViewSettings(
         userAgent:
@@ -94,7 +94,7 @@ class MyInAppBrowser extends InAppBrowser {
     );
     await contentWebView?.run();
 
-    // 加载 turndown.js 文件
+    // Load turndown.js file
     turndownJs = await rootBundle.loadString('assets/js/turndown.js');
   }
 
@@ -121,15 +121,15 @@ class MyInAppBrowser extends InAppBrowser {
 
       await Future.delayed(const Duration(seconds: 3));
 
-      // 检查页面内容
+      // Check page content
       final pageContent = await controller.evaluateJavascript(
           source: 'document.documentElement.outerHTML');
 
       final md = html2md.convert(pageContent);
       return md;
     } catch (e) {
-      print('提取正文出错: $e');
-      print('错误堆栈: ${StackTrace.current}');
+      print('Error extracting content: $e');
+      print('Error stack: ${StackTrace.current}');
       return '';
     }
   }
@@ -164,7 +164,7 @@ class MyInAppBrowser extends InAppBrowser {
             parsed.map((item) => SearchResult.fromJson(item)).toList();
 
         List<Map<String, String>> pageDataList = [];
-        // 遍历获取每个结果的正文
+        // Iterate to get the content of each result
         for (var result in searchResults) {
           Map<String, String> paegData = {
             'title': result.title,
@@ -177,7 +177,7 @@ class MyInAppBrowser extends InAppBrowser {
 
         return pageDataList;
       } catch (e) {
-        Logger.root.severe('解析搜索结果出错: $e');
+        Logger.root.severe('Error parsing search results: $e');
       }
     }
     return [];
@@ -185,7 +185,7 @@ class MyInAppBrowser extends InAppBrowser {
 
   @override
   void onReceivedError(WebResourceRequest request, WebResourceError error) {
-    print("Can't load ${request.url}.. Error: ${error.description}");
+    print("Can't load ${request.url}. Error: ${error.description}");
   }
 
   @override

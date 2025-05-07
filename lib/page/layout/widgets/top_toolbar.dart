@@ -187,7 +187,7 @@ class TopToolbar extends StatelessWidget {
                         await wm.windowManager.maximize();
                       }
                     } catch (e) {
-                      debugPrint('窗口操作失败: $e');
+                      debugPrint('window operation failed: $e');
                     }
                   }
                 },

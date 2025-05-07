@@ -186,10 +186,10 @@ List<Map<String, dynamic>> chatMessageToGeminiMessage(
       }
     }
 
-    // 确保至少有一个part
+    // Ensure at least one part
     if (parts.isEmpty) {
       parts.add({
-        'text': ' ', // 添加一个空格作为默认文本
+        'text': ' ', // Add a space as default text
       });
     }
 

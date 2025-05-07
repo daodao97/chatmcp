@@ -15,20 +15,20 @@ class ModelSelector extends StatefulWidget {
 }
 
 class _ModelSelectorState extends State<ModelSelector> {
-  // 缓存future避免重复执行
+  // Cache future to avoid repeated execution
   List<llm_model.Model> _models = [];
 
   @override
   void initState() {
     super.initState();
     _updateModels();
-    // 添加监听器
+    // Add listener
     ProviderManager.settingsProvider.addListener(_updateModels);
   }
 
   @override
   void dispose() {
-    // 移除监听器避免内存泄漏
+    // Remove listener to avoid memory leaks
     ProviderManager.settingsProvider.removeListener(_updateModels);
     super.dispose();
   }
@@ -61,7 +61,7 @@ class _ModelSelectorState extends State<ModelSelector> {
   }
 }
 
-// 创建一个通知类来监听弹出窗口的打开状态
+// Create a notification class to listen to the open status of the popup window
 class PopupNotification extends Notification {
   final bool opened;
   PopupNotification(this.opened);
@@ -93,11 +93,11 @@ class _ModelSelectorPopupState extends State<ModelSelectorPopup> {
     super.dispose();
   }
 
-  // 按 provider 对模型进行分组并根据搜索文本过滤
+  // Group models by provider and filter by search text
   Map<String, List<llm_model.Model>> _getFilteredModelsByProvider() {
     final modelsByProvider = <String, List<llm_model.Model>>{};
 
-    // 筛选匹配搜索文本的模型
+    // Filter models matching the search text
     final filteredModels = widget.availableModels.where((model) {
       return _searchText.isEmpty ||
           model.label.toLowerCase().contains(_searchText) ||
@@ -111,7 +111,7 @@ class _ModelSelectorPopupState extends State<ModelSelectorPopup> {
     return modelsByProvider;
   }
 
-  // 构建模型列表
+  // Build model list
   Widget _buildModelList() {
     final modelsByProvider = _getFilteredModelsByProvider();
 
@@ -132,7 +132,7 @@ class _ModelSelectorPopupState extends State<ModelSelectorPopup> {
     final List<Widget> items = [];
 
     modelsByProvider.forEach((provider, models) {
-      // 添加分隔线
+      // Add a divider
       if (items.isNotEmpty) {
         items.add(Divider(
           height: 1,
@@ -144,7 +144,7 @@ class _ModelSelectorPopupState extends State<ModelSelectorPopup> {
 
       final firstModel = models.first;
 
-      // 添加提供商标题
+      // Add provider title
       items.add(
         Padding(
           padding: const EdgeInsets.fromLTRB(16, 6, 16, 2),
@@ -163,16 +163,16 @@ class _ModelSelectorPopupState extends State<ModelSelectorPopup> {
         ),
       );
 
-      // 添加该提供商下的所有模型
+      // Add all models under this provider
       for (var model in models) {
         items.add(
           InkWell(
             onTap: () {
               widget.onModelSelected(model);
-              // 清除搜索框内容
+              // Clear the search box content
               _searchController.clear();
               _searchText = '';
-              // 关闭弹窗
+              // Close the popup
               Navigator.of(context).pop();
             },
             child: Padding(
@@ -240,7 +240,7 @@ class _ModelSelectorPopupState extends State<ModelSelectorPopup> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                // 搜索框
+                // Search box
                 Padding(
                   padding: const EdgeInsets.fromLTRB(8.0, 8.0, 8.0, 4.0),
                   child: TextField(
@@ -276,7 +276,7 @@ class _ModelSelectorPopupState extends State<ModelSelectorPopup> {
                     },
                   ),
                 ),
-                // 模型列表
+                // Model list
                 Flexible(
                   child: _buildModelList(),
                 ),

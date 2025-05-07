@@ -89,16 +89,16 @@ class _CodeBlock extends StatefulWidget {
 
 class _CodeBlockState extends State<_CodeBlock>
     with AutomaticKeepAliveClientMixin {
-  // 是否显示预览
+  // Whether to display preview
   bool _isPreviewVisible = false;
-  // 是否支持预览
+  // Whether to support preview
   bool _isSupportPreview = false;
-  // 预览组件
+  // Preview component
   Widget? _previewWidget;
 
-  // 支持预览的语言列表
+  // Supported preview languages list
   static const List<String> _supportedLanguages = ['mermaid', 'html', 'svg'];
-  // HTML相关语言
+  // HTML related languages
   static const List<String> _htmlLanguages = ['html', 'svg'];
 
   @override
@@ -110,7 +110,7 @@ class _CodeBlockState extends State<_CodeBlock>
     _initializePreviewState();
   }
 
-  /// 初始化预览状态
+  /// Initialize preview state
   void _initializePreviewState() {
     final bool supportPreview = _supportedLanguages.contains(widget.language);
 
@@ -122,12 +122,12 @@ class _CodeBlockState extends State<_CodeBlock>
 
     setState(() {
       _isSupportPreview = supportPreview;
-      // 如果支持预览且代码块已完成，则默认显示预览
+      // If support preview and code block is closed, default to display preview
       _isPreviewVisible = supportPreview && widget.isClosed;
     });
   }
 
-  /// 构建预览组件
+  /// Build preview component
   Widget? _buildPreviewWidget() {
     if (widget.language == 'mermaid') {
       return MermaidDiagramView(
@@ -143,14 +143,14 @@ class _CodeBlockState extends State<_CodeBlock>
     return null;
   }
 
-  /// 切换预览/代码视图
+  /// Toggle preview/code view
   void _togglePreviewVisibility() {
     setState(() {
       _isPreviewVisible = !_isPreviewVisible;
     });
   }
 
-  /// 复制代码到剪贴板
+  /// Copy code to clipboard
   void _copyCodeToClipboard(BuildContext context, AppLocalizations t) {
     Clipboard.setData(ClipboardData(text: widget.code));
     ScaffoldMessenger.of(context).showSnackBar(
@@ -179,7 +179,7 @@ class _CodeBlockState extends State<_CodeBlock>
     );
   }
 
-  /// 构建内容区域（代码或预览）
+  /// Build content area (code or preview)
   Widget _buildContentSection() {
     if (_isSupportPreview && _isPreviewVisible && _previewWidget != null) {
       return _previewWidget!;
@@ -193,7 +193,7 @@ class _CodeBlockState extends State<_CodeBlock>
     }
   }
 
-  /// 构建工具栏
+  /// Build toolbar
   Widget _buildToolBar(AppLocalizations t) {
     return Container(
       height: 30,
@@ -214,7 +214,7 @@ class _CodeBlockState extends State<_CodeBlock>
     );
   }
 
-  /// 构建语言标签
+  /// Build language label
   Widget _buildLanguageLabel() {
     return Text(
       widget.language.isEmpty ? 'text' : widget.language,
@@ -226,7 +226,7 @@ class _CodeBlockState extends State<_CodeBlock>
     );
   }
 
-  /// 构建工具栏操作按钮
+  /// Build toolbar actions
   Widget _buildToolbarActions(AppLocalizations t) {
     return Row(
       mainAxisSize: MainAxisSize.min,
@@ -244,7 +244,7 @@ class _CodeBlockState extends State<_CodeBlock>
     );
   }
 
-  /// 构建预览切换按钮
+  /// Build preview toggle button
   Widget _buildPreviewToggleButton() {
     return TextButton(
       style: TextButton.styleFrom(
@@ -264,7 +264,7 @@ class _CodeBlockState extends State<_CodeBlock>
     );
   }
 
-  /// 构建代码块列表
+  /// Build code block list
   List<Widget> buildCodeBlockList() {
     return List.generate(widget.splitContents.length, (index) {
       final currentContent = widget.splitContents[index];
@@ -296,7 +296,7 @@ class FencedCodeBlockSyntax extends m.BlockSyntax {
 
   @override
   m.Node parse(m.BlockParser parser) {
-    // 获取开始标记和语言
+    // Get start mark and language
     final match = pattern.firstMatch(parser.current.content)!;
     final openingFence = match.group(1)!;
     final infoString = match.group(2)!.trim();
@@ -304,15 +304,15 @@ class FencedCodeBlockSyntax extends m.BlockSyntax {
     bool isClosed = false;
     final lines = <String>[];
 
-    // 前进到内容行
+    // Advance to content line
     parser.advance();
 
-    // 收集内容直到找到结束标记
+    // Collect content until finding the end mark
     while (!parser.isDone) {
       final currentLine = parser.current.content;
       final closingMatch = pattern.firstMatch(currentLine);
 
-      // 检查是否是结束标记
+      // Check if it is the end mark
       if (closingMatch != null &&
           closingMatch.group(1)!.startsWith(openingFence) &&
           closingMatch.group(2)!.trim().isEmpty) {
@@ -325,23 +325,23 @@ class FencedCodeBlockSyntax extends m.BlockSyntax {
       parser.advance();
     }
 
-    // 如果最后一行是空行且未找到结束标记，移除它
+    // If the last line is an empty line and the end mark is not found, remove it
     if (!isClosed && lines.isNotEmpty && lines.last.trim().isEmpty) {
       lines.removeLast();
     }
 
-    // 创建代码元素
+    // Create code element
     final code = m.Element.text('code', lines.join('\n') + '\n');
 
-    // 如果有语言标记，添加 class
+    // If there is a language mark, add class
     if (infoString.isNotEmpty) {
       code.attributes['class'] = 'language-$infoString';
     }
 
-    // 添加是否闭合的标记
+    // Add the closed mark
     code.attributes['isClosed'] = isClosed.toString();
 
-    // 创建 pre 元素
+    // Create pre element
     final pre = m.Element('pre', [code]);
     pre.attributes['isClosed'] = isClosed.toString();
 

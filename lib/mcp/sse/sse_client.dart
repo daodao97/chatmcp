@@ -66,22 +66,22 @@ class SSEClient implements McpClient {
 
     _isConnecting = true;
     try {
-      Logger.root.info('开始建立SSE连接: ${serverConfig.command}');
+      Logger.root.info('Starting SSE connection: : ${serverConfig.command}');
       _processStateController.add(const ProcessState.starting());
 
       _sseSubscription?.cancel();
 
-      // 检查是否需要更新SSE连接URL中的会话ID
+      // Check if the session ID in the SSE connection URL needs to be updated
       String connectionUrl = serverConfig.command;
 
-      // 如果之前连接过且有消息端点且消息端点中包含会话ID，则尝试更新连接URL
+      //  If previously connected and the message endpoint exists and contains a session ID, attempt to update the connection URL. 
       if (_messageEndpoint != null) {
         try {
           final messageUri = Uri.parse(_messageEndpoint!);
           if (messageUri.queryParameters.containsKey('session_id')) {
             final sessionId = messageUri.queryParameters['session_id'];
             if (sessionId != null && sessionId.isNotEmpty) {
-              Logger.root.info('使用当前会话ID进行SSE连接: $sessionId');
+              Logger.root.info('Using current session ID for SSE connection: $sessionId');
 
               final originalUri = Uri.parse(connectionUrl);
               final Map<String, String> queryParams =
@@ -96,17 +96,17 @@ class SSEClient implements McpClient {
               );
 
               connectionUrl = updatedUri.toString();
-              Logger.root.info('更新后的SSE连接URL: $connectionUrl');
+              Logger.root.info('Updated SSE connection URL: $connectionUrl');
             }
           }
         } catch (e) {
-          Logger.root.warning('尝试更新SSE连接URL时出错: $e');
+          Logger.root.warning('Error updating SSE connection URL: $e');
         }
       }
 
-      Logger.root.info('建立SSE连接到: $connectionUrl');
+      Logger.root.info('Establishing SSE connection to: $connectionUrl');
 
-      // 使用flutter_client_sse库建立SSE连接
+      // Use the flutter_client_sse library to establish an SSE connection  
       _sseSubscription = flutter_client_sse.SSEClient.subscribeToSSE(
         method: SSERequestType.GET,
         url: connectionUrl,
@@ -114,26 +114,26 @@ class SSEClient implements McpClient {
       ).listen(
         (event) {
           Logger.root.fine(
-              '收到SSE事件: ${event.event}, ID: ${event.id}, 数据长度: ${event.data?.length ?? 0}字节');
+              'Received SSE event: ${event.event}, ID: ${event.id}, Data length: ${event.data?.length ?? 0} bytes');
           _handleSSEEvent(event);
         },
         onError: (error) {
-          Logger.root.severe('SSE连接错误: $error');
+          Logger.root.severe('SSE connection error: $error');
           _processStateController
               .add(ProcessState.error(error, StackTrace.current));
           _scheduleReconnect();
         },
         onDone: () {
-          Logger.root.info('SSE连接关闭');
+          Logger.root.info('SSE connection closed');
           _processStateController.add(const ProcessState.exited(0));
           _scheduleReconnect();
         },
       );
 
-      Logger.root.info('SSE连接建立成功，等待事件...');
+      Logger.root.info('SSE connection established successfully, waiting for events...');
       _reconnectAttempts = 0;
     } catch (e, stack) {
-      Logger.root.severe('SSE连接失败: $e\n$stack');
+      Logger.root.severe('SSE connection failed: $e\n$stack');
       _processStateController.add(ProcessState.error(e, stack));
       _scheduleReconnect();
     } finally {
@@ -150,7 +150,7 @@ class SSEClient implements McpClient {
     if (eventType == 'endpoint' && data != null) {
       final uri = Uri.parse(serverConfig.command);
       final baseUrl = uri.origin;
-      // 处理并规范化消息端点URL，确保没有多余的空格
+      // Process and normalize the message endpoint URL, ensuring no extra spaces
       String rawEndpoint;
       if (data.startsWith("http")) {
         rawEndpoint = data.trim();
@@ -160,18 +160,18 @@ class SSEClient implements McpClient {
       }
 
       try {
-        // 验证消息端点URL是否有效
+        // Validate the message endpoint URL to ensure it is valid
         final parsedUri = Uri.parse(rawEndpoint);
         if (!parsedUri.hasScheme || !parsedUri.hasAuthority) {
-          Logger.root.severe('收到无效的消息端点URL: $rawEndpoint');
+          Logger.root.severe('Received invalid message endpoint URL: $rawEndpoint');
           return;
         }
 
         _messageEndpoint = rawEndpoint;
-        Logger.root.info('成功设置消息端点: $_messageEndpoint');
+        Logger.root.info('Successfully set message endpoint: $_messageEndpoint');
         _processStateController.add(const ProcessState.running());
       } catch (e) {
-        Logger.root.severe('解析消息端点URL失败: $rawEndpoint, 错误: $e');
+        Logger.root.severe('Failed to parse message endpoint URL: $rawEndpoint, error: $e');
       }
     } else if (eventType == 'message' && data != null) {
       try {
@@ -179,10 +179,10 @@ class SSEClient implements McpClient {
         final message = JSONRPCMessage.fromJson(jsonData);
         _handleMessage(message);
       } catch (e, stack) {
-        Logger.root.severe('解析服务器消息失败: $e\n$stack');
+        Logger.root.severe('Failed to parse server message: $e\n$stack');
       }
     } else {
-      Logger.root.info('收到未处理的SSE事件类型: $eventType');
+      Logger.root.info('Received unhandled SSE event type: $eventType');
     }
   }
 
@@ -191,28 +191,28 @@ class SSEClient implements McpClient {
 
     _reconnectAttempts++;
     if (_reconnectAttempts > _maxReconnectAttempts) {
-      Logger.root.severe('达到最大重连尝试次数 ($_maxReconnectAttempts)，停止重连');
+      Logger.root.severe('Reached maximum reconnection attempts ($_maxReconnectAttempts), stopping reconnection');
       return;
     }
 
     final delay = _initialReconnectDelay * (1 << (_reconnectAttempts - 1));
-    Logger.root.info('计划在 ${delay.inSeconds} 秒后进行第 $_reconnectAttempts 次重连尝试');
+    Logger.root.info('Scheduling reconnection in ${delay.inSeconds} seconds for attempt $_reconnectAttempts');
 
-    // 在重连前尝试刷新会话ID
+    // Try to refresh the session ID before reconnecting
     _reconnectTimer = Timer(delay, () async {
       _reconnectTimer = null;
 
-      // 如果消息端点已建立，尝试刷新会话ID
+      // If the message endpoint has been established, try to refresh the session ID
       if (_messageEndpoint != null) {
         try {
           final refreshed = await _refreshSessionId();
           if (refreshed) {
-            Logger.root.info('重连前成功刷新会话ID');
+            Logger.root.info('Successfully refreshed session ID before reconnection');
           } else {
-            Logger.root.warning('重连前刷新会话ID失败，使用原有会话ID继续');
+            Logger.root.warning('Failed to refresh session ID before reconnection, using existing session ID');
           }
         } catch (e) {
-          Logger.root.warning('重连前刷新会话ID时发生错误: $e');
+          Logger.root.warning('Error refreshing session ID before reconnection: $e');
         }
       }
 
@@ -226,7 +226,7 @@ class SSEClient implements McpClient {
     _reconnectTimer?.cancel();
     _reconnectTimer = null;
 
-    // 取消SSE订阅
+    // Cancel the SSE subscription
     await _sseSubscription?.cancel();
     _sseSubscription = null;
 
@@ -236,33 +236,33 @@ class SSEClient implements McpClient {
 
   Future<void> _sendHttpPost(Map<String, dynamic> data) async {
     if (_messageEndpoint == null) {
-      throw StateError('消息端点未初始化 ${jsonEncode(data)}');
+      throw StateError('Message endpoint not initialized ${jsonEncode(data)}');
     }
 
     await _writeLock.synchronized(() async {
       try {
-        // 构建URL并确保它是有效的
+        // Build the URL and ensure it is valid
         final String cleanEndpoint = _messageEndpoint!.trim();
-        Logger.root.info('构建HTTP请求URL: $cleanEndpoint');
+        Logger.root.info('Building HTTP request URL: $cleanEndpoint');
 
-        // 解析URL以检查和处理可能存在的问题
+        // Parse the URL to check and handle any potential issues
         final uri = Uri.parse(cleanEndpoint);
 
-        // 检查URL查询参数中是否有session_id
+        // Check if the URL query parameters contain a session_id
         if (uri.queryParameters.containsKey('session_id')) {
           final sessionId = uri.queryParameters['session_id'];
-          Logger.root.info('检测到会话ID: $sessionId');
+          Logger.root.info('Detected session ID: $sessionId');
 
-          // 验证会话ID是否有效（通常是非空且有一定长度的UUID）
+          // Validate the session ID to ensure it is valid (typically non-empty and has a certain length)
           if (sessionId == null || sessionId.isEmpty || sessionId.length < 10) {
-            Logger.root.warning('可能无效的会话ID: $sessionId，尝试获取新的会话ID');
-            // 这里可以添加获取新会话ID的逻辑
+            Logger.root.warning('Invalid session ID: $sessionId, attempting to refresh session ID');
+            // TODO: Add logic to refresh the session ID
           }
         } else {
-          Logger.root.warning('URL中没有检测到会话ID参数');
+          Logger.root.warning('No session ID parameter detected in the URL');
         }
 
-        Logger.root.info('发送HTTP请求到 $cleanEndpoint: ${jsonEncode(data)}');
+        Logger.root.info('Sending HTTP request to $cleanEndpoint: ${jsonEncode(data)}');
 
         final response = await http.post(
           Uri.parse(cleanEndpoint),
@@ -270,7 +270,7 @@ class SSEClient implements McpClient {
           body: jsonEncode(data),
         );
 
-        Logger.root.info('HTTP响应状态码: ${response.statusCode}');
+        Logger.root.info('HTTP response status code: ${response.statusCode}');
 
         if (response.statusCode >= 400) {
           final errorBody = response.body;
@@ -279,46 +279,46 @@ class SSEClient implements McpClient {
           throw Exception(
               'MCP HTTP POST ERROR: ${response.statusCode} - $errorBody');
         } else {
-          // 记录成功响应
+          // Record successful response
           if (response.body.isNotEmpty) {
             try {
-              // 使用utf8解码确保中文正确显示
+              // Use utf8 decoding to ensure Chinese characters are displayed correctly
               Logger.root.info(
                   'HTTP response content: ${utf8.decode(response.bodyBytes)}');
             } catch (e) {
-              // 如果解码失败，回退到原始方式
+              // If decoding fails, fall back to the original method
               Logger.root.info('HTTP response content: ${response.body}');
             }
           }
         }
       } catch (e, stack) {
-        Logger.root.severe('发送HTTP POST失败: $e\n$stack');
+        Logger.root.severe('HTTP POST failed: $e\n$stack');
         rethrow;
       }
     });
   }
 
   Future<bool> _refreshSessionId() async {
-    // 如果没有消息端点，无法刷新会话ID
+    // If there is no message endpoint, the session ID cannot be refreshed
     if (_messageEndpoint == null) {
-      Logger.root.severe('尝试刷新会话ID但消息端点尚未建立');
+      Logger.root.severe('Attempting to refresh session ID but message endpoint not established');
       return false;
     }
 
     try {
-      Logger.root.info('尝试刷新会话ID');
+      Logger.root.info('Attempting to refresh session ID');
 
-      // 提取原始URL的基本部分（不包含查询参数）
+      // Extract the basic part of the original URL (excluding query parameters)
       final Uri originalUri = Uri.parse(_messageEndpoint!);
       final String baseUrl =
           '${originalUri.scheme}://${originalUri.host}${originalUri.path}';
 
-      // 构建获取新会话ID的URL（这里需要根据实际API调整）
+      // Build the URL for getting a new session ID (adjust this based on the actual API)
       final String sessionUrl = '$baseUrl?action=new_session';
 
-      Logger.root.info('请求新的会话ID: $sessionUrl');
+      Logger.root.info('Requesting new session ID: $sessionUrl');
 
-      // 发送请求获取新的会话ID
+      // Send a request to get a new session ID
       final response = await http.get(Uri.parse(sessionUrl));
 
       if (response.statusCode == 200) {
@@ -327,7 +327,7 @@ class SSEClient implements McpClient {
           final String? newSessionId = responseData['session_id'];
 
           if (newSessionId != null && newSessionId.isNotEmpty) {
-            // 更新消息端点的会话ID
+            // Update the session ID of the message endpoint
             final Map<String, String> queryParams =
                 Map.from(originalUri.queryParameters);
             queryParams['session_id'] = newSessionId;
@@ -340,20 +340,20 @@ class SSEClient implements McpClient {
             );
 
             _messageEndpoint = newUri.toString();
-            Logger.root.info('成功刷新会话ID，新的消息端点: $_messageEndpoint');
+            Logger.root.info('Successfully refreshed session ID, new message endpoint: $_messageEndpoint');
             return true;
           } else {
-            Logger.root.severe('获取新会话ID失败: 响应中没有有效的会话ID');
+            Logger.root.severe('Failed to get new session ID: No valid session ID in the response');
           }
         } catch (e) {
-          Logger.root.severe('解析会话ID响应时出错: $e');
+          Logger.root.severe('Error parsing session ID response: $e');
         }
       } else {
         Logger.root.severe(
-            '获取新会话ID失败，状态码: ${response.statusCode}, 响应: ${response.body}');
+            'Failed to get new session ID, status code: ${response.statusCode}, response: ${response.body}');
       }
     } catch (e, stack) {
-      Logger.root.severe('刷新会话ID时发生异常: $e\n$stack');
+      Logger.root.severe('Exception refreshing session ID: $e\n$stack');
     }
 
     return false;
@@ -362,35 +362,35 @@ class SSEClient implements McpClient {
   @override
   Future<JSONRPCMessage> sendMessage(JSONRPCMessage message) async {
     if (message.id == null) {
-      throw ArgumentError('消息必须有ID');
+      throw ArgumentError('Message must have an ID');
     }
 
     final completer = Completer<JSONRPCMessage>();
     _pendingRequests[message.id!] = completer;
 
     try {
-      Logger.root.info('准备发送消息: ${message.id} - ${message.method}');
+      Logger.root.info('Preparing to send message: ${message.id} - ${message.method}');
       bool retried = false;
 
-      // 尝试发送请求，如果会话ID无效则尝试刷新
+      // Try sending the request, if the session ID is invalid, try refreshing
       while (true) {
         try {
           await _sendHttpPost(message.toJson());
-          break; // 如果成功发送，则跳出循环
+          break; // If successful, exit the loop
         } catch (e) {
-          // 检查是否是会话ID无效的错误
+          // Check if it is an invalid session ID error
           if (!retried && e.toString().contains('Invalid session id')) {
-            Logger.root.warning('检测到会话ID无效，尝试刷新会话ID');
+            Logger.root.warning('Detected invalid session ID, attempting to refresh session ID');
             retried = true;
 
-            // 尝试刷新会话ID
+            // Try refreshing the session ID
             bool refreshed = await _refreshSessionId();
             if (refreshed) {
-              Logger.root.info('会话ID已刷新，重试发送消息');
-              continue; // 重试发送请求
+              Logger.root.info('Session ID refreshed, retrying message send');
+              continue; // Retry sending the request
             }
           }
-          // 其他错误或刷新会话ID失败，直接抛出异常
+          // Other errors or failed to refresh session ID, throw an exception
           rethrow;
         }
       }
@@ -399,7 +399,7 @@ class SSEClient implements McpClient {
         const Duration(seconds: 60 * 60),
         onTimeout: () {
           _pendingRequests.remove(message.id);
-          throw TimeoutException('请求超时: ${message.id}');
+          throw TimeoutException('Request timed out: ${message.id}');
         },
       );
     } catch (e) {
@@ -410,36 +410,37 @@ class SSEClient implements McpClient {
 
   @override
   Future<JSONRPCMessage> sendInitialize() async {
-    // 确保连接已经建立
+    // Ensure the connection has been established
     if (_messageEndpoint == null) {
-      Logger.root.warning('尝试初始化但消息端点尚未建立，等待端点建立...');
-      // 等待一段时间以确保SSE连接已建立并获取到端点
+      Logger.root.warning('Attempting to initialize but message endpoint not established, waiting for endpoint...');
+      // Wait for a while to ensure the SSE connection has been established and the endpoint has been obtained
       int attempts = 0;
-      const maxAttempts = 30; // 增加到30次尝试
+      const maxAttempts = 30; // Increase to 30 attempts
       const delay = Duration(milliseconds: 500);
 
       while (_messageEndpoint == null && attempts < maxAttempts) {
         await Future.delayed(delay);
         attempts++;
-        Logger.root.info('等待消息端点建立: 尝试 $attempts/$maxAttempts');
+        Logger.root.info('Waiting for message endpoint to be established: attempt $attempts/$maxAttempts');
 
-        // 如果连接已关闭或出错，尝试重新连接
+        // If the connection is closed or an error occurs, try to reconnect
         if (_disposed || _sseSubscription == null) {
-          Logger.root.warning('SSE连接可能已关闭，尝试重新连接');
+          Logger.root.warning('SSE connection may have been closed, attempting to reconnect');
           await _connect();
         }
       }
 
       if (_messageEndpoint == null) {
         Logger.root.severe(
-            '消息端点在 ${maxAttempts * delay.inMilliseconds / 1000} 秒后仍未建立');
-        throw StateError('消息端点在等待后仍未建立，无法完成初始化');
+            'Message endpoint not established after ${maxAttempts * delay.inMilliseconds / 1000} seconds');
+        throw StateError(
+            'Message endpoint not established after waiting, cannot complete initialization');
       }
     }
 
-    Logger.root.info('开始发送初始化请求到 $_messageEndpoint');
+    Logger.root.info('Sending initialization request to $_messageEndpoint');
 
-    // 发送初始化请求
+    // Send the initialization request
     final initMessage =
         JSONRPCMessage(id: 'init-1', method: 'initialize', params: {
       'protocolVersion': '2024-11-05',
@@ -450,22 +451,22 @@ class SSEClient implements McpClient {
       'clientInfo': {'name': 'DartMCPClient', 'version': '1.0.0'}
     });
 
-    Logger.root.info('初始化请求内容: ${jsonEncode(initMessage.toJson())}');
+    Logger.root.info('Initialization request content: ${jsonEncode(initMessage.toJson())}');
 
     try {
       final initResponse = await sendMessage(initMessage);
-      Logger.root.info('初始化响应: $initResponse');
+      Logger.root.info('Initialization response: $initResponse');
 
-      // 等待一小段时间确保服务器已处理初始化请求
+      // Wait for a short period to ensure the server has processed the initialization request
       await Future.delayed(const Duration(milliseconds: 100));
 
-      // 发送初始化完成通知
-      Logger.root.info('发送初始化完成通知');
+      // Send the initialization complete notification
+      Logger.root.info('Sending initialization complete notification');
       await _sendNotification('notifications/initialized', {});
 
       return initResponse;
     } catch (e, stack) {
-      Logger.root.severe('初始化失败: $e\n$stack');
+      Logger.root.severe('Initialization failed: $e\n$stack');
       rethrow;
     }
   }
@@ -501,7 +502,7 @@ class SSEClient implements McpClient {
     return sendMessage(message);
   }
 
-  // 添加一个实用方法来发送符合格式的通知
+  // Add a utility method to send notifications in the correct format
   Future<void> _sendNotification(
       String method, Map<String, dynamic> params) async {
     final notification = JSONRPCMessage(
@@ -512,21 +513,21 @@ class SSEClient implements McpClient {
     try {
       await _sendHttpPost(notification.toJson());
     } catch (e) {
-      // 如果是会话ID无效的错误，尝试刷新后重试一次
+      // If it is an invalid session ID error, try refreshing and retry once
       if (e.toString().contains('Invalid session id')) {
-        Logger.root.warning('发送通知时检测到会话ID无效，尝试刷新会话ID并重试');
+        Logger.root.warning('Detected invalid session ID when sending notification, attempting to refresh session ID and retry');
 
-        // 尝试刷新会话ID
+        // Try refreshing the session ID
         bool refreshed = await _refreshSessionId();
         if (refreshed) {
-          Logger.root.info('会话ID已刷新，重试发送通知');
+          Logger.root.info('Session ID refreshed, retrying notification send');
           await _sendHttpPost(notification.toJson());
         } else {
-          Logger.root.severe('刷新会话ID失败，无法发送通知: $method');
+          Logger.root.severe('Failed to refresh session ID, cannot send notification: $method');
           rethrow;
         }
       } else {
-        // 其他错误直接抛出
+        // Other errors, throw an exception directly
         rethrow;
       }
     }

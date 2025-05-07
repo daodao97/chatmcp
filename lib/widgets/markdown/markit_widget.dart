@@ -20,7 +20,7 @@ class MarkitTestPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     String testMarkdown = r'''
-这张图片是一个数学题，涉及到一个学校教学楼的防滑地砖的计费计算。题目描述如下：
+This image is a math problem, involving the calculation of the cost of anti-slip floor tiles in a school building. The problem description is as follows:
 
 <think data-name="test1" age="18" start-time="2025-02-07 10:00:00"># test</think status="en">
 
