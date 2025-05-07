@@ -92,7 +92,7 @@ class McpServerProvider extends ChangeNotifier {
       if (data['mcpServers'] == null) {
         data['mcpServers'] = <String, dynamic>{};
       }
-      // 遍历data['mcpServers']，直接设置installed为true，
+      // Iterate through data['mcpServers'], directly setting installed to true
       for (var server in data['mcpServers'].entries) {
         server.value['installed'] = true;
       }
@@ -145,7 +145,7 @@ class McpServerProvider extends ChangeNotifier {
     final allServerConfig = await _loadServers();
     final serverConfig = allServerConfig['mcpServers'] as Map<String, dynamic>;
 
-    // 检查默认内存服务器是否已存在，如不存在则添加
+    // Check if the default in-memory servers exist, if not, add them
     bool needSave = false;
     for (var server in defaultInMemoryServers) {
       if (!serverConfig.containsKey(server['name'])) {
@@ -154,12 +154,12 @@ class McpServerProvider extends ChangeNotifier {
       }
     }
 
-    // 如果有新增服务器，保存配置
+    // If there are new servers, save the configuration
     if (needSave) {
       await saveServers({'mcpServers': serverConfig});
     }
 
-    // 过滤得到所有内存类型服务器
+    // Filter to get all in-memory type servers
     final servers = Map.fromEntries(serverConfig.entries
         .where((entry) => entry.value['type'] == 'inmemory'));
 
@@ -173,7 +173,7 @@ class McpServerProvider extends ChangeNotifier {
     final newServers = <String, dynamic>{};
     newServers.addAll(allServerConfig['mcpServers'] as Map<String, dynamic>);
     newServers[server['name']] = server;
-    // 更新配置
+    // Update configuration
     allServerConfig['mcpServers'] = newServers;
     await saveServers(allServerConfig);
     notifyListeners();
@@ -227,17 +227,17 @@ class McpServerProvider extends ChangeNotifier {
     return _tools;
   }
 
-  // 存储工具类别的启用状态
+  // Store the enabled status of tool categories
   final Map<String, bool> _toolCategoryEnabled = {};
   Map<String, bool> get toolCategoryEnabled => _toolCategoryEnabled;
 
-  // 切换工具类别的启用状态
+  // Toggle the enabled status of tool categories
   void toggleToolCategory(String category, bool enabled) {
     _toolCategoryEnabled[category] = enabled;
     notifyListeners();
   }
 
-  // 获取工具类别的启用状态，默认为启用
+  // Get the enabled status of tool categories, default is enabled
   bool isToolCategoryEnabled(String category) {
     return _toolCategoryEnabled[category] ?? false;
   }
@@ -415,9 +415,9 @@ class McpServerProvider extends ChangeNotifier {
           sseServers = servers;
         }
 
-        // 获取本地已安装的mcp服务器
+        // Get locally installed mcp servers
         final localInstalledServers = await _loadServers();
-        //遍历sseServers，如果本地已安装的mcp服务器中存在，则将sseServers中的该服务器设置为已安装
+        // Iterate through sseServers, if the locally installed mcp server exists, set the server in sseServers to installed
         for (var server in sseServers.entries) {
           if (localInstalledServers['mcpServers'][server.key] != null) {
             server.value['installed'] = true;

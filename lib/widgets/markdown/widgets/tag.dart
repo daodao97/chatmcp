@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:markdown/markdown.dart' as md;
 
-// 属性匹配正则表达式
+// Attribute matching regular expression
 final attributeRegex =
     RegExp(r'''([\w-]+)\s*=\s*(?:["']([^"'>]+)["']|([^\s>"']+))''');
 
@@ -21,7 +21,7 @@ class TagInlineSyntax extends md.InlineSyntax {
     for (final match in matches) {
       if (match.groupCount >= 1) {
         final key = match.group(1) ?? '';
-        // 值可能在引号组或无引号组中
+        // The value may be in the quote group or the non-quote group
         final value = match.group(2) ?? match.group(3) ?? '';
         if (key.isNotEmpty) {
           attributes[key] = value;
@@ -40,7 +40,7 @@ class TagInlineSyntax extends md.InlineSyntax {
 
     final element = md.Element(tag, [md.Text(content)]);
 
-    // 合并开始和结束标签的属性
+    // Merge the attributes of the start and end tags
     element.attributes.addAll(openingAttributes);
     element.attributes.addAll(closingAttributes);
 
@@ -74,7 +74,7 @@ class TagBlockSyntax extends md.BlockSyntax {
     for (final match in matches) {
       if (match.groupCount >= 1) {
         final key = match.group(1) ?? '';
-        // 值可能在引号组或无引号组中
+        // The value may be in the quote group or the non-quote group
         final value = match.group(2) ?? match.group(3) ?? '';
         if (key.isNotEmpty) {
           attributes[key] = value;
@@ -119,7 +119,7 @@ class TagBlockSyntax extends md.BlockSyntax {
     final content = lines.join('\n');
     md.Element el = md.Element.text(tag, content);
 
-    // 合并开始和结束标签的属性
+    // Merge the attributes of the start and end tags
     el.attributes.addAll(openingAttributes);
     el.attributes.addAll(closingAttributes);
 

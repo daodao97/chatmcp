@@ -149,7 +149,7 @@ class OllamaClient extends BaseLLMClient {
         try {
           final json = jsonDecode(jsonStr);
 
-          // 检查 choices 数组是否为空
+          // Check if the choices array is empty
           if (json['choices'] == null || json['choices'].isEmpty) {
             continue;
           }

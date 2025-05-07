@@ -307,7 +307,7 @@ class ChatSetting extends StatelessWidget {
     );
   }
 
-  /// 将double值四舍五入到小数点后一位
+  /// Round double value to one decimal place
   double _roundToOneDecimal(double value) {
     return (value * 10).round() / 10;
   }

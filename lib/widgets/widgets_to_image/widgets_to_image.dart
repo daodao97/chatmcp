@@ -4,14 +4,14 @@ import 'utils.dart';
 class WidgetsToImage extends StatelessWidget {
   final Widget? child;
   final WidgetsToImageController controller;
-  // 添加新的属性
+  // Add new property
   final bool captureAll;
 
   const WidgetsToImage({
     super.key,
     required this.child,
     required this.controller,
-    this.captureAll = false, // 默认为false
+    this.captureAll = false, // Default to false
   });
 
   @override
@@ -23,7 +23,7 @@ class WidgetsToImage extends StatelessWidget {
       );
     }
 
-    // 使用SingleChildScrollView包装，确保所有内容都被渲染
+    // Wrap with SingleChildScrollView to ensure all content is rendered
     return RepaintBoundary(
       key: controller.containerKey,
       child: SingleChildScrollView(

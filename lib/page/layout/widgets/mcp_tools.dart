@@ -21,7 +21,7 @@ class _McpToolsState extends State<McpTools> {
   bool _isLoading = true;
   String? _error;
 
-  // 服务器状态提供者
+  // Server status provider
   final ServerStateProvider _stateProvider = ServerStateProvider();
 
   @override
@@ -33,7 +33,7 @@ class _McpToolsState extends State<McpTools> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    // 监听 provider 变化并重新加载服务器列表
+    // Listen to provider changes and reload the server list
     final provider = Provider.of<McpServerProvider>(context);
     if (provider.loadingServerTools == false) {
       _loadServers();
@@ -69,28 +69,28 @@ class _McpToolsState extends State<McpTools> {
     }
   }
 
-  // 处理服务器的状态切换
+  // Handle server status switching
   Future<void> _handleServerToggle(
       BuildContext context, String serverName, bool newValue) async {
     final provider = Provider.of<McpServerProvider>(context, listen: false);
 
-    // 更新启用状态
+    // Update enabled status
     _stateProvider.setEnabled(serverName, newValue);
 
-    // 更新Provider中的状态
+    // Update the status in the Provider
     provider.toggleToolCategory(serverName, newValue);
 
-    // 如果新状态为true且服务器未运行，则启动服务器
+    // If the new status is true and the server is not running, start the server
     if (newValue && !provider.mcpServerIsRunning(serverName)) {
-      // 设置启动中状态
+      // Set starting status
       _stateProvider.setStarting(serverName, true);
 
       try {
         await provider.startMcpServer(serverName);
-        // 更新运行状态
+        // Update running status
         _stateProvider.setRunning(serverName, true);
       } catch (e) {
-        // 启动失败，更新状态
+        // Start failed, update status
         _stateProvider.setRunning(serverName, false);
         _stateProvider.setStarting(serverName, false);
       }
@@ -140,7 +140,7 @@ class _McpToolsState extends State<McpTools> {
                           )
                         : Container(
                             constraints: const BoxConstraints(
-                              maxHeight: 400, // 限制菜单项列表的最大高度
+                              maxHeight: 400, // Limit the maximum height of the menu item list
                             ),
                             child: SingleChildScrollView(
                               child: Column(
@@ -170,7 +170,7 @@ class _McpToolsState extends State<McpTools> {
         Provider.of<McpServerProvider>(context, listen: false);
     final List<Widget> menuItems = [];
 
-    // 处理加载状态
+    // Handle loading status
     if (_isLoading) {
       return [
         const SizedBox(
@@ -186,7 +186,7 @@ class _McpToolsState extends State<McpTools> {
       ];
     }
 
-    // 处理错误状态
+    // Handle error status
     if (_error != null) {
       return [
         SizedBox(
@@ -199,7 +199,7 @@ class _McpToolsState extends State<McpTools> {
       ];
     }
 
-    // 处理无数据状态
+    // Handle no data status
     if (_cachedServers == null || _cachedServers!.isEmpty) {
       return [
         SizedBox(
@@ -212,14 +212,14 @@ class _McpToolsState extends State<McpTools> {
       ];
     }
 
-    // 使用缓存的服务器列表构建菜单项
+    // Build menu items using the cached server list
     for (String serverName in _cachedServers!) {
-      // 添加分隔线
+      // Add a divider
       if (menuItems.isNotEmpty) {
         menuItems.add(const Divider(height: 1));
       }
 
-      // 使用普通的 Container 替代 CustomPopupMenuWidget
+      // Use a normal Container instead of CustomPopupMenuWidget
       menuItems.add(
         Container(
           height: 40,
@@ -232,7 +232,7 @@ class _McpToolsState extends State<McpTools> {
                 bool isRunning = stateProvider.isRunning(serverName);
                 bool isStarting = stateProvider.isStarting(serverName);
 
-                // 获取服务器工具数量
+                // Get the number of server tools
                 List<Map<String, dynamic>>? serverTools =
                     provider.tools[serverName];
                 int toolCount = serverTools?.length ?? 0;

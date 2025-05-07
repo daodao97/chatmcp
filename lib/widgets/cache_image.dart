@@ -14,7 +14,7 @@ class CacheImage extends StatelessWidget {
   });
 
   Future<void> _downloadImage(BuildContext context) async {
-    // 获取全局上下文
+    // Get the global context
     final scaffoldContext = Navigator.of(context).context;
     try {
       if (!scaffoldContext.mounted) return;
@@ -22,26 +22,26 @@ class CacheImage extends StatelessWidget {
         const SnackBar(content: Text('start to save image...')),
       );
 
-      // 从缓存中获取文件
+      // Get the file from the cache
       var fileInfo = await DefaultCacheManager().getFileFromCache(imageUrl);
       fileInfo ??= await DefaultCacheManager().downloadFile(imageUrl);
 
       if (Platform.isAndroid || Platform.isIOS) {
         // todo
       } else {
-        // 获取下载目录
+        // Get the download directory
         final dir = await getDownloadsDirectory();
         if (dir == null) {
           throw Exception('cannot get download directory');
         }
 
-        // 从URL中提取文件扩展名
+        // Extract the file extension from the URL
         final extension = imageUrl.split('.').last.split('?').first;
         final fileName =
             'image_${DateTime.now().millisecondsSinceEpoch}.$extension';
         final savePath = '${dir.path}/$fileName';
 
-        // 复制文件
+        // Copy the file
         await fileInfo.file.copy(savePath);
 
         if (!scaffoldContext.mounted) return;

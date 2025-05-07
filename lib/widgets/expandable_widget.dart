@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-/// 单行展示的组件
+/// Single-line display component
 class ExpandableRow extends StatelessWidget {
   final List<Widget> children;
   final bool isExpanded;
@@ -27,7 +27,7 @@ class ExpandableRow extends StatelessWidget {
   }
 }
 
-/// 可展开的组件
+/// Expandable component
 class ExpandableWidget extends StatefulWidget {
   final Widget header;
   final Widget expandedContent;

@@ -43,7 +43,7 @@ class _ListViewToImageScreenState extends State<ListViewToImageScreen> {
       ),
       body: ScrollConfiguration(
         behavior: ScrollConfiguration.of(context).copyWith(
-          scrollbars: false, // 完全禁用滚动条
+          scrollbars: false, // Disable scrollbars
         ),
         child: SingleChildScrollView(
           controller: _scrollController,
@@ -121,7 +121,7 @@ class _ListViewToImageScreenState extends State<ListViewToImageScreen> {
 
   Future<void> _captureListViewAsImage() async {
     try {
-      // 创建一个离屏widget来渲染完整内容
+      // Create an off-screen widget to render the complete content
       final renderWidget = Screenshot(
         controller: screenshotController,
         child: MediaQuery(
@@ -134,10 +134,10 @@ class _ListViewToImageScreenState extends State<ListViewToImageScreen> {
         ),
       );
 
-      // 使用Overlay将widget临时添加到屏幕外
+      // Use Overlay to temporarily add the widget to the off-screen
       final overlayEntry = OverlayEntry(
         builder: (context) => Positioned(
-          left: -10000, // 放在屏幕外
+          left: -10000, // Place it outside the screen
           child: SizedBox(
             width: MediaQuery.of(context).size.width,
             child: renderWidget,
@@ -147,19 +147,19 @@ class _ListViewToImageScreenState extends State<ListViewToImageScreen> {
 
       Overlay.of(context).insert(overlayEntry);
 
-      // 等待widget完全渲染
+      // Wait for the widget to fully render
       await Future.delayed(const Duration(milliseconds: 500));
 
-      // 捕获图像
+      // Capture the image
       final image = await screenshotController.capture(
         pixelRatio: 3.0,
       );
 
-      // 移除临时widget
+      // Remove the temporary widget
       overlayEntry.remove();
 
       if (image == null) {
-        Logger.root.severe('截图失败: 无法获取图片');
+        Logger.root.severe('Failed to capture image: cannot get image');
         return;
       }
 
@@ -199,7 +199,7 @@ class _ListViewToImageScreenState extends State<ListViewToImageScreen> {
         Navigator.of(context).pop();
       }
     } catch (e) {
-      Logger.root.severe('截图失败: $e');
+      Logger.root.severe('Failed to capture image: $e');
     }
   }
 }

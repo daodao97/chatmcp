@@ -35,7 +35,7 @@ class _MessageListState extends State<MessageList> {
   bool _isScrolledToBottom({double threshold = 1.0}) {
     if (!_scrollController.hasClients) return true;
     final currentScroll = _scrollController.offset;
-    // 允许1像素的误差
+    // Allow 1 pixel error
     return (endScroll - currentScroll).abs() <= threshold;
   }
 
@@ -113,7 +113,7 @@ class _MessageListState extends State<MessageList> {
           _scrollToBottom();
         }
 
-        // 将消息分组
+        // Group messages
         List<List<ChatMessage>> groupedMessages = [];
         List<ChatMessage> currentGroup = [];
 
@@ -142,7 +142,7 @@ class _MessageListState extends State<MessageList> {
               controller: _scrollController,
               padding: const EdgeInsets.all(16.0),
               itemCount: groupedMessages.length,
-              // physics: const ClampingScrollPhysics(), // 禁用弹性效果
+              // physics: const ClampingScrollPhysics(), // Disable elastic effect
               itemBuilder: (context, index) {
                 final group = groupedMessages[index];
 
