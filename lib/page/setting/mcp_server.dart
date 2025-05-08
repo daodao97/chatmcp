@@ -295,6 +295,12 @@ class _McpServerState extends State<McpServer> {
     McpServerProvider provider,
     bool installed,
   ) {
+    // Add search filter
+    final searchText = _searchController.text.toLowerCase();
+    if (searchText.isNotEmpty && !serverName.toLowerCase().contains(searchText)) {
+      return const SizedBox.shrink();
+    }
+
     final l10n = AppLocalizations.of(context)!;
     bool serverActive = isActive(serverName);
 

@@ -603,7 +603,12 @@ class _ChatPageState extends State<ChatPage> {
       if (toolName == null || toolArguments == null) continue;
 
       try {
-        final toolArgumentsMap = jsonc.decode(toolArguments);
+        // 移除换行符和多余的空格
+        final cleanedToolArguments = toolArguments
+            .replaceAll('\n', ' ')
+            .replaceAll(RegExp(r'\s+'), ' ')
+            .trim();
+        final toolArgumentsMap = jsonc.decode(cleanedToolArguments);
         _onRunFunction(RunFunctionEvent(toolName, toolArgumentsMap));
       } catch (e) {
         Logger.root.warning('解析工具参数失败: $e');
