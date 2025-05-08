@@ -22,26 +22,19 @@ sudo apt-get install libsqlite3-0 libsqlite3-dev
 
 ## Preview
 
-### Deep Think
-![preview](./assets/preview/think.png)
+![Artifact Display](./assets/preview/artifact.gif)
+![Thinking Mode](./assets/preview/think.png)
+![Generate Image](./assets/preview/gen_img.png)
+![LaTeX Support](./assets/preview/latex.png)
+![HTML Preview](./assets/preview/html-preview.png)
+![Mermaid Diagram](./assets/preview/mermaid.png)
+![mcp workflow](./assets/preview/mcp-workerflow.png)
+![mcp inmemory](./assets/preview/mcp-inmemory.png)
+![MCP Tools](./assets/preview/mcp-tools.png)
+![LLM Provider](./assets/preview/llm-provider.png)
+![MCP Stdio](./assets/preview/mcp-stdio.png)
+![MCP SSE](./assets/preview/mcp-sse.png)
 
-### Artifact generation and review
-![preview](./assets/preview/artifact.png)
-
-### Dalle Gen Image
-![preview](./assets/preview/gen_img.png)
-
-### HTML Code Preview
-![preview](./assets/preview/html.png)
-
-### MCP Fetch Url
-![preview](./assets/preview/mcp_fetch.png)
-
-### Mermaid Diagram
-![preview](./assets/preview/mermaid.png)
-
-### Web Search
-![preview](./assets/preview/web_search.png)
 
 ## Usage
 

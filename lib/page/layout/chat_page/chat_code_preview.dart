@@ -1,12 +1,16 @@
 import 'package:chatmcp/provider/provider_manager.dart';
 import 'package:chatmcp/utils/platform.dart';
+import 'package:chatmcp/widgets/markdown/widgets/html_view.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_highlight/themes/github.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter/foundation.dart';
 import 'package:chatmcp/utils/event_bus.dart';
 import 'package:chatmcp/widgets/markdown/markit_widget.dart';
 import 'package:chatmcp/utils/color.dart';
 import 'package:chatmcp/generated/app_localizations.dart';
+import 'package:flutter_highlight/flutter_highlight.dart';
 
 class ChatCodePreview extends StatefulWidget {
   final CodePreviewEvent codePreviewEvent;
@@ -58,6 +62,9 @@ class _ChatCodePreviewState extends State<ChatCodePreview> {
     setState(() => _webViewKey = UniqueKey());
   }
 
+  CodePreviewEvent? get codePreviewEvent =>
+      ProviderManager.chatProvider.artifactEvent;
+
   Widget _buildToolBar() {
     var t = AppLocalizations.of(context)!;
     return Container(
@@ -87,11 +94,32 @@ class _ChatCodePreviewState extends State<ChatCodePreview> {
                     return;
                   }
                   setState(() {
-                    emit(CodePreviewEvent(widget.codePreviewEvent.textContent,
-                        widget.codePreviewEvent.attributes));
+                    ProviderManager.chatProvider.clearArtifactEvent();
                   });
                 },
                 icon: const Icon(Icons.close),
+              ),
+              const SizedBox(width: 4),
+              // copy button
+              TextButton(
+                onPressed: () {
+                  Clipboard.setData(
+                      ClipboardData(text: widget.codePreviewEvent.textContent));
+                },
+                style: IconButton.styleFrom(
+                  iconSize: 16,
+                  padding: const EdgeInsets.all(0),
+                  minimumSize: Size.zero,
+                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                ),
+                child: Text(
+                  t.copy,
+                  style: TextStyle(
+                    fontSize: 9,
+                    height: 1,
+                    color: AppColors.getInactiveTextColor(context),
+                  ),
+                ),
               ),
               const SizedBox(width: 4),
               TextButton(
@@ -171,11 +199,62 @@ class _ChatCodePreviewState extends State<ChatCodePreview> {
     );
   }
 
+  Widget _buildSandboxWebView({required int sandboxServerPort}) {
+    var t = AppLocalizations.of(context)!;
+    return InAppWebView(
+      key: _webViewKey,
+      initialSettings: InAppWebViewSettings(
+        javaScriptEnabled: true,
+        transparentBackground: true,
+        isInspectable: kDebugMode,
+      ),
+      initialUrlRequest: URLRequest(
+        url: WebUri('http://localhost:$sandboxServerPort'),
+        headers: {
+          'Content-Type': 'text/html; charset=UTF-8',
+        },
+      ),
+      onLoadStop: (controller, url) async {
+        await Future.delayed(const Duration(milliseconds: 1000));
+        // 注入并执行 JavaScript 代码
+        await controller.evaluateJavascript(
+            source:
+                '''updateCode("${Uri.encodeComponent(codePreviewEvent?.textContent ?? '')}")''');
+      },
+      onCreateWindow: (controller, request) => Future.value(false),
+      onReceivedError: (controller, request, error) {
+        debugPrint('Error on received error: ${error.description}');
+        _handleError();
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     var t = AppLocalizations.of(context)!;
     if (_hasError) {
-      return Center(child: Text(t.loadContentFailed));
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(t.loadContentFailed),
+            const SizedBox(height: 8),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.getToolbarBackgroundColor(context),
+              ),
+              onPressed: () {
+                setState(() {
+                  _hasError = false;
+                  _retryCount = 0;
+                });
+                _resetWebView();
+              },
+              child: Text(t.retry),
+            ),
+          ],
+        ),
+      );
     }
 
     String language = widget.codePreviewEvent.attributes['type'] ?? '';
@@ -201,6 +280,8 @@ class _ChatCodePreviewState extends State<ChatCodePreview> {
       language = "c";
     }
 
+    print("language: $language");
+
     final sandboxServerPort =
         ProviderManager.settingsProvider.sandboxServerPort;
 
@@ -218,10 +299,16 @@ class _ChatCodePreviewState extends State<ChatCodePreview> {
             _buildToolBar(),
             Expanded(
               child: language == "text/markdown"
-                  ? Markit(data: widget.codePreviewEvent.textContent)
-                  : Markit(data: '''```$language
-${widget.codePreviewEvent.textContent}
-```'''),
+                  ? Markit(data: codePreviewEvent?.textContent ?? '')
+                  : SizedBox(
+                      width: double.infinity,
+                      child: HighlightView(
+                        codePreviewEvent?.textContent ?? '',
+                        language: language,
+                        theme: githubTheme,
+                        padding: const EdgeInsets.all(8),
+                      ),
+                    ),
             ),
           ],
         ),
@@ -241,37 +328,24 @@ ${widget.codePreviewEvent.textContent}
           _buildToolBar(),
           Expanded(
             child: !_showCode
-                ? InAppWebView(
-                    key: _webViewKey,
-                    initialSettings: InAppWebViewSettings(
-                      javaScriptEnabled: true,
-                      transparentBackground: true,
-                      isInspectable: kDebugMode,
+                ? (language == "html"
+                    ? HtmlView(
+                        html: codePreviewEvent?.textContent ?? '',
+                      )
+                    : _buildSandboxWebView(
+                        sandboxServerPort: sandboxServerPort,
+                      ))
+                : SingleChildScrollView(
+                    child: SizedBox(
+                      width: double.infinity,
+                      child: HighlightView(
+                        codePreviewEvent?.textContent ?? '',
+                        language: language,
+                        theme: githubTheme,
+                        padding: const EdgeInsets.all(8),
+                      ),
                     ),
-                    initialUrlRequest: URLRequest(
-                      url: WebUri('http://localhost:$sandboxServerPort'),
-                      headers: {
-                        'Content-Type': 'text/html; charset=UTF-8',
-                      },
-                    ),
-                    onLoadStop: (controller, url) async {
-                      await Future.delayed(const Duration(milliseconds: 1000));
-                      // 注入并执行 JavaScript 代码
-                      await controller.evaluateJavascript(
-                          source:
-                              '''updateCode("${Uri.encodeComponent(widget.codePreviewEvent.textContent)}")''');
-                    },
-                    onCreateWindow: (controller, request) =>
-                        Future.value(false),
-                    onReceivedError: (controller, request, error) {
-                      debugPrint(
-                          'Error on received error: ${error.description}');
-                      _handleError();
-                    },
-                  )
-                : Markit(data: '''```$language
-${widget.codePreviewEvent.textContent}
-```'''),
+                  ),
           ),
         ],
       ),

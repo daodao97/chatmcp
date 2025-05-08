@@ -109,7 +109,7 @@ class ChatHistoryList extends StatelessWidget {
                 child: CText(
                   text: entry.key,
                   size: 10,
-                  fontWeight: FontWeight.w500,
+                  fontWeight: FontWeight.w700,
                 ),
               ),
               ...entry.value.map(
@@ -118,6 +118,7 @@ class ChatHistoryList extends StatelessWidget {
                   chatProvider: chatProvider,
                 ),
               ),
+              const Gap(size: 12),
             ],
           );
         },

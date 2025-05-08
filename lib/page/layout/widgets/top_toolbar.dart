@@ -76,6 +76,10 @@ class TopToolbar extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
+            UpgradeNotice(
+              showCheckUpdate: true,
+              autoCheck: false,
+            ),
             if (ProviderManager.chatProvider.activeChat != null)
               InkWell(
                 onTap: () {
@@ -99,10 +103,6 @@ class TopToolbar extends StatelessWidget {
                   ),
                 ),
               ),
-            UpgradeNotice(
-              showCheckUpdate: true,
-              autoCheck: false,
-            ),
             InkWell(
               onTap: () {
                 _onShowChatSetting(context);

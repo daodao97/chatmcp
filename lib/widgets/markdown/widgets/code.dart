@@ -9,6 +9,7 @@ import 'package:flutter_highlight/flutter_highlight.dart';
 
 import 'mermaid_diagram_view.dart' show MermaidDiagramView;
 import 'html_view.dart';
+import './artifact.dart';
 
 SpanNodeGeneratorWithTag codeBlockGenerator = SpanNodeGeneratorWithTag(
     tag: "pre",
@@ -57,9 +58,24 @@ class CodeBlockNode extends ElementNode {
           splitContents: splitContents,
           visitor: visitor),
     );
+
+    if (language != 'html') {
+      return WidgetSpan(
+          child: preConfig.wrapper?.call(widget, content, language ?? '') ??
+              widget);
+    }
+
+    final widget1 = ArtifactAntArtifactWidget(
+      content,
+      {
+        'title': content.length > 20 ? content.substring(0, 20) : content,
+        'closed': isClosed.toString(),
+        'type': language ?? '',
+      },
+    );
     return WidgetSpan(
-        child:
-            preConfig.wrapper?.call(widget, content, language ?? '') ?? widget);
+        child: preConfig.wrapper?.call(widget1, content, language ?? '') ??
+            widget1);
   }
 
   @override

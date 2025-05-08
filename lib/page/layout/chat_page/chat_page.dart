@@ -30,8 +30,6 @@ class ChatPage extends StatefulWidget {
 }
 
 class _ChatPageState extends State<ChatPage> {
-  // 状态变量
-  bool _showCodePreview = false;
   Chat? _chat;
   List<ChatMessage> _messages = [];
   bool _isComposing = false; // 是否正在输入
@@ -55,14 +53,13 @@ class _ChatPageState extends State<ChatPage> {
   void initState() {
     super.initState();
     _initializeState();
-    on<CodePreviewEvent>(_onArtifactEvent);
+    // on<CodePreviewEvent>(_onArtifactEvent);
     on<ShareEvent>(_handleShare);
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (_isMobile() != mobile) {
         setState(() {
           mobile = _isMobile();
-          _showCodePreview = false;
         });
       }
       if (!mobile && showModalCodePreview) {
@@ -194,7 +191,19 @@ class _ChatPageState extends State<ChatPage> {
 
   void _onChatProviderChanged() {
     _initializeHistoryMessages();
+
+    if (ProviderManager.chatProvider.artifactEvent != null) {
+      if (_isMobile()) {
+        _showMobileCodePreview();
+      }
+    }
+
+    setState(() {
+      _showCodePreview = ProviderManager.chatProvider.showCodePreview;
+    });
   }
+
+  bool _showCodePreview = false;
 
   List<ChatMessage> _allMessages = [];
 
@@ -333,9 +342,6 @@ class _ChatPageState extends State<ChatPage> {
   // 消息处理相关方法
   Future<void> _initializeHistoryMessages() async {
     final activeChat = ProviderManager.chatProvider.activeChat;
-    setState(() {
-      _showCodePreview = false;
-    });
     if (activeChat == null && _messages.isEmpty) {
       setState(() {
         _messages = [];
@@ -359,6 +365,8 @@ class _ChatPageState extends State<ChatPage> {
         // 如果没有找到合适的消息，使用最后一条消息的ID
         parentId = messages.last.messageId;
       }
+
+      ProviderManager.chatProvider.clearArtifactEvent();
 
       setState(() {
         _messages = messages;
@@ -1003,7 +1011,7 @@ class _ChatPageState extends State<ChatPage> {
   CodePreviewEvent? _codePreviewEvent;
 
   void _onArtifactEvent(CodePreviewEvent event) {
-    _toggleCodePreview();
+    // _toggleCodePreview();
     setState(() {
       _codePreviewEvent = event;
     });
@@ -1059,21 +1067,6 @@ class _ChatPageState extends State<ChatPage> {
         );
       },
     );
-  }
-
-  void _toggleCodePreview() {
-    if (_isMobile()) {
-      _showMobileCodePreview();
-      if (_showCodePreview) {
-        setState(() {
-          _showCodePreview = false;
-        });
-      }
-    } else {
-      setState(() {
-        _showCodePreview = !_showCodePreview;
-      });
-    }
   }
 
   Widget _buildFunctionRunning() {
@@ -1150,12 +1143,10 @@ class _ChatPageState extends State<ChatPage> {
         ),
         if (!mobile && _showCodePreview)
           Expanded(
-            flex: 1,
-            child: _codePreviewEvent != null
-                ? ChatCodePreview(
-                    codePreviewEvent: _codePreviewEvent!,
-                  )
-                : const SizedBox.shrink(),
+            flex: 2,
+            child: ChatCodePreview(
+              codePreviewEvent: ProviderManager.chatProvider.artifactEvent!,
+            ),
           ),
       ],
     );

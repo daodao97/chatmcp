@@ -1,3 +1,4 @@
+import 'package:chatmcp/provider/provider_manager.dart';
 import 'package:chatmcp/utils/color.dart';
 import 'package:flutter/material.dart';
 import 'package:markdown_widget/markdown_widget.dart';
@@ -73,7 +74,7 @@ class ArtifactAntArtifactNode extends ThinkNode {
   }
 }
 
-class ArtifactAntArtifactWidget extends StatelessWidget {
+class ArtifactAntArtifactWidget extends StatefulWidget {
   final String textContent;
   final Map<String, String> attributes;
 
@@ -81,13 +82,27 @@ class ArtifactAntArtifactWidget extends StatelessWidget {
       {super.key});
 
   @override
+  State<ArtifactAntArtifactWidget> createState() =>
+      _ArtifactAntArtifactWidgetState();
+}
+
+class _ArtifactAntArtifactWidgetState extends State<ArtifactAntArtifactWidget> {
+  @override
   Widget build(BuildContext context) {
-    String title = attributes['title'] ?? '';
-    bool isClosed = attributes['closed'] == 'true';
+    String title = widget.attributes['title'] ?? '';
+    bool isClosed = widget.attributes['closed'] == 'true';
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        ProviderManager.chatProvider.setArtifactEvent(
+          CodePreviewEvent(widget.textContent, widget.attributes),
+        );
+      }
+    });
 
     return InkWell(
       onTap: () {
-        emit(CodePreviewEvent(textContent, attributes));
+        ProviderManager.chatProvider.setShowCodePreview(true);
       },
       child: Container(
         width: 300,

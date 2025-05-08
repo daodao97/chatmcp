@@ -1,3 +1,4 @@
+import 'package:chatmcp/utils/event_bus.dart';
 import 'package:flutter/material.dart';
 import 'package:chatmcp/dao/chat.dart';
 import 'package:chatmcp/dao/chat_message.dart';
@@ -16,6 +17,27 @@ class ChatProvider extends ChangeNotifier {
 
   Chat? get activeChat => _activeChat;
   List<Chat> get chats => _chats;
+
+  bool _showCodePreview = false;
+  bool get showCodePreview => _showCodePreview;
+  void setShowCodePreview(bool show) {
+    _showCodePreview = show;
+    notifyListeners();
+  }
+
+  CodePreviewEvent? _artifactEvent;
+  CodePreviewEvent? get artifactEvent => _artifactEvent;
+
+  void setArtifactEvent(CodePreviewEvent event) {
+    _artifactEvent = event;
+    notifyListeners();
+  }
+
+  void clearArtifactEvent() {
+    _artifactEvent = null;
+    notifyListeners();
+    setShowCodePreview(false);
+  }
 
   Future<void> loadChats() async {
     final chatDao = ChatDao();

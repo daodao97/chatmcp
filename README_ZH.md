@@ -24,26 +24,19 @@ Android：[release](https://github.com/daodao97/chatmcp/releases)
 
 ## 预览
 
-### 深度思考
-![预览](./assets/preview/think.png)
+![Artifact Display](./assets/preview/artifact.gif)
+![Thinking Mode](./assets/preview/think.png)
+![Generate Image](./assets/preview/gen_img.png)
+![LaTeX Support](./assets/preview/latex.png)
+![HTML Preview](./assets/preview/html-preview.png)
+![Mermaid Diagram](./assets/preview/mermaid.png)
+![mcp workflow](./assets/preview/mcp-workerflow.png)
+![mcp inmemory](./assets/preview/mcp-inmemory.png)
+![MCP Tools](./assets/preview/mcp-tools.png)
+![LLM Provider](./assets/preview/llm-provider.png)
+![MCP Stdio](./assets/preview/mcp-stdio.png)
+![MCP SSE](./assets/preview/mcp-sse.png)
 
-### 代码生成与审查
-![预览](./assets/preview/artifact.png)
-
-### Dalle 图像生成
-![预览](./assets/preview/gen_img.png)
-
-### HTML 代码预览
-![预览](./assets/preview/html.png)
-
-### MCP 网址获取
-![预览](./assets/preview/mcp_fetch.png)
-
-### Mermaid 图表
-![预览](./assets/preview/mermaid.png)
-
-### 网络搜索
-![预览](./assets/preview/web_search.png)
 
 ## 使用方法
 
