@@ -9,10 +9,10 @@ import './widgets/details.dart';
 import 'widgets/think.dart';
 import './widgets/artifact.dart';
 import './widgets/image.dart';
-import 'package:flutter_highlight/themes/github.dart';
 import './widgets/inline_code.dart';
 import './widgets/function.dart';
 import './widgets/function_result.dart';
+import 'package:chatmcp/components/widgets/base.dart';
 
 class MarkitTestPage extends StatelessWidget {
   const MarkitTestPage({super.key});
@@ -60,8 +60,6 @@ class Markit extends StatelessWidget {
 
   Widget buildMarkdown(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final config =
-        isDark ? MarkdownConfig.darkConfig : MarkdownConfig.defaultConfig;
     return SingleChildScrollView(
       child: MarkdownBlock(
         data: data,
@@ -69,26 +67,62 @@ class Markit extends StatelessWidget {
           configs: [
             PConfig(
                 textStyle: textStyle ??
-                    const TextStyle(fontSize: 14, height: 20 / 14)),
-            H1Config(style: const TextStyle(fontSize: 24, height: 24 / 24)),
-            H2Config(style: const TextStyle(fontSize: 20, height: 20 / 20)),
-            H3Config(style: const TextStyle(fontSize: 16, height: 16 / 16)),
-            H4Config(style: const TextStyle(fontSize: 12, height: 12 / 12)),
-            H5Config(style: const TextStyle(fontSize: 14, height: 14 / 14)),
-            H6Config(style: const TextStyle(fontSize: 14, height: 14 / 14)),
+                    FontUtils.getPlatformTextStyle(
+                      context: context,
+                      size: 14,
+                      height: 20 / 14,
+                    )),
+            H1Config(style: FontUtils.getPlatformTextStyle(
+              context: context,
+              size: 24,
+              height: 24 / 24,
+            )),
+            H2Config(style: FontUtils.getPlatformTextStyle(
+              context: context,
+              size: 20,
+              height: 20 / 20,
+            )),
+            H3Config(style: FontUtils.getPlatformTextStyle(
+              context: context,
+              size: 16,
+              height: 16 / 16,
+            )),
+            H4Config(style: FontUtils.getPlatformTextStyle(
+              context: context,
+              size: 12,
+              height: 12 / 12,
+            )),
+            H5Config(style: FontUtils.getPlatformTextStyle(
+              context: context,
+              size: 14,
+              height: 14 / 14,
+            )),
+            H6Config(style: FontUtils.getPlatformTextStyle(
+              context: context,
+              size: 14,
+              height: 14 / 14,
+            )),
             TableConfig(),
             CodeConfig(),
             LinkConfig(
-              style: const TextStyle(
+              style: FontUtils.getPlatformTextStyle(
+                context: context,
                 color: Colors.yellow,
+              ).copyWith(
                 decoration: TextDecoration.underline,
               ),
             ),
             isDark
                 ? PreConfig.darkConfig
-                    .copy(textStyle: const TextStyle(fontSize: 12))
-                : PreConfig().copy(textStyle: const TextStyle(fontSize: 12)),
-            DetailConfig(),
+                    .copy(textStyle: FontUtils.getPlatformTextStyle(
+                      context: context,
+                      size: 12,
+                    ))
+                : PreConfig().copy(textStyle: FontUtils.getPlatformTextStyle(
+                      context: context,
+                      size: 12,
+                    )),
+            DetailConfig(context: context),
           ],
         ),
         generator: MarkdownGenerator(
