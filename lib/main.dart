@@ -97,6 +97,14 @@ void main() async {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
+  // 获取当前平台的默认字体
+  String getPlatformFontFamily() {
+    if (Platform.isWindows) {
+      return 'Microsoft YaHei'; // 微软雅黑
+    }
+    return ''; // 其它平台使用 Flutter 默认字体
+  }
+
   @override
   Widget build(BuildContext context) {
     return Consumer<SettingsProvider>(
@@ -108,10 +116,12 @@ class MyApp extends StatelessWidget {
           theme: ThemeData(
             useMaterial3: true,
             brightness: Brightness.light,
+            fontFamily: getPlatformFontFamily(),
           ),
           darkTheme: ThemeData(
             useMaterial3: true,
             brightness: Brightness.dark,
+            fontFamily: getPlatformFontFamily(),
           ),
           themeMode: _getThemeMode(settings.generalSetting.theme),
           home: LayoutPage(),
