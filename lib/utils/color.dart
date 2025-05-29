@@ -323,4 +323,11 @@ class AppColors {
     return getThemeColor(context,
         lightColor: Colors.grey.shade400, darkColor: Colors.grey.shade400);
   }
+
+  // 消息气泡阴影颜色
+  static Color getMessageBubbleShadowColor(BuildContext context) {
+    return getThemeColor(context,
+        lightColor: Colors.black.withOpacity(0.05),
+        darkColor: Colors.black.withOpacity(0.2));
+  }
 }

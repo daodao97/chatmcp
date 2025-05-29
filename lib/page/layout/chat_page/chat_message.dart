@@ -382,23 +382,69 @@ class MessageBubble extends StatelessWidget {
   });
 
   BorderRadius _getBorderRadius() {
-    const double radius = 16.0;
+    const double largeRadius = 16.0;
+    const double smallRadius = 4.0; // For the tail
 
+    // Standalone message (not part of a group or is the only message in a group)
+    if (!useTransparentBackground || position == BubblePosition.single) {
+      if (message.role == MessageRole.user) {
+        return const BorderRadius.only(
+          topLeft: Radius.circular(largeRadius),
+          topRight: Radius.circular(largeRadius),
+          bottomLeft: Radius.circular(largeRadius),
+          bottomRight: Radius.circular(smallRadius), // Tail for user
+        );
+      } else {
+        return const BorderRadius.only(
+          topLeft: Radius.circular(largeRadius),
+          topRight: Radius.circular(largeRadius),
+          bottomLeft: Radius.circular(smallRadius), // Tail for assistant
+          bottomRight: Radius.circular(largeRadius),
+        );
+      }
+    }
+
+    // Message part of a group (useTransparentBackground is true)
+    final isUser = message.role == MessageRole.user;
     switch (position) {
       case BubblePosition.first:
         return const BorderRadius.only(
-          topLeft: Radius.circular(radius),
-          topRight: Radius.circular(radius),
+          topLeft: Radius.circular(largeRadius),
+          topRight: Radius.circular(largeRadius),
+          // No bottom rounding as it connects to the next message
         );
       case BubblePosition.middle:
-        return BorderRadius.zero;
+        return BorderRadius.zero; // Middle messages are flat to connect
       case BubblePosition.last:
-        return const BorderRadius.only(
-          bottomLeft: Radius.circular(radius),
-          bottomRight: Radius.circular(radius),
-        );
+        if (isUser) {
+          return const BorderRadius.only(
+            bottomLeft: Radius.circular(largeRadius),
+            bottomRight: Radius.circular(smallRadius), // Tail for user
+          );
+        } else {
+          return const BorderRadius.only(
+            bottomLeft: Radius.circular(smallRadius), // Tail for assistant
+            bottomRight: Radius.circular(largeRadius),
+          );
+        }
       case BubblePosition.single:
-        return const BorderRadius.all(Radius.circular(radius));
+        // This case should ideally be handled by the !useTransparentBackground block,
+        // but as a fallback, provide full rounding with tail.
+        if (isUser) {
+          return const BorderRadius.only(
+            topLeft: Radius.circular(largeRadius),
+            topRight: Radius.circular(largeRadius),
+            bottomLeft: Radius.circular(largeRadius),
+            bottomRight: Radius.circular(smallRadius),
+          );
+        } else {
+          return const BorderRadius.only(
+            topLeft: Radius.circular(largeRadius),
+            topRight: Radius.circular(largeRadius),
+            bottomLeft: Radius.circular(smallRadius),
+            bottomRight: Radius.circular(largeRadius),
+          );
+        }
     }
   }
 
@@ -417,7 +463,7 @@ class MessageBubble extends StatelessWidget {
 
   EdgeInsets _getPadding() {
     const double horizontal = 16.0;
-    const double verticalNormal = 10.0;
+    const double verticalNormal = 12.0; // Increased vertical padding
 
     switch (position) {
       case BubblePosition.first:
@@ -428,6 +474,7 @@ class MessageBubble extends StatelessWidget {
           bottom: 0,
         );
       case BubblePosition.middle:
+        // No vertical padding for middle messages to maintain continuous bubble look
         return const EdgeInsets.symmetric(
           horizontal: horizontal,
           vertical: 0,
@@ -479,17 +526,36 @@ class ToolCallWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final toolCallName = message.toolCalls![0]['function']['name'];
     return Container(
-      margin: const EdgeInsets.symmetric(vertical: 8.0),
+      margin: const EdgeInsets.symmetric(vertical: 4.0), // Reduced margin slightly
+      decoration: BoxDecoration(
+        color: AppColors.getArtifactBackgroundColor(context), // Background tint
+        borderRadius: BorderRadius.circular(8.0),
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0), // Padding for the tinted container
       child: CollapsibleSection(
         initiallyExpanded: false,
-        title: Text(
-          l10n.toolCall(message.toolCalls![0]['function']['name']),
-          style: TextStyle(
-            fontSize: 12,
-            color: AppColors.getToolCallTextColor(),
-            fontStyle: FontStyle.italic,
-          ),
+        title: Row(
+          children: [
+            Icon(
+              Icons.extension_outlined, // Icon for tool call
+              size: 16,
+              color: AppColors.getToolCallTextColor(),
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                l10n.toolCall(toolCallName),
+                style: TextStyle(
+                  fontSize: 12,
+                  color: AppColors.getToolCallTextColor(),
+                  fontStyle: FontStyle.italic,
+                ),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ],
         ),
         content: Markit(
           data: (message.toolCalls?.isNotEmpty ?? false)
@@ -542,17 +608,36 @@ class ToolResultWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final toolName = message.toolCallId!.replaceFirst('call_', '');
     return Container(
-      margin: const EdgeInsets.symmetric(vertical: 8.0),
+      margin: const EdgeInsets.symmetric(vertical: 4.0), // Reduced margin slightly
+      decoration: BoxDecoration(
+        color: AppColors.getArtifactBackgroundColor(context), // Background tint
+        borderRadius: BorderRadius.circular(8.0),
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0), // Padding for the tinted container
       child: CollapsibleSection(
         initiallyExpanded: false,
-        title: Text(
-          l10n.toolResult(message.toolCallId!.replaceFirst('call_', '')),
-          style: TextStyle(
-            fontSize: 12,
-            color: AppColors.getToolCallTextColor(),
-            fontStyle: FontStyle.italic,
-          ),
+        title: Row(
+          children: [
+            Icon(
+              Icons.check_circle_outline, // Icon for tool result
+              size: 16,
+              color: AppColors.getToolCallTextColor(),
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                l10n.toolResult(toolName),
+                style: TextStyle(
+                  fontSize: 12,
+                  color: AppColors.getToolCallTextColor(),
+                  fontStyle: FontStyle.italic,
+                ),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ],
         ),
         content: _buildFactory(context),
       ),

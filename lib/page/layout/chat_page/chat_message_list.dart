@@ -4,6 +4,7 @@ import 'package:chatmcp/llm/model.dart';
 import 'package:flutter/rendering.dart';
 import 'chat_message.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
+import 'animated_chat_message_item.dart'; // Import the new animation widget
 
 import 'scroll_down_button.dart';
 
@@ -145,11 +146,19 @@ class _MessageListState extends State<MessageList> {
               // physics: const ClampingScrollPhysics(), // 禁用弹性效果
               itemBuilder: (context, index) {
                 final group = groupedMessages[index];
+                // Use the ID of the first message in the group as a key.
+                // This helps ensure the AnimatedChatMessageItem is treated as a new widget
+                // when a new message group appears, triggering its initState and animation.
+                // Ensure group is not empty and has an ID.
+                final String? keyString = group.isNotEmpty ? group.first.id : null;
 
-                return ChatUIMessage(
-                  messages: group,
-                  onRetry: widget.onRetry,
-                  onSwitch: widget.onSwitch,
+                return AnimatedChatMessageItem(
+                  key: keyString != null ? ValueKey(keyString) : null,
+                  child: ChatUIMessage(
+                    messages: group,
+                    onRetry: widget.onRetry,
+                    onSwitch: widget.onSwitch,
+                  ),
                 );
               },
             ),

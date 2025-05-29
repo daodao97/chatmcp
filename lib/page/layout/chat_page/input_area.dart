@@ -50,6 +50,18 @@ class _InputAreaState extends State<InputArea> {
   final TextEditingController textController = TextEditingController();
   bool _isImeComposing = false;
 
+  @override
+  void initState() {
+    super.initState();
+    textController.addListener(() {
+      // Call setState to rebuild the widget when text changes,
+      // so the AnimatedSwitcher for the send button updates.
+      if (mounted) {
+        setState(() {});
+      }
+    });
+  }
+
   Future<void> _pickFiles() async {
     try {
       final result = await FilePicker.platform.pickFiles(
@@ -299,10 +311,27 @@ class _InputAreaState extends State<InputArea> {
                     filled: true,
                     fillColor: AppColors.getInputAreaBackgroundColor(context),
                     hoverColor: Colors.transparent,
-                    border: InputBorder.none,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(24.0),
+                      borderSide: BorderSide.none, // No border by default
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(24.0),
+                      borderSide: BorderSide(
+                        color: AppColors.getInputAreaBorderColor(context), // Use existing border color
+                        width: 1.0,
+                      ),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(24.0),
+                      borderSide: BorderSide(
+                        color: Theme.of(context).primaryColor, // Highlight with primary color when focused
+                        width: 1.5,
+                      ),
+                    ),
                     contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 0,
-                      vertical: 10,
+                      horizontal: 16.0, // Added horizontal padding
+                      vertical: 10.0,
                     ),
                     isDense: true,
                   ),
@@ -337,7 +366,7 @@ class _InputAreaState extends State<InputArea> {
                         ),
                       ] else ...[
                         InkIcon(
-                          icon: CupertinoIcons.plus_app,
+                          icon: Icons.attach_file, // Changed icon
                           onTap: () {
                             if (widget.disabled) return;
                             _pickFiles();
@@ -351,29 +380,49 @@ class _InputAreaState extends State<InputArea> {
                   ),
                 if (!widget.disabled) ...[
                   const Spacer(),
-                  InkIcon(
-                    icon: CupertinoIcons.arrow_up_circle,
-                    onTap: () {
-                      if (widget.disabled ||
-                          textController.text.trim().isEmpty) {
-                        return;
-                      }
-                      widget.onSubmitted(
-                          SubmitData(textController.text, _selectedFiles));
-                      _afterSubmitted();
+                  AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 200),
+                    transitionBuilder: (Widget child, Animation<double> animation) {
+                      return ScaleTransition(
+                        scale: animation,
+                        child: FadeTransition(
+                          opacity: animation,
+                          child: child,
+                        ),
+                      );
                     },
-                    tooltip: "send",
+                    child: textController.text.trim().isEmpty
+                        ? InkIcon(
+                            key: const ValueKey('send_disabled'),
+                            icon: Icons.send,
+                            iconColor: AppColors.getInputAreaIconColor(context), // Disabled look
+                            onTap: null, // Explicitly null when disabled
+                            tooltip: l10n.send,
+                          )
+                        : InkIcon(
+                            key: const ValueKey('send_enabled'),
+                            icon: Icons.send,
+                            iconColor: Theme.of(context).primaryColor, // Active look
+                            onTap: () {
+                              // Condition already checked by textController.text.trim().isEmpty for widget switching
+                              widget.onSubmitted(
+                                  SubmitData(textController.text, _selectedFiles));
+                              _afterSubmitted();
+                            },
+                            tooltip: l10n.send,
+                          ),
                   )
                 ] else ...[
                   const Spacer(),
                   InkIcon(
-                    icon: CupertinoIcons.stop,
+                    key: const ValueKey('cancel_button'), // Added key for AnimatedSwitcher if it were to wrap this too
+                    icon: Icons.stop_circle_outlined, // Changed icon
                     onTap: widget.onCancel != null
                         ? () {
                             widget.onCancel!();
                           }
                         : null,
-                    tooltip: "cancel",
+                    tooltip: l10n.cancel,
                   ),
                 ]
               ],
