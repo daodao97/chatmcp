@@ -31,12 +31,12 @@ void main() {
       final textField = tester.widget<TextField>(textFieldFinder);
       expect(textField.decoration, isNotNull);
       expect(textField.decoration!.border, isA<OutlineInputBorder>());
-      
+
       // Check enabledBorder specifically as that's what's visible by default
       final enabledBorder = textField.decoration!.enabledBorder as OutlineInputBorder?;
       expect(enabledBorder, isNotNull);
       expect(enabledBorder!.borderRadius, BorderRadius.circular(24.0));
-      
+
       // Check focusedBorder as well for consistency
       final focusedBorder = textField.decoration!.focusedBorder as OutlineInputBorder?;
       expect(focusedBorder, isNotNull);
@@ -46,7 +46,7 @@ void main() {
     testWidgets('Send Button Icon Change and Animation Presence', (WidgetTester tester) async {
       // Need to use a stateful wrapper to manage the text controller for this test effectively
       // or call tester.enterText and pump.
-      
+
       String currentText = "";
       SubmitData? submittedData;
 
@@ -71,7 +71,7 @@ void main() {
         (widget) => widget is InkIcon && widget.icon == Icons.send && widget.onTap == null
       );
       expect(sendButtonFinder, findsOneWidget, reason: "Finds disabled send button initially");
-      
+
       InkIcon sendButton = tester.widget<InkIcon>(sendButtonFinder);
       final BuildContext context = tester.element(sendButtonFinder);
       expect(sendButton.iconColor, equals(AppColors.getInputAreaIconColor(context)), reason: "Initial send button color is for disabled state");
@@ -80,17 +80,17 @@ void main() {
       final textFieldFinder = find.byType(TextField);
       await tester.enterText(textFieldFinder, 'Hello');
       // The InputArea's internal textController listener calls setState, so pump should rebuild.
-      await tester.pump(); 
-      
+      await tester.pump();
+
       // After entering text, the send button should be the 'enabled' one
       sendButtonFinder = find.byWidgetPredicate(
         (widget) => widget is InkIcon && widget.icon == Icons.send && widget.onTap != null
       );
       expect(sendButtonFinder, findsOneWidget, reason: "Finds enabled send button after text entry");
-      
+
       sendButton = tester.widget<InkIcon>(sendButtonFinder);
       // Re-fetch context as widget tree might have changed
-      final BuildContext enabledContext = tester.element(sendButtonFinder); 
+      final BuildContext enabledContext = tester.element(sendButtonFinder);
       expect(sendButton.iconColor, equals(Theme.of(enabledContext).primaryColor), reason: "Send button color changes to primaryColor when enabled");
 
       // Tap the send button

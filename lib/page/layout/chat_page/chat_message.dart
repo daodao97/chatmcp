@@ -190,7 +190,14 @@ class ChatUIMessage extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: AppColors.getMessageBubbleBackgroundColor(context, isUser),
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(16), // Consistent for the group
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.getMessageBubbleShadowColor(context), // Use theme-aware shadow color
+            blurRadius: 3.0,
+            offset: const Offset(0, 1),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment:

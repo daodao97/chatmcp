@@ -43,7 +43,7 @@ class MockSettingsProvider extends ChangeNotifier implements SettingsProvider {
 
   @override
   McpModelSetting? getModelSetting(String modelId) => null;
-  
+
   @override
   void setModelSetting(McpModelSetting setting) {}
 
@@ -58,7 +58,7 @@ Future<Widget> pumpWidgetWithShell(WidgetTester tester, Widget widget, { SharedP
     SharedPreferences.setMockInitialValues({});
     mockPrefs = await SharedPreferences.getInstance();
   }
-  
+
   final settingsProvider = MockSettingsProvider();
   // You might need to await settingsProvider.loadSettings() if it does async work you depend on.
 

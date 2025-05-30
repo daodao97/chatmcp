@@ -7,8 +7,8 @@ import 'package:chatmcp/utils/color.dart';
 
 SpanNodeGeneratorWithTag linkGenerator = SpanNodeGeneratorWithTag(
     tag: _linkTag,
-    generator: (e, config, visitor) =>
-        MyLinkNode(e.attributes, e.textContent, config));
+    generator: (e, config, visitor) => MyLinkNode(
+        e.attributes, e.textContent, config, visitor.context!));
 
 const _linkTag = 'a';
 
@@ -16,8 +16,9 @@ class MyLinkNode extends SpanNode {
   final Map<String, String> attributes;
   final String textContent;
   final MarkdownConfig config;
+  final BuildContext context; // Added context
 
-  MyLinkNode(this.attributes, this.textContent, this.config);
+  MyLinkNode(this.attributes, this.textContent, this.config, this.context); // Added context
 
   @override
   InlineSpan build() {
@@ -26,7 +27,7 @@ class MyLinkNode extends SpanNode {
     return TextSpan(
       text: content,
       style: TextStyle(
-        color: AppColors.getLinkColor(),
+        color: AppColors.getLinkColor(context), // Pass context here
         decoration: TextDecoration.none,
       ),
       recognizer: TapGestureRecognizer()

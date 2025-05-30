@@ -395,14 +395,14 @@ class _InputAreaState extends State<InputArea> {
                         ? InkIcon(
                             key: const ValueKey('send_disabled'),
                             icon: Icons.send,
-                            iconColor: AppColors.getInputAreaIconColor(context), // Disabled look
+                            color: AppColors.getInputAreaIconColor(context), // Corrected: iconColor to color
                             onTap: null, // Explicitly null when disabled
                             tooltip: l10n.send,
                           )
                         : InkIcon(
                             key: const ValueKey('send_enabled'),
                             icon: Icons.send,
-                            iconColor: Theme.of(context).primaryColor, // Active look
+                            color: Theme.of(context).primaryColor, // Corrected: iconColor to color
                             onTap: () {
                               // Condition already checked by textController.text.trim().isEmpty for widget switching
                               widget.onSubmitted(

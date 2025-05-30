@@ -10,7 +10,7 @@ import '../../test_helpers.dart'; // Adjust path as necessary
 void main() {
   // Helper to create a simple ChatMessage
   ChatMessage createTestMessage({
-    String id = '1',
+    String messageId = '1', // Changed parameter name from id to messageId
     String? content = 'Test message',
     MessageRole role = MessageRole.user,
     List<MessageFile>? files,
@@ -20,7 +20,7 @@ void main() {
     String? currentModelId = 'test_model',
   }) {
     return ChatMessage(
-      id: id,
+      messageId: messageId, // Use the messageId parameter
       conversationId: 'conv1',
       role: role,
       content: content,
@@ -37,8 +37,8 @@ void main() {
 
   group('ChatUIMessage Widget Tests', () {
     testWidgets('User Message Bubble Tail and Shadow', (WidgetTester tester) async {
-      final userMessage = createTestMessage(role: MessageRole.user, content: 'Hello user');
-      
+      final userMessage = createTestMessage(messageId: 'userMsg1', role: MessageRole.user, content: 'Hello user'); // Updated call site
+
       await pumpWidgetWithShell(tester, ChatUIMessage(
         messages: [userMessage],
         onRetry: (_) {},
@@ -81,7 +81,7 @@ void main() {
         }
         return false;
       });
-      
+
       // Find MessageBubble
       final messageBubbleFinder = find.byType(MessageBubble);
       expect(messageBubbleFinder, findsOneWidget);
@@ -97,7 +97,7 @@ void main() {
       // Accessing internal _getBorderRadius is not ideal. We check the Container's decoration.
       final bubbleContainer = tester.firstWidget<Container>(find.descendant(of: messageBubbleFinder, matching: find.byType(Container)));
       expect((bubbleContainer.decoration as BoxDecoration).borderRadius, equals(expectedRadiusUser));
-      
+
       // Verify background color
       final BuildContext context = tester.element(messageBubbleFinder);
       expect((bubbleContainer.decoration as BoxDecoration).color, equals(AppColors.getMessageBubbleBackgroundColor(context, true)));
@@ -118,8 +118,8 @@ void main() {
     });
 
     testWidgets('User Message Group (2 messages) has Shadow', (WidgetTester tester) async {
-      final userMessage1 = createTestMessage(id: 'usr1', role: MessageRole.user, content: 'User msg 1', timestamp: 1);
-      final userMessage2 = createTestMessage(id: 'usr2', role: MessageRole.user, content: 'User msg 2', timestamp: 2); // Part of same group
+      final userMessage1 = createTestMessage(messageId: 'usr1', role: MessageRole.user, content: 'User msg 1', timestamp: 1); // Updated call site
+      final userMessage2 = createTestMessage(messageId: 'usr2', role: MessageRole.user, content: 'User msg 2', timestamp: 2); // Updated call site
 
       await pumpWidgetWithShell(tester, ChatUIMessage(
         messages: [userMessage1, userMessage2], // This will be treated as one group by ChatUIMessage logic.
@@ -128,7 +128,7 @@ void main() {
         onRetry: (_) {},
         onSwitch: (_) {},
       ));
-      
+
       // Find the group container in ChatUIMessage
       final groupContainerFinder = find.byWidgetPredicate((widget) {
         if (widget is Container && widget.decoration is BoxDecoration) {
@@ -146,14 +146,14 @@ void main() {
 
 
     testWidgets('Assistant Message Bubble Tail', (WidgetTester tester) async {
-      final assistantMessage = createTestMessage(role: MessageRole.assistant, content: 'Hello assistant');
-      
+      final assistantMessage = createTestMessage(messageId: 'assistMsg1', role: MessageRole.assistant, content: 'Hello assistant'); // Updated call site
+
       await pumpWidgetWithShell(tester, ChatUIMessage(
         messages: [assistantMessage],
         onRetry: (_) {},
         onSwitch: (_) {},
       ));
-      
+
       final messageBubbleFinder = find.byType(MessageBubble);
       expect(messageBubbleFinder, findsOneWidget);
       final messageBubble = tester.widget<MessageBubble>(messageBubbleFinder);
@@ -174,9 +174,9 @@ void main() {
     testWidgets('Grouped Message Bubbles (Middle Message) Styling', (WidgetTester tester) async {
       // ChatUIMessage receives messages that are *already* grouped.
       // So we pass three messages of the same role to simulate first, middle, last.
-      final assistantMsg1 = createTestMessage(id: 'as1', role: MessageRole.assistant, content: 'Msg 1', timestamp: 1);
-      final assistantMsg2 = createTestMessage(id: 'as2', role: MessageRole.assistant, content: 'Msg 2', timestamp: 2);
-      final assistantMsg3 = createTestMessage(id: 'as3', role: MessageRole.assistant, content: 'Msg 3', timestamp: 3);
+      final assistantMsg1 = createTestMessage(messageId: 'as1', role: MessageRole.assistant, content: 'Msg 1', timestamp: 1); // Updated call site
+      final assistantMsg2 = createTestMessage(messageId: 'as2', role: MessageRole.assistant, content: 'Msg 2', timestamp: 2); // Updated call site
+      final assistantMsg3 = createTestMessage(messageId: 'as3', role: MessageRole.assistant, content: 'Msg 3', timestamp: 3); // Updated call site
 
       await pumpWidgetWithShell(tester, ChatUIMessage(
         messages: [assistantMsg1, assistantMsg2, assistantMsg3],
@@ -201,7 +201,7 @@ void main() {
         matching: find.byType(MessageBubble),
       );
       expect(middleMessageBubbleFinder, findsOneWidget);
-      
+
       final middleMessageBubbleWidget = tester.widget<MessageBubble>(middleMessageBubbleFinder);
       expect(middleMessageBubbleWidget.useTransparentBackground, isTrue); // Middle messages in a group use transparent bg
 

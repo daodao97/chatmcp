@@ -150,7 +150,7 @@ class _MessageListState extends State<MessageList> {
                 // This helps ensure the AnimatedChatMessageItem is treated as a new widget
                 // when a new message group appears, triggering its initState and animation.
                 // Ensure group is not empty and has an ID.
-                final String? keyString = group.isNotEmpty ? group.first.id : null;
+                final String? keyString = group.isNotEmpty ? group.first.messageId : null; // Corrected: id to messageId
 
                 return AnimatedChatMessageItem(
                   key: keyString != null ? ValueKey(keyString) : null,
