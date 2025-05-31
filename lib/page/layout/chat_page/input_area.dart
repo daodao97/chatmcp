@@ -397,7 +397,7 @@ class _InputAreaState extends State<InputArea> {
                             icon: Icons.send,
                             color: AppColors.getInputAreaIconColor(context), // Corrected: iconColor to color
                             onTap: null, // Explicitly null when disabled
-                            tooltip: l10n.send,
+                            // tooltip: l10n.send, // Temporarily removed
                           )
                         : InkIcon(
                             key: const ValueKey('send_enabled'),
@@ -409,7 +409,7 @@ class _InputAreaState extends State<InputArea> {
                                   SubmitData(textController.text, _selectedFiles));
                               _afterSubmitted();
                             },
-                            tooltip: l10n.send,
+                            // tooltip: l10n.send, // Temporarily removed
                           ),
                   )
                 ] else ...[

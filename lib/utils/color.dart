@@ -266,10 +266,12 @@ class AppColors {
 
   // 链接颜色
   static Color getLinkColor(BuildContext context) {
+    // Reverted to expect context, actual theme logic will be re-added if this path fails.
+    // For now, let's assume the previous theme logic was correct if context is available.
     final brightness = Theme.of(context).brightness;
     return brightness == Brightness.light
-        ? Colors.blue // Standard blue for light mode
-        : Colors.lightBlueAccent[200]!; // Lighter blue for dark mode
+        ? Colors.blue
+        : Colors.lightBlueAccent[200]!;
   }
 
   // 输入区域相关颜色

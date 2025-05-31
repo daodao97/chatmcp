@@ -8,7 +8,7 @@ import 'package:chatmcp/utils/color.dart';
 SpanNodeGeneratorWithTag linkGenerator = SpanNodeGeneratorWithTag(
     tag: _linkTag,
     generator: (e, config, visitor) => MyLinkNode(
-        e.attributes, e.textContent, config, visitor.context!));
+        e.attributes, e.textContent, config, visitor.widgetVisitor.context!));
 
 const _linkTag = 'a';
 
