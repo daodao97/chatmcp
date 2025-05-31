@@ -10,6 +10,7 @@ import 'package:chatmcp/generated/app_localizations.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:chatmcp/widgets/ink_icon.dart';
 import 'package:chatmcp/utils/color.dart';
+import 'package:chatmcp/page/layout/widgets/conv_setting.dart';
 
 class SubmitData {
   final String text;
@@ -376,6 +377,8 @@ class _InputAreaState extends State<InputArea> {
                           tooltip: AppLocalizations.of(context)!.uploadFile,
                         ),
                       ],
+                      const SizedBox(width: 10),
+                      const ConvSetting(),
                     ],
                   ),
                 if (!widget.disabled) ...[

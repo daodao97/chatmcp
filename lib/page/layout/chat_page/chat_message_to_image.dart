@@ -74,53 +74,68 @@ class _ListViewToImageScreenState extends State<ListViewToImageScreen> {
     if (currentGroup.isNotEmpty) {
       groupedMessages.add(currentGroup);
     }
-    return Container(
-      padding: const EdgeInsets.all(20),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          if (ProviderManager.chatProvider.activeChat?.title != null) ...[
-            Padding(
-              padding: const EdgeInsets.only(bottom: 16),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      ProviderManager.chatProvider.activeChat!.title!,
-                      style: const TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final horizontalPadding =
+            constraints.maxWidth * 0.05; // 使用相对宽度的5%作为padding
+
+        return Container(
+          width: constraints.maxWidth,
+          padding: EdgeInsets.symmetric(
+            horizontal: horizontalPadding,
+            vertical: 20,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (ProviderManager.chatProvider.activeChat?.title != null) ...[
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 16),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          ProviderManager.chatProvider.activeChat!.title!,
+                          style: const TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                       ),
-                    ),
+                      Text(
+                        "by ChatMcp",
+                        style: const TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      )
+                    ],
                   ),
-                  Text(
-                    "by ChatMcp",
-                    style: const TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  )
-                ],
-              ),
-            ),
-            const Divider(height: 1),
-            const SizedBox(height: 16),
-          ],
-          ...groupedMessages.map((group) {
-            return ChatUIMessage(
-              messages: group,
-              onRetry: (ChatMessage message) {},
-              onSwitch: (String messageId) {},
-            );
-          }).toList(),
-        ],
-      ),
+                ),
+                const Divider(height: 1),
+                const SizedBox(height: 16),
+              ],
+              ...groupedMessages.map((group) {
+                return ChatUIMessage(
+                  messages: group,
+                  onRetry: (ChatMessage message) {},
+                  onSwitch: (String messageId) {},
+                );
+              }).toList(),
+            ],
+          ),
+        );
+      },
     );
   }
 
   Future<void> _captureListViewAsImage() async {
     try {
+      final screenWidth = MediaQuery.of(context).size.width;
+      final theme = Theme.of(context);
+
       // 创建一个离屏widget来渲染完整内容
       final renderWidget = Screenshot(
         controller: screenshotController,
@@ -128,8 +143,19 @@ class _ListViewToImageScreenState extends State<ListViewToImageScreen> {
           data: MediaQuery.of(context).copyWith(
             devicePixelRatio: 3.0,
           ),
-          child: Material(
-            child: _buildMessage(),
+          child: Theme(
+            data: theme,
+            child: Material(
+              color: theme.scaffoldBackgroundColor,
+              child: Container(
+                width: screenWidth,
+                constraints: BoxConstraints(
+                  minWidth: screenWidth,
+                  maxWidth: screenWidth,
+                ),
+                child: _buildMessage(),
+              ),
+            ),
           ),
         ),
       );
@@ -137,9 +163,14 @@ class _ListViewToImageScreenState extends State<ListViewToImageScreen> {
       // 使用Overlay将widget临时添加到屏幕外
       final overlayEntry = OverlayEntry(
         builder: (context) => Positioned(
-          left: -10000, // 放在屏幕外
-          child: SizedBox(
-            width: MediaQuery.of(context).size.width,
+          left: -screenWidth - 100, // 确保完全在屏幕外
+          top: 0,
+          child: Container(
+            width: screenWidth,
+            constraints: BoxConstraints(
+              minWidth: screenWidth,
+              maxWidth: screenWidth,
+            ),
             child: renderWidget,
           ),
         ),
@@ -148,7 +179,7 @@ class _ListViewToImageScreenState extends State<ListViewToImageScreen> {
       Overlay.of(context).insert(overlayEntry);
 
       // 等待widget完全渲染
-      await Future.delayed(const Duration(milliseconds: 500));
+      await Future.delayed(const Duration(milliseconds: 800));
 
       // 捕获图像
       final image = await screenshotController.capture(

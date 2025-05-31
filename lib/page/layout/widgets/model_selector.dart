@@ -4,8 +4,8 @@ import 'package:provider/provider.dart';
 import 'package:chatmcp/provider/provider_manager.dart';
 import 'package:chatmcp/provider/chat_model_provider.dart';
 import 'package:chatmcp/llm/model.dart' as llm_model;
-import 'package:flutter_popup/flutter_popup.dart';
 import 'package:chatmcp/utils/color.dart';
+import 'package:chatmcp/components/widgets/custom_popup.dart';
 
 class ModelSelector extends StatefulWidget {
   const ModelSelector({super.key});
@@ -84,24 +84,16 @@ class ModelSelectorPopup extends StatefulWidget {
 }
 
 class _ModelSelectorPopupState extends State<ModelSelectorPopup> {
-  final TextEditingController _searchController = TextEditingController();
-  String _searchText = '';
-
-  @override
-  void dispose() {
-    _searchController.dispose();
-    super.dispose();
-  }
-
   // 按 provider 对模型进行分组并根据搜索文本过滤
-  Map<String, List<llm_model.Model>> _getFilteredModelsByProvider() {
+  Map<String, List<llm_model.Model>> _getFilteredModelsByProvider(
+      String searchText) {
     final modelsByProvider = <String, List<llm_model.Model>>{};
 
     // 筛选匹配搜索文本的模型
     final filteredModels = widget.availableModels.where((model) {
-      return _searchText.isEmpty ||
-          model.label.toLowerCase().contains(_searchText) ||
-          model.providerId.toLowerCase().contains(_searchText);
+      return searchText.isEmpty ||
+          model.label.toLowerCase().contains(searchText) ||
+          model.providerId.toLowerCase().contains(searchText);
     }).toList();
 
     for (var model in filteredModels) {
@@ -112,21 +104,11 @@ class _ModelSelectorPopupState extends State<ModelSelectorPopup> {
   }
 
   // 构建模型列表
-  Widget _buildModelList() {
-    final modelsByProvider = _getFilteredModelsByProvider();
+  Widget _buildModelList(String searchText) {
+    final modelsByProvider = _getFilteredModelsByProvider(searchText);
 
     if (modelsByProvider.isEmpty) {
-      return Center(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 16),
-          child: Text(
-            'No results found',
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: AppColors.getInactiveTextColor(context),
-                ),
-          ),
-        ),
-      );
+      return const PopupEmptyState(message: 'No results found');
     }
 
     final List<Widget> items = [];
@@ -134,69 +116,36 @@ class _ModelSelectorPopupState extends State<ModelSelectorPopup> {
     modelsByProvider.forEach((provider, models) {
       // 添加分隔线
       if (items.isNotEmpty) {
-        items.add(Divider(
-          height: 1,
-          indent: 8,
-          endIndent: 8,
-          color: AppColors.getCodePreviewBorderColor(context),
-        ));
+        items.add(const PopupDivider());
       }
 
       final firstModel = models.first;
 
       // 添加提供商标题
       items.add(
-        Padding(
-          padding: const EdgeInsets.fromLTRB(16, 6, 16, 2),
-          child: Row(
-            children: [
-              LlmIcon(icon: firstModel.icon),
-              const SizedBox(width: 8),
-              Text(
-                firstModel.providerName,
-                style: TextStyle(
-                  color: AppColors.getThemeTextColor(context),
-                ),
-              ),
-            ],
-          ),
+        PopupGroupHeader(
+          title: firstModel.providerName,
+          icon: LlmIcon(icon: firstModel.icon),
         ),
       );
 
       // 添加该提供商下的所有模型
       for (var model in models) {
         items.add(
-          InkWell(
+          PopupListItem(
             onTap: () {
               widget.onModelSelected(model);
-              // 清除搜索框内容
-              _searchController.clear();
-              _searchText = '';
-              // 关闭弹窗
               Navigator.of(context).pop();
             },
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(32, 6, 16, 6),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      model.label,
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: widget.isCurrentModel(model)
-                                ? AppColors.getTextButtonColor(context)
-                                : AppColors.getThemeTextColor(context),
-                          ),
-                    ),
+            isSelected: widget.isCurrentModel(model),
+            padding: const EdgeInsets.fromLTRB(32, 6, 16, 6),
+            child: Text(
+              model.label,
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: widget.isCurrentModel(model)
+                        ? AppColors.getTextButtonColor(context)
+                        : AppColors.getThemeTextColor(context),
                   ),
-                  if (widget.isCurrentModel(model))
-                    Icon(
-                      Icons.check,
-                      size: 14,
-                      color: AppColors.getTextButtonColor(context),
-                    ),
-                ],
-              ),
             ),
           ),
         );
@@ -226,65 +175,9 @@ class _ModelSelectorPopupState extends State<ModelSelectorPopup> {
       ),
     );
 
-    return CustomPopup(
-      showArrow: true,
-      arrowColor: AppColors.getSidebarBackgroundColor(context),
-      backgroundColor: AppColors.getSidebarBackgroundColor(context),
-      content: StatefulBuilder(
-        builder: (BuildContext context, StateSetter popupSetState) {
-          return Container(
-            constraints: BoxConstraints(
-              maxWidth: 280,
-              maxHeight: MediaQuery.of(context).size.height * 0.6,
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // 搜索框
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(8.0, 8.0, 8.0, 4.0),
-                  child: TextField(
-                    controller: _searchController,
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: AppColors.getThemeTextColor(context),
-                        ),
-                    decoration: InputDecoration(
-                      hintText: 'Search',
-                      hintStyle:
-                          Theme.of(context).textTheme.bodySmall?.copyWith(
-                                color: AppColors.getInactiveTextColor(context),
-                              ),
-                      prefixIcon: Icon(
-                        Icons.search,
-                        size: 16,
-                        color: AppColors.getInactiveTextColor(context),
-                      ),
-                      isDense: true,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        borderSide: BorderSide.none,
-                      ),
-                      filled: true,
-                      fillColor: AppColors.getSidebarBackgroundColor(context),
-                      contentPadding: const EdgeInsets.symmetric(
-                          vertical: 6, horizontal: 8),
-                    ),
-                    onChanged: (value) {
-                      popupSetState(() {
-                        _searchText = value.toLowerCase();
-                      });
-                    },
-                  ),
-                ),
-                // 模型列表
-                Flexible(
-                  child: _buildModelList(),
-                ),
-              ],
-            ),
-          );
-        },
-      ),
+    return SearchablePopup(
+      searchHint: 'Search',
+      contentBuilder: _buildModelList,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         child: Row(

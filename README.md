@@ -1,5 +1,5 @@
 <div align="center">
-<img src="./macos/Runner/Assets.xcassets/AppIcon.appiconset/icon_128@1x.png" alt="logo">
+<img src="./assets/logo.png" alt="logo" width="120" height="120">
 <h1>chatmcp</h1>
 
 Cross-platform `Macos | Windows | Linux | iOS | Android` AI Chat Client
@@ -22,18 +22,18 @@ sudo apt-get install libsqlite3-0 libsqlite3-dev
 
 ## Preview
 
-![Artifact Display](./assets/preview/artifact.gif)
-![Thinking Mode](./assets/preview/think.png)
-![Generate Image](./assets/preview/gen_img.png)
-![LaTeX Support](./assets/preview/latex.png)
-![HTML Preview](./assets/preview/html-preview.png)
-![Mermaid Diagram](./assets/preview/mermaid.png)
-![mcp workflow](./assets/preview/mcp-workerflow.png)
-![mcp inmemory](./assets/preview/mcp-inmemory.png)
-![MCP Tools](./assets/preview/mcp-tools.png)
-![LLM Provider](./assets/preview/llm-provider.png)
-![MCP Stdio](./assets/preview/mcp-stdio.png)
-![MCP SSE](./assets/preview/mcp-sse.png)
+![Artifact Display](./docs/preview/artifact.gif)
+![Thinking Mode](./docs/preview/think.webp)
+![Generate Image](./docs/preview/gen_img.webp)
+![LaTeX Support](./docs/preview/latex.webp)
+![HTML Preview](./docs/preview/html-preview.webp)
+![Mermaid Diagram](./docs/preview/mermaid.webp)
+![mcp workflow](./docs/preview/mcp-workerflow.webp)
+![mcp inmemory](./docs/preview/mcp-inmemory.webp)
+![MCP Tools](./docs/preview/mcp-tools.webp)
+![LLM Provider](./docs/preview/llm-provider.webp)
+![MCP Stdio](./docs/preview/mcp-stdio.webp)
+![MCP SSE](./docs/preview/mcp-sse.webp)
 
 
 ## Usage
@@ -64,10 +64,10 @@ sudo apt install nodejs npm
 3. Chat with MCP Server
 
 - stdio mcp server
-![](./docs/mcp_stdio.png)
+![](./docs/mcp_stdio.webp)
 
 - sse mcp server
-![](./docs//mcp_sse.png)
+![](./docs//mcp_sse.webp)
 
 ## Debug 
 

@@ -1,4 +1,3 @@
-import 'package:chatmcp/components/widgets/base.dart';
 import 'package:chatmcp/utils/color.dart';
 import 'package:chatmcp/widgets/ink_icon.dart';
 import 'package:flutter/cupertino.dart';
@@ -7,7 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:chatmcp/provider/mcp_server_provider.dart';
 import 'package:chatmcp/provider/serve_state_provider.dart';
 import 'package:flutter_switch/flutter_switch.dart';
-import 'package:flutter_popup/flutter_popup.dart';
+import 'package:chatmcp/components/widgets/custom_popup.dart';
 
 class McpTools extends StatefulWidget {
   const McpTools({super.key});
@@ -107,45 +106,28 @@ class _McpToolsState extends State<McpTools> {
           }
         });
 
-        return CustomPopup(
+        return BasePopup(
           showArrow: true,
-          arrowColor: AppColors.getLayoutBackgroundColor(context),
-          backgroundColor: AppColors.getLayoutBackgroundColor(context),
-          content: Container(
-            constraints: BoxConstraints(
-              maxWidth: 400,
-              maxHeight: MediaQuery.of(context).size.height * 0.4,
-            ),
-            child: _isLoading
-                ? const Center(
-                    child: SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    ),
-                  )
-                : _error != null
-                    ? Center(
-                        child: Text(_error!,
-                            style: Theme.of(context).textTheme.bodyMedium),
-                      )
-                    : _cachedServers == null || _cachedServers!.isEmpty
-                        ? Center(
-                            child: Text('No available servers',
-                                style: Theme.of(context).textTheme.bodyMedium),
-                          )
-                        : Container(
-                            constraints: const BoxConstraints(
-                              maxHeight: 400, // 限制菜单项列表的最大高度
-                            ),
-                            child: SingleChildScrollView(
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: _buildMenuItems(context),
-                              ),
-                            ),
+          maxWidth: 400,
+          padding: EdgeInsets.zero,
+          content: _isLoading
+              ? const Center(
+                  child: SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  ),
+                )
+              : _error != null
+                  ? PopupEmptyState(message: 'Load failed: $_error')
+                  : _cachedServers == null || _cachedServers!.isEmpty
+                      ? const PopupEmptyState(message: 'No available servers')
+                      : SingleChildScrollView(
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: _buildMenuItems(context),
                           ),
-          ),
+                        ),
           child: Consumer<ServerStateProvider>(
             builder: (context, stateProvider, _) {
               return InkIcon(

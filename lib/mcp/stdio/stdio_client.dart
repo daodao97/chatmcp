@@ -37,76 +37,69 @@ class StdioClient implements McpClient {
   }
 
   Future<void> _setupProcess() async {
-    try {
-      Logger.root.info(
-          'Starting process: ${serverConfig.command} ${serverConfig.args.join(" ")}');
+    Logger.root.info(
+        'Starting process: ${serverConfig.command} ${serverConfig.args.join(" ")}');
 
-      _processStateController.add(const ProcessState.starting());
+    _processStateController.add(const ProcessState.starting());
 
-      process = await startProcess(
-        serverConfig.command,
-        serverConfig.args,
-        serverConfig.env,
-      );
+    process = await startProcess(
+      serverConfig.command,
+      serverConfig.args,
+      serverConfig.env,
+    );
 
-      Logger.root.info('Process startup status: PID=${process.pid}');
+    Logger.root.info('Process startup status: PID=${process.pid}');
 
-      // Use utf8 decoder
-      final stdoutStream = process.stdout
-          .transform(utf8.decoder)
-          .transform(const LineSplitter());
+    // Use utf8 decoder
+    final stdoutStream =
+        process.stdout.transform(utf8.decoder).transform(const LineSplitter());
 
-      stdoutStream.listen(
-        (String line) {
-          try {
-            for (final callback in stdOutCallback) {
-              callback(line);
-            }
-            final data = jsonDecode(line);
-            final message = JSONRPCMessage.fromJson(data);
-            _handleMessage(message);
-          } catch (e, stack) {
-            Logger.root.severe('Failed to parse server output: $e\n$stack');
+    stdoutStream.listen(
+      (String line) {
+        try {
+          for (final callback in stdOutCallback) {
+            callback(line);
           }
-        },
-        onError: (error) {
-          Logger.root.severe('stdout error: $error');
-          for (final callback in stdErrCallback) {
-            callback(error.toString());
-          }
-        },
-        onDone: () {
-          Logger.root.info('stdout stream closed');
-        },
-      );
+          final data = jsonDecode(line);
+          final message = JSONRPCMessage.fromJson(data);
+          _handleMessage(message);
+        } catch (e, stack) {
+          Logger.root.severe('Failed to parse server output: $e\n$stack');
+        }
+      },
+      onError: (error) {
+        Logger.root.severe('stdout error: $error');
+        for (final callback in stdErrCallback) {
+          callback(error.toString());
+        }
+      },
+      onDone: () {
+        Logger.root.info('stdout stream closed');
+      },
+    );
 
-      process.stderr.transform(utf8.decoder).listen(
-        (String text) {
-          Logger.root.warning('Server error output: $text');
-          for (final callback in stdErrCallback) {
-            callback(text);
-          }
-        },
-        onError: (error) {
-          Logger.root.severe('stderr error: $error');
-          for (final callback in stdErrCallback) {
-            callback(error.toString());
-          }
-        },
-      );
+    process.stderr.transform(utf8.decoder).listen(
+      (String text) {
+        Logger.root.warning('Server error output: $text');
+        for (final callback in stdErrCallback) {
+          callback(text);
+        }
+      },
+      onError: (error) {
+        Logger.root.severe('stderr error: $error');
+        for (final callback in stdErrCallback) {
+          callback(error.toString());
+        }
+      },
+    );
 
-      // Listen for process exit
-      process.exitCode.then((code) {
-        Logger.root.info('Process exited with code: $code');
-        _processStateController.add(ProcessState.exited(code));
-      });
+    // Listen for process exit
+    process.exitCode.then((code) {
+      Logger.root.info('Process exited with code: $code');
+      _processStateController.add(ProcessState.exited(code));
+    });
 
-      _processStateController.add(const ProcessState.running());
-    } catch (e, stack) {
-      Logger.root.severe('Failed to start process: $e\n$stack');
-      _processStateController.add(ProcessState.error(e, stack));
-      rethrow;
-    }
+    _processStateController.add(const ProcessState.running());
   }
 
   Future<void> write(List<int> data) async {

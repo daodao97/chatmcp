@@ -1114,6 +1114,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Maximize'**
   String get maximize;
+
+  /// No description provided for @conversationSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Conversation Settings'**
+  String get conversationSettings;
+
+  /// No description provided for @maxMessages.
+  ///
+  /// In en, this message translates to:
+  /// **'Max Messages'**
+  String get maxMessages;
+
+  /// No description provided for @maxMessagesDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Limit the maximum number of messages passed to LLM (1-1000)'**
+  String get maxMessagesDescription;
+
+  /// No description provided for @maxLoops.
+  ///
+  /// In en, this message translates to:
+  /// **'Max Loops'**
+  String get maxLoops;
+
+  /// No description provided for @maxLoopsDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Limit the maximum number of tool call loops to prevent infinite loops (1-1000)'**
+  String get maxLoopsDescription;
+
+  /// No description provided for @mcpServers.
+  ///
+  /// In en, this message translates to:
+  /// **'MCP Servers'**
+  String get mcpServers;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

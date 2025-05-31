@@ -76,17 +76,19 @@ class GeneralSetting {
   String theme;
   bool showAssistantAvatar = false;
   bool showUserAvatar = false;
-  bool enableArtifacts = true;
   String systemPrompt;
   String locale;
+  int maxMessages;
+  int maxLoops;
 
   GeneralSetting({
     required this.theme,
     this.showAssistantAvatar = false,
     this.showUserAvatar = false,
-    this.enableArtifacts = true,
     this.systemPrompt = 'You are a helpful assistant.',
     this.locale = 'en',
+    this.maxMessages = 50,
+    this.maxLoops = 100,
   });
 
   Map<String, dynamic> toJson() {
@@ -96,16 +98,20 @@ class GeneralSetting {
       'showUserAvatar': showUserAvatar,
       'systemPrompt': systemPrompt,
       'locale': locale,
+      'maxMessages': maxMessages,
+      'maxLoops': maxLoops,
     };
   }
 
   factory GeneralSetting.fromJson(Map<String, dynamic> json) {
     return GeneralSetting(
       theme: json['theme'] as String? ?? 'light',
-      showAssistantAvatar: json['showAssistantAvatar'] as bool? ?? true,
-      showUserAvatar: json['showUserAvatar'] as bool? ?? true,
+      showAssistantAvatar: json['showAssistantAvatar'] as bool? ?? false,
+      showUserAvatar: json['showUserAvatar'] as bool? ?? false,
       systemPrompt: json['systemPrompt'] as String? ?? defaultSystemPrompt,
       locale: json['locale'] as String? ?? 'en',
+      maxMessages: json['maxMessages'] as int? ?? 50,
+      maxLoops: json['maxLoops'] as int? ?? 100,
     );
   }
 }
@@ -339,6 +345,8 @@ class SettingsProvider extends ChangeNotifier {
     bool? showUserAvatar,
     String? systemPrompt,
     String? locale,
+    int? maxMessages,
+    int? maxLoops,
   }) async {
     final prefs = await SharedPreferences.getInstance();
     _generalSetting = GeneralSetting(
@@ -348,6 +356,8 @@ class SettingsProvider extends ChangeNotifier {
       showUserAvatar: showUserAvatar ?? _generalSetting.showUserAvatar,
       systemPrompt: systemPrompt ?? _generalSetting.systemPrompt,
       locale: locale ?? _generalSetting.locale,
+      maxMessages: maxMessages ?? _generalSetting.maxMessages,
+      maxLoops: maxLoops ?? _generalSetting.maxLoops,
     );
     await prefs.setString(
         'generalSettings', jsonEncode(_generalSetting.toJson()));
@@ -360,6 +370,8 @@ class SettingsProvider extends ChangeNotifier {
     required bool showUserAvatar,
     required String systemPrompt,
     required String locale,
+    int? maxMessages,
+    int? maxLoops,
   }) async {
     final prefs = await SharedPreferences.getInstance();
     _generalSetting = GeneralSetting(
@@ -368,6 +380,8 @@ class SettingsProvider extends ChangeNotifier {
       showUserAvatar: showUserAvatar,
       systemPrompt: systemPrompt,
       locale: locale,
+      maxMessages: maxMessages ?? _generalSetting.maxMessages,
+      maxLoops: maxLoops ?? _generalSetting.maxLoops,
     );
     await prefs.setString(
         'generalSettings', jsonEncode(_generalSetting.toJson()));

@@ -541,4 +541,22 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get maximize => 'Maximize';
+
+  @override
+  String get conversationSettings => 'Conversation Settings';
+
+  @override
+  String get maxMessages => 'Max Messages';
+
+  @override
+  String get maxMessagesDescription => 'Limit the maximum number of messages passed to LLM (1-1000)';
+
+  @override
+  String get maxLoops => 'Max Loops';
+
+  @override
+  String get maxLoopsDescription => 'Limit the maximum number of tool call loops to prevent infinite loops (1-1000)';
+
+  @override
+  String get mcpServers => 'MCP Servers';
 }

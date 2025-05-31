@@ -1,5 +1,5 @@
 <div align="center">
-<img src="./macos/Runner/Assets.xcassets/AppIcon.appiconset/icon_128@1x.png" alt="logo">
+<img src="./assets/logo.png" alt="logo" width="120" height="120">
 <h1>chatmcp</h1>
 
 跨平台 `MacOS | Windows | Linux | iOS | Android` AI 聊天客户端
@@ -24,18 +24,18 @@ Android：[release](https://github.com/daodao97/chatmcp/releases)
 
 ## 预览
 
-![Artifact Display](./assets/preview/artifact.gif)
-![Thinking Mode](./assets/preview/think.png)
-![Generate Image](./assets/preview/gen_img.png)
-![LaTeX Support](./assets/preview/latex.png)
-![HTML Preview](./assets/preview/html-preview.png)
-![Mermaid Diagram](./assets/preview/mermaid.png)
-![mcp workflow](./assets/preview/mcp-workerflow.png)
-![mcp inmemory](./assets/preview/mcp-inmemory.png)
-![MCP Tools](./assets/preview/mcp-tools.png)
-![LLM Provider](./assets/preview/llm-provider.png)
-![MCP Stdio](./assets/preview/mcp-stdio.png)
-![MCP SSE](./assets/preview/mcp-sse.png)
+![Artifact Display](./docs/preview/artifact.gif)
+![Thinking Mode](./docs/preview/think.webp)
+![Generate Image](./docs/preview/gen_img.webp)
+![LaTeX Support](./docs/preview/latex.webp)
+![HTML Preview](./docs/preview/html-preview.webp)
+![Mermaid Diagram](./docs/preview/mermaid.webp)
+![mcp workflow](./docs/preview/mcp-workerflow.webp)
+![mcp inmemory](./docs/preview/mcp-inmemory.webp)
+![MCP Tools](./docs/preview/mcp-tools.webp)
+![LLM Provider](./docs/preview/llm-provider.webp)
+![MCP Stdio](./docs/preview/mcp-stdio.webp)
+![MCP SSE](./docs/preview/mcp-sse.webp)
 
 
 ## 使用方法
@@ -55,10 +55,10 @@ brew install node
 3. 与 MCP 服务器开始对话
 
 - stdio mcp server
-![](./docs/mcp_stdio.png)
+![](./docs/mcp_stdio.webp)
 
 - sse mcp server
-![](./docs//mcp_sse.png)
+![](./docs//mcp_sse.webp)
 
 
 ## 调试 
@@ -106,6 +106,26 @@ rm -rf ~/.local/share/ChatMcp
 flutter pub get
 flutter run -d macos
 ```
+
+### Android 签名配置
+
+如果您需要构建发布版本的 Android 应用，请配置签名：
+
+```bash
+# 生成签名密钥
+./scripts/create_keystore.sh
+
+# 验证签名配置
+./scripts/verify_signing.sh
+
+# 构建签名的 APK
+flutter build apk --release
+
+# 构建签名的 App Bundle（推荐用于 Google Play）
+flutter build appbundle --release
+```
+
+详细的签名配置说明请参考：[Android 签名配置指南](./docs/android-signing.md)
 
 ## 功能特性
 

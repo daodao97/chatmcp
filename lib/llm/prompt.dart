@@ -5,6 +5,8 @@ class SystemPromptGenerator {
   final String template = '''
 <system_prompt>
 You will select appropriate tools and call them to solve user queries
+
+**CRITICAL CONSTRAINT: You MUST call only ONE tool per response. Never call multiple tools simultaneously.**
 </system_prompt>
 
 **Tool Definitions:**

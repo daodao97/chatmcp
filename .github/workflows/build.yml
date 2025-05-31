@@ -28,17 +28,17 @@ jobs:
             build_target: windows
             apk_build: false
     runs-on: ${{ matrix.os }}
-    
+
     steps:
       - uses: actions/checkout@v3
-      
+
       - name: Setup Java
         if: matrix.apk_build
         uses: actions/setup-java@v3
         with:
           distribution: 'zulu'
           java-version: '17'
-      
+
       - name: Setup Android SDK
         if: matrix.apk_build
         uses: android-actions/setup-android@v3
@@ -48,7 +48,7 @@ jobs:
         with:
           channel: 'stable'
           flutter-version: '3.29.0'
-      
+
       - name: Create empty .env file
         run: touch .env
 
@@ -60,14 +60,37 @@ jobs:
       
       - name: Install dependencies
         run: flutter pub get
+
+      - name: Setup Android Signing
+        if: matrix.apk_build && github.event_name != 'pull_request'
+        env:
+          SIGNING_KEYSTORE: ${{ secrets.SIGNING_KEYSTORE }}
+          SIGNING_KEY_ALIAS: ${{ secrets.SIGNING_KEY_ALIAS }}
+          SIGNING_STORE_PASSWORD: ${{ secrets.SIGNING_STORE_PASSWORD }}
+          SIGNING_KEY_PASSWORD: ${{ secrets.SIGNING_KEY_PASSWORD }}
+        run: |
+          mkdir -p android/app/keystore
+          
+          if [ -n "$SIGNING_KEYSTORE" ]; then
+            echo "$SIGNING_KEYSTORE" | base64 -d > android/app/keystore/release.jks
+            echo "SIGNING_STORE_PATH=keystore/release.jks" >> $GITHUB_ENV
+            echo "SIGNING_KEY_ALIAS=$SIGNING_KEY_ALIAS" >> $GITHUB_ENV
+            echo "SIGNING_STORE_PASSWORD=$SIGNING_STORE_PASSWORD" >> $GITHUB_ENV
+            echo "SIGNING_KEY_PASSWORD=$SIGNING_KEY_PASSWORD" >> $GITHUB_ENV
+            echo "✅ Android 签名配置已设置"
+          else
+            echo "⚠️  未找到签名配置，将使用 debug 签名"
+          fi
       
       - name: Build ${{ matrix.build_target }}
         shell: bash
         run: |
-          flutter build ${{ matrix.build_target }} --release
+          echo "apk_build: ${{ matrix.apk_build }}"
           if [ "${{ matrix.apk_build }}" == "true" ]; then
             flutter build apk --release
+            flutter build appbundle --release
           fi
+          flutter build ${{ matrix.build_target }} --release
       
       - name: Package Linux App
         if: matrix.os == 'ubuntu-latest'
@@ -96,10 +119,21 @@ jobs:
           Copy-Item -Path "windows/sqlite3.dll" -Destination "${{ matrix.output_path }}" -Force
           Compress-Archive -Path "${{ matrix.output_path }}/*" -DestinationPath "${{ matrix.asset_name }}" -Force
 
-      - name: Package Android APK
+      - name: Package Android APK and AAB
         if: matrix.apk_build
         run: |
-          cp build/app/outputs/flutter-apk/app-release.apk chatmcp-android.apk
+          mkdir -p android-artifacts
+          
+          if [ -f "build/app/outputs/flutter-apk/app-release.apk" ]; then
+            cp build/app/outputs/flutter-apk/app-release.apk android-artifacts/chatmcp-universal.apk
+          fi
+          
+          if [ -f "build/app/outputs/bundle/release/app-release.aab" ]; then
+            cp build/app/outputs/bundle/release/app-release.aab android-artifacts/chatmcp-release.aab
+          fi
+          
+          echo "生成的 Android 文件:"
+          ls -la android-artifacts/
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
@@ -107,7 +141,7 @@ jobs:
           name: ${{ matrix.apk_build && 'chatmcp-android' || matrix.build_target }}
           path: |
             ${{ matrix.asset_name }}
-            ${{ matrix.apk_build && 'chatmcp-android.apk' || '' }}
+            ${{ matrix.apk_build && 'android-artifacts/*' || '' }}
       
       - name: Create Release
         if: startsWith(github.ref, 'refs/tags/')
@@ -115,6 +149,6 @@ jobs:
         with:
           files: |
             ${{ matrix.asset_name }}
-            ${{ matrix.apk_build && 'chatmcp-android.apk' || '' }}
+            ${{ matrix.apk_build && 'android-artifacts/*' || '' }}
         env:
           GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}

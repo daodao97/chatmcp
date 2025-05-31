@@ -10,31 +10,40 @@ class ChatSetting extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     return Consumer<SettingsProvider>(
       builder: (context, settingsProvider, child) {
         final modelSetting = settingsProvider.modelSetting;
 
         return SingleChildScrollView(
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            padding: const EdgeInsets.all(24.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const SizedBox(height: 20),
                 _buildSectionTitle(
                   context,
                   l10n.modelSettings,
                   CupertinoIcons.slider_horizontal_3,
                 ),
-                Card(
-                  elevation: 0,
-                  color: Theme.of(context).colorScheme.surface,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    side: BorderSide(
-                      color:
-                          Theme.of(context).colorScheme.outline.withAlpha(50),
+                const SizedBox(height: 16),
+                Container(
+                  decoration: BoxDecoration(
+                    color: colorScheme.surface,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: colorScheme.outline.withOpacity(0.1),
+                      width: 1,
                     ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: colorScheme.shadow.withOpacity(0.05),
+                        blurRadius: 10,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
                   ),
                   child: Column(
                     children: [
@@ -106,14 +115,41 @@ class ChatSetting extends StatelessWidget {
                     ],
                   ),
                 ),
+                const SizedBox(height: 20),
                 Align(
                   alignment: Alignment.centerRight,
-                  child: TextButton.icon(
-                    onPressed: () => _resetModelSettings(settingsProvider),
-                    icon: const Icon(CupertinoIcons.refresh_thin),
-                    label: Text('Reset'),
-                    style: TextButton.styleFrom(
-                      foregroundColor: Theme.of(context).colorScheme.primary,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: colorScheme.primary.withOpacity(0.2),
+                        width: 1,
+                      ),
+                    ),
+                    child: TextButton.icon(
+                      onPressed: () => _resetModelSettings(settingsProvider),
+                      icon: Icon(
+                        CupertinoIcons.refresh_thin,
+                        size: 18,
+                        color: colorScheme.primary,
+                      ),
+                      label: Text(
+                        'Reset',
+                        style: TextStyle(
+                          color: colorScheme.primary,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      style: TextButton.styleFrom(
+                        foregroundColor: colorScheme.primary,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 8,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
                     ),
                   ),
                 ),
@@ -126,22 +162,32 @@ class ChatSetting extends StatelessWidget {
   }
 
   Widget _buildSectionTitle(BuildContext context, String title, IconData icon) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 4.0),
       child: Row(
         children: [
-          Icon(
-            icon,
-            size: 18,
-            color: Theme.of(context).colorScheme.primary,
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: colorScheme.primary.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(
+              icon,
+              size: 20,
+              color: colorScheme.primary,
+            ),
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: 12),
           Text(
             title,
             style: TextStyle(
-              fontSize: 14,
+              fontSize: 18,
               fontWeight: FontWeight.w600,
-              color: Theme.of(context).colorScheme.primary,
+              color: colorScheme.onSurface,
+              letterSpacing: -0.5,
             ),
           ),
         ],
@@ -152,9 +198,9 @@ class ChatSetting extends StatelessWidget {
   Widget _buildDivider(BuildContext context) {
     return Divider(
       height: 1,
-      indent: 16,
-      endIndent: 16,
-      color: Theme.of(context).colorScheme.outline.withAlpha(50),
+      indent: 20,
+      endIndent: 20,
+      color: Theme.of(context).colorScheme.outline.withOpacity(0.08),
     );
   }
 
@@ -167,38 +213,65 @@ class ChatSetting extends StatelessWidget {
     required ValueChanged<double> onChanged,
     String? tooltip,
   }) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+      padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 16.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 16,
-              color: Theme.of(context).colorScheme.onSurface,
-            ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
+                child: Text(
+                  label,
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                    color: colorScheme.onSurface,
+                  ),
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: colorScheme.primary.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: Text(
+                  value.toStringAsFixed(2),
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: colorScheme.primary,
+                  ),
+                ),
+              ),
+            ],
           ),
           if (tooltip != null)
             Padding(
-              padding: const EdgeInsets.only(top: 4),
+              padding: const EdgeInsets.only(top: 6),
               child: Text(
                 tooltip,
                 style: TextStyle(
                   fontSize: 13,
-                  color: Theme.of(context).colorScheme.onSurface.withAlpha(60),
+                  color: colorScheme.onSurface.withOpacity(0.6),
+                  height: 1.3,
                 ),
               ),
             ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 12),
           SliderTheme(
             data: SliderTheme.of(context).copyWith(
-              activeTrackColor: Theme.of(context).colorScheme.primary,
-              inactiveTrackColor:
-                  Theme.of(context).colorScheme.primary.withOpacity(0.2),
-              thumbColor: Theme.of(context).colorScheme.primary,
-              overlayColor:
-                  Theme.of(context).colorScheme.primary.withOpacity(0.1),
+              activeTrackColor: colorScheme.primary,
+              inactiveTrackColor: colorScheme.primary.withOpacity(0.15),
+              thumbColor: colorScheme.primary,
+              overlayColor: colorScheme.primary.withOpacity(0.1),
+              trackHeight: 4,
+              thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 8),
+              overlayShape: const RoundSliderOverlayShape(overlayRadius: 16),
             ),
             child: Slider(
               value: value,
@@ -220,8 +293,10 @@ class ChatSetting extends StatelessWidget {
     String? tooltip,
   }) {
     final l10n = AppLocalizations.of(context)!;
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+      padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 16.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -229,54 +304,67 @@ class ChatSetting extends StatelessWidget {
             label,
             style: TextStyle(
               fontSize: 16,
-              color: Theme.of(context).colorScheme.onSurface,
+              fontWeight: FontWeight.w500,
+              color: colorScheme.onSurface,
             ),
           ),
           if (tooltip != null)
             Padding(
-              padding: const EdgeInsets.only(top: 4),
+              padding: const EdgeInsets.only(top: 6),
               child: Text(
                 tooltip,
                 style: TextStyle(
                   fontSize: 13,
-                  color: Theme.of(context).colorScheme.onSurface.withAlpha(60),
+                  color: colorScheme.onSurface.withOpacity(0.6),
+                  height: 1.3,
                 ),
               ),
             ),
-          const SizedBox(height: 8),
-          TextField(
-            controller: TextEditingController(text: value?.toString() ?? ''),
-            keyboardType: TextInputType.number,
-            decoration: InputDecoration(
-              hintText: l10n.enterMaxTokens,
-              contentPadding:
-                  const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-                borderSide: BorderSide(
-                  color: Theme.of(context).colorScheme.outline.withAlpha(20),
-                ),
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-                borderSide: BorderSide(
-                  color: Theme.of(context).colorScheme.outline.withAlpha(20),
-                ),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-                borderSide: BorderSide(
-                  color: Theme.of(context).colorScheme.primary,
-                ),
+          const SizedBox(height: 12),
+          Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: colorScheme.outline.withOpacity(0.2),
+                width: 1,
               ),
             ),
-            onChanged: (value) {
-              if (value.isEmpty) {
-                onChanged(null);
-              } else {
-                onChanged(int.tryParse(value));
-              }
-            },
+            child: TextField(
+              controller: TextEditingController(text: value?.toString() ?? ''),
+              keyboardType: TextInputType.number,
+              style: TextStyle(
+                fontSize: 15,
+                color: colorScheme.onSurface,
+                fontWeight: FontWeight.w500,
+              ),
+              decoration: InputDecoration(
+                hintText: l10n.enterMaxTokens,
+                hintStyle: TextStyle(
+                  color: colorScheme.onSurface.withOpacity(0.5),
+                  fontWeight: FontWeight.normal,
+                ),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 12,
+                ),
+                border: InputBorder.none,
+                enabledBorder: InputBorder.none,
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(
+                    color: colorScheme.primary,
+                    width: 2,
+                  ),
+                ),
+              ),
+              onChanged: (value) {
+                if (value.isEmpty) {
+                  onChanged(null);
+                } else {
+                  onChanged(int.tryParse(value));
+                }
+              },
+            ),
           ),
         ],
       ),

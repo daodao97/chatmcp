@@ -13,6 +13,7 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'dart:io';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:chatmcp/generated/app_localizations.dart';
+import 'package:bot_toast/bot_toast.dart';
 
 final GlobalKey<ScaffoldMessengerState> _scaffoldMessengerKey =
     GlobalKey<ScaffoldMessengerState>();
@@ -126,6 +127,8 @@ class MyApp extends StatelessWidget {
           themeMode: _getThemeMode(settings.generalSetting.theme),
           home: LayoutPage(),
           locale: Locale(settings.generalSetting.locale),
+          builder: BotToastInit(), //1.调用BotToastInit
+          navigatorObservers: [BotToastNavigatorObserver()], //2.注册路由观察者
           localizationsDelegates: const [
             AppLocalizations.delegate,
             GlobalMaterialLocalizations.delegate,

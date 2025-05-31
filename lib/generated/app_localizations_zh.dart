@@ -541,4 +541,22 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get maximize => '最大化';
+
+  @override
+  String get conversationSettings => '对话设置';
+
+  @override
+  String get maxMessages => '最大消息数';
+
+  @override
+  String get maxMessagesDescription => '限制传递给 LLM 的最大消息数量 (1-1000)';
+
+  @override
+  String get maxLoops => '最大循环数';
+
+  @override
+  String get maxLoopsDescription => '限制工具调用的最大循环次数，防止无限循环 (1-1000)';
+
+  @override
+  String get mcpServers => 'MCP 服务器';
 }

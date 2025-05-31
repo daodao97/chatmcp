@@ -18,6 +18,7 @@ import 'package:chatmcp/page/layout/widgets/chat_setting.dart';
 import 'package:flutter_popup/flutter_popup.dart';
 import 'package:chatmcp/widgets/upgradge.dart';
 import 'package:chatmcp/page/layout/widgets/window_controls.dart';
+import 'package:chatmcp/components/widgets/custom_popup.dart';
 
 class TopToolbar extends StatelessWidget {
   final bool hideSidebar;
@@ -64,53 +65,26 @@ class TopToolbar extends StatelessWidget {
   Widget _buildMoreMenu(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
 
-    return CustomPopup(
+    return BasePopup(
       showArrow: true,
-      arrowColor: AppColors.getLayoutBackgroundColor(context),
-      backgroundColor: AppColors.getLayoutBackgroundColor(context),
-      content: Container(
-        constraints: const BoxConstraints(
-          maxWidth: 200,
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            if (ProviderManager.chatProvider.activeChat != null)
-              InkWell(
-                onTap: () {
-                  emit(ShareEvent(false));
-                  Navigator.of(context).pop();
-                },
-                child: Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                  child: Row(
-                    children: [
-                      const Icon(CupertinoIcons.share, size: 18),
-                      const SizedBox(width: 12),
-                      Text(
-                        l10n.share,
-                        style: TextStyle(
-                          color: AppColors.getThemeTextColor(context),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (ProviderManager.chatProvider.activeChat != null)
             InkWell(
               onTap: () {
-                _onShowChatSetting(context);
+                emit(ShareEvent(false));
+                Navigator.of(context).pop();
               },
               child: Padding(
                 padding:
                     const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 child: Row(
                   children: [
-                    const Icon(CupertinoIcons.slider_horizontal_3, size: 18),
+                    const Icon(CupertinoIcons.share, size: 18),
                     const SizedBox(width: 12),
                     Text(
-                      l10n.modelConfig,
+                      l10n.share,
                       style: TextStyle(
                         color: AppColors.getThemeTextColor(context),
                       ),
@@ -119,41 +93,61 @@ class TopToolbar extends StatelessWidget {
                 ),
               ),
             ),
-            if (kIsDebug)
-              InkWell(
-                onTap: () {
-                  Navigator.of(context).pop();
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (context) => Scaffold(
-                        appBar: AppBar(
-                          title: Text(l10n.webSearchTest),
-                        ),
-                        body: const MarkitTestPage(),
+          InkWell(
+            onTap: () {
+              _onShowChatSetting(context);
+            },
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              child: Row(
+                children: [
+                  const Icon(CupertinoIcons.slider_horizontal_3, size: 18),
+                  const SizedBox(width: 12),
+                  Text(
+                    l10n.modelConfig,
+                    style: TextStyle(
+                      color: AppColors.getThemeTextColor(context),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          if (kIsDebug)
+            InkWell(
+              onTap: () {
+                Navigator.of(context).pop();
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => Scaffold(
+                      appBar: AppBar(
+                        title: Text(l10n.webSearchTest),
+                      ),
+                      body: const MarkitTestPage(),
+                    ),
+                  ),
+                );
+              },
+              child: Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                child: Row(
+                  children: [
+                    const Icon(CupertinoIcons.ant, size: 18),
+                    const SizedBox(width: 12),
+                    Text(
+                      l10n.debug,
+                      style: TextStyle(
+                        color: AppColors.getThemeTextColor(context),
                       ),
                     ),
-                  );
-                },
-                child: Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                  child: Row(
-                    children: [
-                      const Icon(CupertinoIcons.ant, size: 18),
-                      const SizedBox(width: 12),
-                      Text(
-                        l10n.debug,
-                        style: TextStyle(
-                          color: AppColors.getThemeTextColor(context),
-                        ),
-                      ),
-                    ],
-                  ),
+                  ],
                 ),
               ),
-          ],
-        ),
+            ),
+        ],
       ),
+      maxWidth: 200,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 12),
         child: const Icon(CupertinoIcons.ellipsis_vertical, size: 18),

@@ -154,5 +154,11 @@
     "invalidError": "无效的请求或参数",
     "unauthorizedError": "未授权访问，请检查权限",
     "minimize": "最小化",
-    "maximize": "最大化"
+    "maximize": "最大化",
+    "conversationSettings": "对话设置",
+    "maxMessages": "最大消息数",
+    "maxMessagesDescription": "限制传递给 LLM 的最大消息数量 (1-1000)",
+    "maxLoops": "最大循环数",
+    "maxLoopsDescription": "限制工具调用的最大循环次数，防止无限循环 (1-1000)",
+    "mcpServers": "MCP 服务器"
 }

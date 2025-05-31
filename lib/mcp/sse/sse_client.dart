@@ -159,18 +159,18 @@ class SSEClient implements McpClient {
 
     Logger.root.info('event: $eventType, data: $data');
 
-    if (eventType == 'endpoint' && data != null) {
+    if (eventType == 'endpoint') {
       _handleEndpointEvent(data);
-    } else if (eventType == 'message' && data != null) {
+    } else if (eventType == 'message') {
       try {
         final jsonData = jsonDecode(data);
         final message = JSONRPCMessage.fromJson(jsonData);
         _handleMessage(message);
       } catch (e, stack) {
-        Logger.root.severe('解析服务器消息失败: $e\n$stack');
+        Logger.root.severe('handle message failed: $e\n$stack');
       }
     } else {
-      Logger.root.info('收到未处理的SSE事件类型: $eventType');
+      Logger.root.info('unhandled event: $eventType');
     }
   }
 
@@ -179,41 +179,22 @@ class SSEClient implements McpClient {
       final uri = Uri.parse(serverConfig.command);
       final baseUrl = uri.origin;
 
-      String rawEndpoint;
-      if (data.startsWith("http")) {
-        rawEndpoint = data.trim();
-      } else {
-        final path = data.trim();
-        rawEndpoint = baseUrl + (path.startsWith("/") ? path : "/$path");
-      }
+      data = data.trim();
+      String rawEndpoint = data.startsWith("http") ? data : baseUrl + data;
 
       final parsedUri = Uri.parse(rawEndpoint);
       if (!parsedUri.hasScheme || !parsedUri.hasAuthority) {
-        Logger.root.severe('收到无效的消息端点URL: $rawEndpoint');
-        return;
-      }
-
-      // 提取新的sessionId - 同时支持sessionId和session_id两种参数名
-      String? newSessionId = parsedUri.queryParameters['sessionId'] ??
-          parsedUri.queryParameters['session_id'];
-
-      if (newSessionId == null || newSessionId.isEmpty) {
-        // 如果URL中没有sessionId参数，尝试从路径中提取
-        final match = RegExp(r'sessionId=([^&]+)').firstMatch(data);
-        if (match != null) {
-          newSessionId = match.group(1);
-        }
-      }
-
-      if (newSessionId == null || newSessionId.isEmpty) {
-        Logger.root.severe('无法从endpoint中提取sessionId: $data');
+        Logger.root.severe('invalid endpoint: $rawEndpoint');
         return;
       }
 
       // 构建标准化的endpoint URL
       final Map<String, String> queryParams =
           Map.from(parsedUri.queryParameters);
-      queryParams['sessionId'] = newSessionId; // 使用标准化的参数名
+
+      uri.queryParameters.forEach((key, value) {
+        queryParams[key] = value;
+      });
 
       final normalizedUri = Uri(
         scheme: parsedUri.scheme,
@@ -226,7 +207,7 @@ class SSEClient implements McpClient {
       _messageEndpoint = normalizedUri.toString();
       _isEndpointConfirmed = true;
 
-      Logger.root.info('成功更新endpoint和sessionId: $_messageEndpoint');
+      Logger.root.info('endpoint: $_messageEndpoint');
       _processStateController.add(const ProcessState.running());
 
       // 完成endpoint确认
@@ -235,7 +216,7 @@ class SSEClient implements McpClient {
       }
       _endpointTimer?.cancel();
     } catch (e) {
-      Logger.root.severe('处理endpoint事件失败: $e');
+      Logger.root.severe('handle endpoint event failed: $e');
       if (!_endpointConfirmedCompleter.isCompleted) {
         _endpointConfirmedCompleter.completeError(e);
       }
@@ -245,7 +226,7 @@ class SSEClient implements McpClient {
   Future<void> _ensureValidConnection() async {
     if (_connectionState != ConnectionState.connected ||
         !_isEndpointConfirmed) {
-      Logger.root.info('检测到连接状态异常，尝试重新建立连接');
+      Logger.root.info('connection state is not valid, try to reconnect');
       await _connect();
     }
   }
@@ -265,7 +246,7 @@ class SSEClient implements McpClient {
 
   Future<void> _sendHttpPost(Map<String, dynamic> data) async {
     if (_messageEndpoint == null) {
-      throw StateError('消息端点未初始化');
+      throw StateError('message endpoint is not initialized');
     }
 
     await _writeLock.synchronized(() async {
@@ -293,14 +274,14 @@ class SSEClient implements McpClient {
   @override
   Future<JSONRPCMessage> sendMessage(JSONRPCMessage message) async {
     if (message.id == null) {
-      throw ArgumentError('消息必须有ID');
+      throw ArgumentError('message must have an id');
     }
 
     final completer = Completer<JSONRPCMessage>();
     _pendingRequests[message.id!] = completer;
 
     try {
-      Logger.root.info('准备发送消息: ${message.id} - ${message.method}');
+      Logger.root.info('send message: ${message.id} - ${message.method}');
       await _sendHttpPost(message.toJson());
 
       return await completer.future.timeout(
@@ -320,7 +301,8 @@ class SSEClient implements McpClient {
   Future<JSONRPCMessage> sendInitialize() async {
     // 确保连接已经建立
     if (_messageEndpoint == null) {
-      Logger.root.warning('尝试初始化但消息端点尚未建立，等待端点建立...');
+      Logger.root.warning(
+          'try to initialize but message endpoint is not established, wait for endpoint to be established...');
       // 等待一段时间以确保SSE连接已建立并获取到端点
       int attempts = 0;
       const maxAttempts = 30; // 增加到30次尝试
@@ -329,19 +311,21 @@ class SSEClient implements McpClient {
       while (_messageEndpoint == null && attempts < maxAttempts) {
         await Future.delayed(delay);
         attempts++;
-        Logger.root.info('等待消息端点建立: 尝试 $attempts/$maxAttempts');
+        Logger.root.info(
+            'wait for message endpoint to be established: attempt $attempts/$maxAttempts');
 
         // 如果连接已关闭或出错，尝试重新连接
         if (_disposed) {
-          Logger.root.warning('SSE连接可能已关闭，尝试重新连接');
+          Logger.root.warning('SSE connection may be closed, try to reconnect');
           await _connect();
         }
       }
 
       if (_messageEndpoint == null) {
         Logger.root.severe(
-            '消息端点在 ${maxAttempts * delay.inMilliseconds / 1000} 秒后仍未建立');
-        throw StateError('消息端点在等待后仍未建立，无法完成初始化');
+            'message endpoint is not established after ${maxAttempts * delay.inMilliseconds / 1000} seconds');
+        throw StateError(
+            'message endpoint is not established, cannot complete initialization');
       }
     }
 
@@ -362,18 +346,18 @@ class SSEClient implements McpClient {
 
     try {
       final initResponse = await sendMessage(initMessage);
-      Logger.root.info('初始化响应: $initResponse');
+      Logger.root.info('initialize response: $initResponse');
 
       // 等待一小段时间确保服务器已处理初始化请求
       await Future.delayed(const Duration(milliseconds: 100));
 
       // 发送初始化完成通知
-      Logger.root.info('发送初始化完成通知');
+      Logger.root.info('send initialize completed notification');
       await _sendNotification('notifications/initialized', {});
 
       return initResponse;
     } catch (e, stack) {
-      Logger.root.severe('初始化失败: $e\n$stack');
+      Logger.root.severe('initialize failed: $e\n$stack');
       rethrow;
     }
   }

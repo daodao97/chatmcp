@@ -1,4 +1,5 @@
 import 'package:logging/logging.dart';
+import '../utils/toast.dart';
 import './models/server.dart';
 import './client/mcp_client_interface.dart';
 import './stdio/stdio_client.dart';
@@ -32,6 +33,9 @@ Future<McpClient?> initializeMcpServer(
             MemoryServerFactory.createMemoryServer(serverConfig.command);
         if (memoryServer == null) {
           Logger.root.severe('Failed to create memory server');
+
+          ToastUtils.error('Memory server creation failed');
+
           return null;
         }
         mcpClient = InMemoryClient(server: memoryServer);
@@ -53,14 +57,23 @@ Future<McpClient?> initializeMcpServer(
     }
   }
 
-  // Initialize client
-  await mcpClient.initialize();
-  final initResponse = await mcpClient.sendInitialize();
-  Logger.root.info('Initialization response: $initResponse');
+  try {
+    await mcpClient.initialize();
+    final initResponse = await mcpClient.sendInitialize();
+    Logger.root.info('Initialization response: $initResponse');
 
-  final toolListResponse = await mcpClient.sendToolList();
-  Logger.root.info('Tool list response: $toolListResponse');
-  return mcpClient;
+    final toolListResponse = await mcpClient.sendToolList();
+    Logger.root.info('Tool list response: $toolListResponse');
+
+    return mcpClient;
+  } catch (e) {
+    Logger.root.severe('Failed to initialize MCP server: $e');
+
+    // 显示错误 toast 通知
+    ToastUtils.error('MCP Error: ${e.toString()}');
+
+    return null;
+  }
 }
 
 Future<bool> verifyMcpServer(Map<String, dynamic> mcpServerConfig) async {
@@ -68,8 +81,7 @@ Future<bool> verifyMcpServer(Map<String, dynamic> mcpServerConfig) async {
 
   McpClient mcpClient;
 
-  // 首先检查类型字段
-  if (serverConfig.type != null && serverConfig.type.isNotEmpty) {
+  if (serverConfig.type.isNotEmpty) {
     switch (serverConfig.type) {
       case 'sse':
         mcpClient = SSEClient(serverConfig: serverConfig);
@@ -101,6 +113,10 @@ Future<bool> verifyMcpServer(Map<String, dynamic> mcpServerConfig) async {
     await mcpClient.sendInitialize();
     return true;
   } catch (e) {
+    Logger.root.warning('Failed to verify MCP server: $e');
+
+    ToastUtils.warn('MCP server verification failed: ${e.toString()}');
+
     return false;
   }
 }

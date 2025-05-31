@@ -170,5 +170,11 @@
     "invalidError": "Invalid request",
     "unauthorizedError": "Unauthorized access",
     "minimize": "Minimize",
-    "maximize": "Maximize"
+    "maximize": "Maximize",
+    "conversationSettings": "Conversation Settings",
+    "maxMessages": "Max Messages",
+    "maxMessagesDescription": "Limit the maximum number of messages passed to LLM (1-1000)",
+    "maxLoops": "Max Loops",
+    "maxLoopsDescription": "Limit the maximum number of tool call loops to prevent infinite loops (1-1000)",
+    "mcpServers": "MCP Servers"
 }

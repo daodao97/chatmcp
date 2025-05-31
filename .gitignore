@@ -61,3 +61,9 @@ dist/*
 
 # VSCode related
 .vscode/
+
+# Android 签名相关文件
+android/app/keystore/
+android/signing.env
+*.jks
+*.keystore

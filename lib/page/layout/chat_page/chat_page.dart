@@ -49,7 +49,6 @@ class _ChatPageState extends State<ChatPage> {
   List<RunFunctionEvent> _runFunctionEvents = [];
   bool _isRunningFunction = false;
 
-  final num _maxLoop = 100;
   num _currentLoop = 0;
 
   @override
@@ -642,8 +641,12 @@ class _ChatPageState extends State<ChatPage> {
     }
 
     try {
+      final generalSetting = ProviderManager.settingsProvider.generalSetting;
+      final maxLoops = generalSetting.maxLoops;
+
       while (await _checkNeedToolCall()) {
-        if (_currentLoop > _maxLoop) {
+        if (_currentLoop > maxLoops) {
+          Logger.root.warning('达到最大循环次数限制: $maxLoops');
           break;
         }
 
@@ -747,6 +750,14 @@ class _ChatPageState extends State<ChatPage> {
     messageList = messageMerge(messageList);
 
     final modelSetting = ProviderManager.settingsProvider.modelSetting;
+    final generalSetting = ProviderManager.settingsProvider.generalSetting;
+
+    // 限制消息数量
+    final maxMessages = generalSetting.maxMessages;
+    if (messageList.length > maxMessages) {
+      // 保留最新的 maxMessages 条消息
+      messageList = messageList.sublist(messageList.length - maxMessages);
+    }
 
     final lastUserMessageIndex = messageList.lastIndexWhere(
       (m) => m.role == MessageRole.user,
