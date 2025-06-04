@@ -82,6 +82,8 @@ class OpenAIClient extends BaseLLMClient {
       return LLMResponse(
         content: message['content'],
         toolCalls: toolCalls,
+        rawToolCallXml: null,
+        needsXmlParsing: false,
       );
     } catch (e) {
       throw await handleError(e, 'OpenAI', endpoint, bodyStr);
@@ -158,6 +160,8 @@ class OpenAIClient extends BaseLLMClient {
             yield LLMResponse(
               content: delta['content'],
               toolCalls: toolCalls,
+              rawToolCallXml: null,
+              needsXmlParsing: false,
             );
           }
         } catch (e) {

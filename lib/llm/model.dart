@@ -218,17 +218,28 @@ class LLMResponse {
   final String? content;
   final List<ToolCall>? toolCalls;
   final bool needToolCall;
+  final String? rawToolCallXml;
+  final bool needsXmlParsing;
 
   LLMResponse({
     this.content,
     this.toolCalls,
+    this.rawToolCallXml,
+    this.needsXmlParsing = false,
   }) : needToolCall = toolCalls != null && toolCalls.isNotEmpty;
 
-  Map<String, dynamic> toJson() => {
-        'content': content,
-        'tool_calls': toolCalls?.map((t) => t.toJson()).toList(),
-        'need_tool_call': needToolCall,
-      };
+  Map<String, dynamic> toJson() {
+    final json = <String, dynamic>{
+      'content': content,
+      'tool_calls': toolCalls?.map((t) => t.toJson()).toList(),
+      'need_tool_call': needToolCall,
+    };
+    if (rawToolCallXml != null) {
+      json['raw_tool_call_xml'] = rawToolCallXml;
+      json['needs_xml_parsing'] = needsXmlParsing;
+    }
+    return json;
+  }
 }
 
 class Model {

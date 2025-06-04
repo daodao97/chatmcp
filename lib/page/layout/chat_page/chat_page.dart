@@ -21,6 +21,7 @@ import 'package:chatmcp/utils/event_bus.dart';
 import 'chat_code_preview.dart';
 import 'package:chatmcp/generated/app_localizations.dart';
 import 'package:jsonc/jsonc.dart';
+import 'package:chatmcp/llm/tool_call_parser.dart';
 
 class ChatPage extends StatefulWidget {
   const ChatPage({super.key});
@@ -486,8 +487,9 @@ class _ChatPageState extends State<ChatPage> {
           messageId: msgId,
           content:
               '<call_function_result name="$toolName">\n$_currentResponse\n</call_function_result>',
-          role: MessageRole.assistant,
+          role: MessageRole.tool, // Changed from MessageRole.assistant
           name: toolName,
+          toolCallId: null, // This message is a result, not a request. If we need to link it to a request, this might be used.
           parentMessageId: _parentMessageId,
         ));
         _parentMessageId = msgId;
@@ -585,47 +587,8 @@ class _ChatPageState extends State<ChatPage> {
     return needToolCall;
   }
 
-  Future<bool> _checkNeedToolCallXml() async {
-    if (_runFunctionEvents.isNotEmpty) return true;
-
-    final lastMessage = _messages.last;
-    if (lastMessage.role == MessageRole.user) return true;
-
-    final content = lastMessage.content ?? '';
-    if (content.isEmpty) return false;
-
-    // 使用正则表达式检查是否包含 <function name=*>*</function> 格式的标签
-    final RegExp functionTagRegex = RegExp(
-        '<function\\s+name=["\']([^"\']*)["\']\\s*>(.*?)</function>',
-        dotAll: true);
-    final matches = functionTagRegex.allMatches(content);
-
-    if (matches.isEmpty) return false;
-
-    for (var match in matches) {
-      final toolName = match.group(1);
-      final toolArguments = match.group(2);
-
-      if (toolName == null || toolArguments == null) continue;
-
-      try {
-        // 移除换行符和多余的空格
-        final cleanedToolArguments = toolArguments
-            .replaceAll('\n', ' ')
-            .replaceAll(RegExp(r'\s+'), ' ')
-            .trim();
-        final toolArgumentsMap = jsonc.decode(cleanedToolArguments);
-        _onRunFunction(RunFunctionEvent(toolName, toolArgumentsMap));
-      } catch (e) {
-        Logger.root.warning('解析工具参数失败: $e');
-      }
-    }
-
-    return _runFunctionEvents.isNotEmpty;
-  }
-
   Future<bool> _checkNeedToolCall() async {
-    return await _checkNeedToolCallXml();
+    return _runFunctionEvents.isNotEmpty;
   }
 
   // 消息提交处理
@@ -741,6 +704,97 @@ class _ChatPageState extends State<ChatPage> {
     return "<user_message>\n$userMessage\n</user_message>\n\n$toolPrompt\n";
   }
 
+  void _processLLMResponseAndExtractToolCalls(LLMResponse response) {
+    _runFunctionEvents.clear(); // Clear previous events
+
+    bool toolCallMadeOrParsed = false;
+
+    if (response.toolCalls != null && response.toolCalls!.isNotEmpty) {
+      for (final tc in response.toolCalls!) {
+        _runFunctionEvents.add(RunFunctionEvent(tc.function.name, tc.function.parsedArguments));
+
+        final toolCallMsgId = Uuid().v4();
+        final toolCallMessage = ChatMessage(
+          messageId: toolCallMsgId,
+          parentMessageId: _parentMessageId,
+          // TODO: Review if this content representation is what we want, or if it should be hidden/different.
+          content: '<function name="${tc.function.name}">${tc.function.arguments}</function>',
+          role: MessageRole.assistant, // Or MessageRole.tool? Assistant requests a tool.
+          // toolCalls: [tc.toJson()], // Storing the structured tool call itself.
+        );
+        _messages.add(toolCallMessage);
+        _parentMessageId = toolCallMsgId; // Update parent ID for the next message
+        _onRunFunction(RunFunctionEvent(tc.function.name, tc.function.parsedArguments)); // To trigger UI/dialog if needed
+      }
+      toolCallMadeOrParsed = true;
+    } else if (response.needsXmlParsing && response.rawToolCallXml != null) {
+      ToolCallParser parser = ToolCallParser();
+      List<ToolCall> parsedXmlToolCalls = parser.parseXmlToolCalls(response.rawToolCallXml!);
+      for (final tc in parsedXmlToolCalls) {
+        _runFunctionEvents.add(RunFunctionEvent(tc.function.name, tc.function.parsedArguments));
+
+        final xmlToolCallMsgId = Uuid().v4();
+        final xmlToolCallMessage = ChatMessage(
+          messageId: xmlToolCallMsgId,
+          parentMessageId: _parentMessageId,
+          content: '<function name="${tc.function.name}">${tc.function.arguments}</function>', // Store the parsed call
+          role: MessageRole.assistant, // Or MessageRole.tool?
+        );
+        _messages.add(xmlToolCallMessage);
+        _parentMessageId = xmlToolCallMsgId; // Update parent ID
+         _onRunFunction(RunFunctionEvent(tc.function.name, tc.function.parsedArguments)); // To trigger UI/dialog if needed
+      }
+      if (parsedXmlToolCalls.isNotEmpty) {
+        toolCallMadeOrParsed = true;
+      }
+    }
+
+    // Handle regular content if no tool calls were made or if content can coexist
+    // The existing _processResponseStream updates _messages.last.
+    // If tool calls were added, _messages.last is now a tool call request.
+    // We need to ensure that if there's also final textual content from the LLM, it's added as a separate assistant message.
+
+    if (response.content != null && response.content!.trim().isNotEmpty) {
+      if (toolCallMadeOrParsed) {
+        // If tool calls were just added, and there's also text content,
+        // this text content should be a new assistant message.
+        final assistantMsgId = Uuid().v4();
+        _messages.add(ChatMessage(
+          messageId: assistantMsgId,
+          content: response.content,
+          role: MessageRole.assistant,
+          parentMessageId: _parentMessageId, // Parent is the last tool call message or previous assistant message
+        ));
+        _parentMessageId = assistantMsgId;
+      } else {
+        // No tool calls, this is simple text content.
+        // The _processResponseStream already updated _messages.last.
+        // We just need to ensure its parentMessageId is correct.
+        if (_messages.isNotEmpty && _messages.last.role == MessageRole.assistant) {
+          // This case should be handled by _initializeAssistantResponse and _processResponseStream
+          // _messages.last = _messages.last.copyWith(parentMessageId: _parentMessageId);
+          // No, _parentMessageId should already be correct before _processLLMResponse is called.
+        }
+      }
+    }
+    // If no content and no tool calls, the empty assistant message initialized earlier might remain.
+    // It might be better to remove it if it's still empty.
+    // However, _processResponseStream only adds to _currentResponse if chunk.content is not null.
+    // _initializeAssistantResponse adds an empty message. If it's still empty and no tool calls, let's remove it.
+    if (!toolCallMadeOrParsed && (response.content == null || response.content!.trim().isEmpty)) {
+        if (_messages.isNotEmpty && _messages.last.role == MessageRole.assistant && (_messages.last.content == null || _messages.last.content!.isEmpty)) {
+            // Let's verify this logic. If _processResponseStream did not add any content,
+            // and _processLLMResponseAndExtractToolCalls did not add any tool calls,
+            // then the initial empty assistant message is indeed empty.
+            // However, _parentMessageId was already updated when it was added.
+            // We should probably only remove it if it's truly the *absolute* last message and is empty.
+            // For now, let this be. The UI might just show an empty bubble.
+        }
+    }
+
+    setState(() {}); // Update UI with new messages or tool call events
+  }
+
   Future<void> _processLLMResponse() async {
     setState(() {
       _isWating = true;
@@ -752,44 +806,100 @@ class _ChatPageState extends State<ChatPage> {
     final modelSetting = ProviderManager.settingsProvider.modelSetting;
     final generalSetting = ProviderManager.settingsProvider.generalSetting;
 
-    // 限制消息数量
     final maxMessages = generalSetting.maxMessages;
     if (messageList.length > maxMessages) {
-      // 保留最新的 maxMessages 条消息
       messageList = messageList.sublist(messageList.length - maxMessages);
     }
 
-    final lastUserMessageIndex = messageList.lastIndexWhere(
-      (m) => m.role == MessageRole.user,
-    );
-
+    final lastUserMessageIndex = messageList.lastIndexWhere((m) => m.role == MessageRole.user);
     final systemPrompt = await _getSystemPrompt();
 
-    if (ProviderManager.serverStateProvider.enabledCount > 0) {
-      messageList[lastUserMessageIndex] =
-          messageList[lastUserMessageIndex].copyWith(
-        content: await _getLasstUserMessagePrompt(
-            messageList[lastUserMessageIndex].content ?? ''),
+    if (ProviderManager.serverStateProvider.enabledCount > 0 && lastUserMessageIndex != -1) {
+      messageList[lastUserMessageIndex] = messageList[lastUserMessageIndex].copyWith(
+        content: await _getLasstUserMessagePrompt(messageList[lastUserMessageIndex].content ?? ''),
       );
     }
 
-    Logger.root.info('start process llm response: $messageList');
+    Logger.root.info('start process llm response (prepared messages): $messageList');
 
     final stream = _llmClient!.chatStreamCompletion(CompletionRequest(
       model: ProviderManager.chatModelProvider.currentModel.name,
       messages: [
-        ChatMessage(
-          content: systemPrompt,
-          role: MessageRole.system,
-        ),
+        ChatMessage(content: systemPrompt, role: MessageRole.system),
         ...messageList,
       ],
       modelSetting: modelSetting,
     ));
 
-    _initializeAssistantResponse();
-    await _processResponseStream(stream);
-    Logger.root.info('end process llm response');
+    _initializeAssistantResponse(); // Adds an empty assistant message and sets its parent to current _parentMessageId
+
+    // Accumulators for the stream
+    _currentResponse = ''; // Reset current response text for accumulation
+    List<ToolCall> accumulatedToolCalls = [];
+    StringBuffer rawXmlBuffer = StringBuffer();
+    bool streamNeedsXmlParsing = false;
+    String? finalContentFromStream; // To capture all text content from stream
+
+    bool isFirstChunk = true;
+    await for (final chunk in stream) {
+      if (isFirstChunk) {
+        setState(() { _isWating = false; });
+        isFirstChunk = false;
+      }
+      if (_isCancelled) break;
+
+      if (chunk.content != null) {
+        _currentResponse += chunk.content!;
+        finalContentFromStream = _currentResponse;
+      }
+      if (chunk.toolCalls != null) {
+        accumulatedToolCalls.addAll(chunk.toolCalls!);
+      }
+      if (chunk.needsXmlParsing && chunk.rawToolCallXml != null) {
+        streamNeedsXmlParsing = true;
+        rawXmlBuffer.write(chunk.rawToolCallXml!);
+      }
+
+      // Update the last message (the assistant message initialized by _initializeAssistantResponse)
+      // with the current accumulated text. Tool calls are processed after the stream.
+      setState(() {
+        if (_messages.isNotEmpty && _messages.last.role == MessageRole.assistant) {
+          _messages.last = _messages.last.copyWith(content: _currentResponse);
+        }
+      });
+    }
+    _isCancelled = false; // Reset cancellation flag
+
+    // Construct the final response from accumulated parts
+    final LLMResponse finalResponse = LLMResponse(
+      content: finalContentFromStream, // Use the fully accumulated text content
+      toolCalls: accumulatedToolCalls.isNotEmpty ? accumulatedToolCalls : null,
+      rawToolCallXml: rawXmlBuffer.isNotEmpty ? rawXmlBuffer.toString() : null,
+      needsXmlParsing: streamNeedsXmlParsing || (rawXmlBuffer.isNotEmpty),
+    );
+
+    // If the stream yielded no actual content for the assistant message,
+    // and no tool calls will be processed from this response,
+    // we might have an empty assistant message.
+    // Let's remove the empty assistant message if finalResponse is also empty.
+    if ((finalResponse.content == null || finalResponse.content!.trim().isEmpty) &&
+        (finalResponse.toolCalls == null || finalResponse.toolCalls!.isEmpty) &&
+        (finalResponse.rawToolCallXml == null || finalResponse.rawToolCallXml!.trim().isEmpty)) {
+      if (_messages.isNotEmpty && _messages.last.role == MessageRole.assistant && (_messages.last.content == null || _messages.last.content!.trim().isEmpty)) {
+        // Before removing, ensure _parentMessageId is reverted if this message was setting a new parent.
+        // This requires knowing the parent of _messages.last.
+        final lastMessageParentId = _messages.last.parentMessageId;
+        _messages.removeLast();
+        _parentMessageId = lastMessageParentId; // Revert _parentMessageId
+      }
+    }
+
+
+    // Now process the final response for tool calls or final content updates
+    _processLLMResponseAndExtractToolCalls(finalResponse);
+
+    Logger.root.info('end process llm response. Final accumulated response: ${finalResponse.toJson()}');
+    setState(() {}); // Ensure UI updates after processing.
   }
 
   List<ChatMessage> _prepareMessageList() {
@@ -873,27 +983,8 @@ class _ChatPageState extends State<ChatPage> {
     });
   }
 
-  Future<void> _processResponseStream(Stream<LLMResponse> stream) async {
-    bool isFirstChunk = true;
-    await for (final chunk in stream) {
-      if (isFirstChunk) {
-        setState(() {
-          _isWating = false;
-        });
-        isFirstChunk = false;
-      }
-      if (_isCancelled) break;
-      setState(() {
-        _currentResponse += chunk.content ?? '';
-        _messages.last = ChatMessage(
-          content: _currentResponse,
-          role: MessageRole.assistant,
-          parentMessageId: _parentMessageId,
-        );
-      });
-    }
-    _isCancelled = false;
-  }
+  // Removed _processResponseStream as its logic is now merged into _processLLMResponse
+  // Future<void> _processResponseStream(Stream<LLMResponse> stream) async { ... }
 
   Future<void> _updateChat() async {
     if (ProviderManager.chatProvider.activeChat == null) {
