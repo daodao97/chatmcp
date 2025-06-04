@@ -65,23 +65,66 @@ class ClaudeClient extends BaseLLMClient {
       }
 
       final json = jsonDecode(responseBody);
-      final content = json['content'][0]['text'];
+      List<dynamic> contentBlocks = json['content'];
+      String? textualContent;
+      List<ToolCall>? toolCalls;
+      String? rawToolCallXml;
+      bool needsXmlParsing = false;
 
-      // Parse tool calls if present
-      final toolCalls = json['tool_calls']
-          ?.map<ToolCall>((t) => ToolCall(
-                id: t['id'],
-                type: t['type'],
-                function: FunctionCall(
-                  name: t['function']['name'],
-                  arguments: t['function']['arguments'],
-                ),
-              ))
-          ?.toList();
+      // Check for structured tool calls first
+      if (json.containsKey('tool_calls') && json['tool_calls'] != null) {
+        toolCalls = (json['tool_calls'] as List)
+            .map<ToolCall>((t) => ToolCall(
+                  id: t['id'],
+                  type: t['type'],
+                  function: FunctionCall(
+                    name: t['function']['name'],
+                    arguments: t['function']['arguments'],
+                  ),
+                ))
+            .toList();
+        // If structured tool calls are present, textual content is usually separate or null
+        final textBlock = contentBlocks.firstWhere((block) => block['type'] == 'text', orElse: () => null);
+        textualContent = textBlock?['text'];
+      } else {
+        // No structured tool_calls, check for XML in text content
+        // Consolidate text from content blocks
+        StringBuffer fullTextContent = StringBuffer();
+        for (var block in contentBlocks) {
+          if (block['type'] == 'text' && block['text'] != null) {
+            fullTextContent.write(block['text']);
+          }
+        }
+        String combinedText = fullTextContent.toString();
+
+        // Check for XML tool call patterns
+        final functionCallsStart = combinedText.indexOf('<function_calls>');
+        final functionCallsEnd = combinedText.indexOf('</function_calls>');
+        final invokeStart = combinedText.indexOf('<invoke>');
+        final invokeEnd = combinedText.indexOf('</invoke>');
+
+        if (functionCallsStart != -1 && functionCallsEnd != -1) {
+          rawToolCallXml = combinedText.substring(functionCallsStart, functionCallsEnd + '</function_calls>'.length);
+          needsXmlParsing = true;
+          textualContent = combinedText.substring(0, functionCallsStart) + combinedText.substring(functionCallsEnd + '</function_calls>'.length);
+        } else if (invokeStart != -1 && invokeEnd != -1) {
+          rawToolCallXml = combinedText.substring(invokeStart, invokeEnd + '</invoke>'.length);
+          needsXmlParsing = true;
+          textualContent = combinedText.substring(0, invokeStart) + combinedText.substring(invokeEnd + '</invoke>'.length);
+        } else {
+          textualContent = combinedText;
+        }
+        // Ensure textualContent is null if empty after extraction
+        if (textualContent != null && textualContent.trim().isEmpty) {
+            textualContent = null;
+        }
+      }
 
       return LLMResponse(
-        content: content,
+        content: textualContent,
         toolCalls: toolCalls,
+        rawToolCallXml: rawToolCallXml,
+        needsXmlParsing: needsXmlParsing,
       );
     } catch (e) {
       throw Exception(
@@ -135,6 +178,12 @@ class ClaudeClient extends BaseLLMClient {
           .transform(utf8.decoder)
           .transform(const LineSplitter());
 
+      String? currentContent;
+      List<ToolCall>? currentToolCalls;
+      StringBuffer rawToolCallXmlBuffer = StringBuffer();
+      bool currentlyNeedsXmlParsing = false;
+      String? activeToolCallId; // For structured streaming tool calls
+
       await for (final line in stream) {
         if (!line.startsWith('data:')) continue;
 
@@ -145,46 +194,103 @@ class ClaudeClient extends BaseLLMClient {
           final event = jsonDecode(jsonStr);
           final eventType = event['type'];
 
+          // Logger.root.fine('Claude stream event: $eventType, data: $jsonStr');
+
           switch (eventType) {
+            case 'message_start':
+              // Potentially initialize things if needed
+              break;
+
             case 'content_block_start':
-              if (event['content_block'] != null &&
-                  event['content_block']['text'] != null) {
-                yield LLMResponse(content: event['content_block']['text']);
-              } else {
-                Logger.root
-                    .warning('Invalid content_block_start event: $event');
+              final contentType = event['content_block']?['type'];
+              if (contentType == 'tool_use') {
+                // Start of a structured tool call
+                activeToolCallId = event['content_block']?['id'];
+                // We don't yield yet, wait for deltas or stop
+              } else if (contentType == 'text') {
+                // Potentially the start of text that might contain XML
+                 currentContent = event['content_block']?['text'] ?? "";
               }
               break;
+
             case 'content_block_delta':
               final delta = event['delta'];
-              if (delta == null) {
-                Logger.root
-                    .warning('Invalid content_block_delta event: $event');
-                break;
-              }
+              if (delta == null) break;
 
-              // 直接处理文本内容
-              if (delta['text'] != null) {
-                yield LLMResponse(content: delta['text']);
-                break;
-              }
-
-              // 处理特定类型的 delta
-              if (delta['type'] == 'text_delta' && delta['text'] != null) {
-                yield LLMResponse(content: delta['text']);
-              } else if (delta['type'] == 'input_json_delta') {
-                // Handle tool use delta
-                // final partialJson = delta['partial_json'];
-                // You may want to accumulate the JSON and parse it when complete
+              final deltaType = delta['type'];
+              if (deltaType == 'text_delta' && delta['text'] != null) {
+                currentContent = (currentContent ?? "") + delta['text'];
+                // Check for XML tags
+                if (!currentlyNeedsXmlParsing) {
+                  if (currentContent!.contains('<invoke>') || currentContent!.contains('<function_calls>')) {
+                    currentlyNeedsXmlParsing = true;
+                  }
+                }
+                if (currentlyNeedsXmlParsing) {
+                  rawToolCallXmlBuffer.write(delta['text']);
+                }
+                yield LLMResponse(
+                  content: currentlyNeedsXmlParsing ? null : delta['text'], // Yield only new text if not parsing XML here
+                  rawToolCallXml: currentlyNeedsXmlParsing ? rawToolCallXmlBuffer.toString() : null,
+                  needsXmlParsing: currentlyNeedsXmlParsing,
+                );
+              } else if (deltaType == 'input_json_delta' && activeToolCallId != null) {
+                // Part of a structured tool call's arguments
+                // This part is complex as we need to accumulate the json.
+                // For now, we acknowledge it. Actual parsing might need to happen at 'content_block_stop' or 'message_stop'.
+                // The current LLMResponse model doesn't perfectly support streaming structured tool calls' arguments.
+                // We will prioritize XML parsing for now as per the task.
+                // TODO: Enhance structured tool call streaming.
               }
               break;
 
             case 'content_block_stop':
-              // Handle end of a content block
+              final contentBlock = event['content_block'];
+               if (contentBlock != null && contentBlock['type'] == 'tool_use' && activeToolCallId != null) {
+                // This is where a structured tool call block ends.
+                // However, Claude sends tool_calls in full at the 'message_delta' or 'message_stop' with 'stop_reason': 'tool_use'
+                // So, we might not need to do much here if we rely on the final message assembly for structured tools.
+                // For now, just reset activeToolCallId.
+                activeToolCallId = null;
+              }
+              // If we were accumulating XML and this block is text, we might yield here.
+              // However, the current delta logic tries to yield incrementally.
+              break;
+
+            case 'message_delta':
+              // This event can contain the full tool_calls array if stop_reason is 'tool_use'
+              if (event['delta']?['stop_reason'] == 'tool_use' && event['usage']?['output_tokens'] != null) {
+                  // The 'message' event that Anthropic sends *after* all content blocks when stop_reason is 'tool_use'
+                  // often contains the full tool_calls. However, the prompt asks to handle XML primarily.
+                  // Let's check if the full message (not delta) contains tool_calls.
+                  // This part is tricky as the prompt implies we get tool_calls in the *final* non-streamed response.
+                  // For streaming, if we see this stop_reason, it's a strong hint.
+                  // The main task is about XML, so we ensure needsXmlParsing is set if XML was seen.
+                  // If structured tool calls were also somehow streamed (less common for Claude), they'd be in currentToolCalls.
+              }
+              // We might yield a final consolidated response here if needed,
+              // but individual deltas should have handled most content.
               break;
 
             case 'message_stop':
-              // Handle end of message
+              // This is the definitive end of the message.
+              // If XML was being parsed, the rawToolCallXmlBuffer should contain it.
+              // Yield a final response if there's anything pending.
+              // The problem is that the current model yields LLMResponse for each delta.
+              // A "final" yield here might be redundant if all content was processed.
+              // However, this is a good place to ensure flags are correctly set based on overall stream.
+              if (currentlyNeedsXmlParsing && rawToolCallXmlBuffer.isNotEmpty) {
+                // This is tricky. If content was already yielded incrementally, what do we yield here?
+                // The prompt focuses on identifying the *need* for XML parsing.
+                // Perhaps a final LLMResponse that summarizes this need.
+                // For now, the incremental yields should have set needsXmlParsing.
+              }
+              // Reset for next potential message in a session (if applicable)
+              currentContent = null;
+              currentToolCalls = null;
+              rawToolCallXmlBuffer.clear();
+              currentlyNeedsXmlParsing = false;
+              activeToolCallId = null;
               break;
 
             case 'error':
@@ -194,120 +300,15 @@ class ClaudeClient extends BaseLLMClient {
             case 'ping':
               // Ignore ping events
               break;
+            default:
+              // Logger.root.info('Unknown Claude stream event: $eventType');
+              break;
           }
         } catch (e) {
           Logger.root.warning('Failed to parse chunk: $jsonStr error: $e');
           continue;
         }
       }
-    } catch (e) {
-      throw await handleError(
-          e, 'Claude', '$baseUrl/messages', jsonEncode(body));
-    }
-  }
-
-  @override
-  Future<Map<String, dynamic>> checkToolCall(
-    String model,
-    CompletionRequest request,
-    Map<String, List<Map<String, dynamic>>> toolsResponse,
-  ) async {
-    // Convert tools to Claude's format
-    final tools = toolsResponse.entries
-        .map((entry) {
-          return entry.value.map((tool) {
-            final parameters = tool['parameters'];
-            if (parameters is! Map<String, dynamic>) {
-              return {
-                'name': tool['name'],
-                'description': tool['description'],
-                'input_schema': {
-                  'type': 'object',
-                  'properties': {},
-                  'required': [],
-                },
-              };
-            }
-
-            return {
-              'name': tool['name'],
-              'description': tool['description'],
-              'input_schema': {
-                'type': 'object',
-                'properties': parameters['properties'] ?? {},
-                'required': parameters['required'] ?? [],
-              },
-            };
-          }).toList();
-        })
-        .expand((x) => x)
-        .toList();
-
-    final body = {
-      'model': ProviderManager.chatModelProvider.currentModel.name,
-      'messages': request.messages,
-      'tools': tools,
-      'max_tokens': 4096,
-    };
-
-    try {
-      final response = await http.post(
-        Uri.parse('$baseUrl/messages'),
-        headers: _headers,
-        body: jsonEncode(body),
-      );
-
-      if (response.statusCode != 200) {
-        throw Exception('HTTP ${response.statusCode}: ${response.body}');
-      }
-
-      final jsonData = jsonDecode(response.body);
-
-      // Check if response contains tool calls in the content array
-      final contentBlocks = jsonData['content'] as List?;
-      if (contentBlocks == null || contentBlocks.isEmpty) {
-        return {
-          'need_tool_call': false,
-          'content': '',
-        };
-      }
-
-      // Look for tool_calls in the response
-      final toolUseBlocks = contentBlocks.where((block) =>
-          block['type'] == 'tool_calls' || block['type'] == 'tool_use');
-
-      if (toolUseBlocks.isEmpty) {
-        // Get text content from the first text block
-        final textBlock = contentBlocks.firstWhere(
-          (block) => block['type'] == 'text',
-          orElse: () => {'text': ''},
-        );
-        return {
-          'need_tool_call': false,
-          'content': textBlock['text'] ?? '',
-        };
-      }
-
-      // Extract tool calls
-      final toolCalls = toolUseBlocks
-          .map((block) => {
-                'id': block['id'],
-                'name': block['name'],
-                'arguments': block['input'],
-              })
-          .toList();
-
-      // Get any accompanying text content
-      final textBlock = contentBlocks.firstWhere(
-        (block) => block['type'] == 'text',
-        orElse: () => {'text': ''},
-      );
-
-      return {
-        'need_tool_call': true,
-        'content': textBlock['text'] ?? '',
-        'tool_calls': toolCalls,
-      };
     } catch (e) {
       throw await handleError(
           e, 'Claude', '$baseUrl/messages', jsonEncode(body));

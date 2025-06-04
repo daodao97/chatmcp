@@ -27,46 +27,6 @@ abstract class BaseLLMClient {
     return urlObj.replace(path: newPath).toString();
   }
 
-  Future<Map<String, dynamic>> checkToolCall(
-    String model,
-    CompletionRequest request,
-    Map<String, List<Map<String, dynamic>>> toolsResponse,
-  ) async {
-    final openaiTools = convertToOpenAITools(toolsResponse);
-
-    try {
-      final response = await chatCompletion(
-        CompletionRequest(
-          model: model,
-          messages: request.messages,
-          tools: openaiTools,
-        ),
-      );
-
-      if (!response.needToolCall) {
-        return {
-          'need_tool_call': false,
-          'content': response.content,
-        };
-      }
-
-      // Return tool call details
-      return {
-        'need_tool_call': true,
-        'content': response.content,
-        'tool_calls': response.toolCalls
-            ?.map((call) => {
-                  'id': call.id,
-                  'name': call.function.name,
-                  'arguments': call.function.parsedArguments,
-                })
-            .toList(),
-      };
-    } catch (e) {
-      rethrow; // Re-throw the exception for outer handling
-    }
-  }
-
   Future<LLMException> handleError(
       dynamic e, String name, String endpoint, String bodyStr) async {
     if (e is http.ClientException) {

@@ -361,11 +361,15 @@ class _KeysSettingsState extends State<KeysSettings> {
   void _deleteProvider(LLMProviderSetting config) {
     setState(() {
       final index = _llmApiConfigs.indexOf(config);
-      if (index != -1) {
+      if (index != -1 && index < _controllers.length) { // Ensure index is valid for _controllers
+        final removedController = _controllers[index]; // Get ref before removal
         _llmApiConfigs.removeAt(index);
-        _controllers.removeAt(index);
-        if (_selectedProvider >= _llmApiConfigs.length) {
+        _controllers.removeAt(index); // Actual removal
+        removedController.dispose(); // Call dispose
+        if (_selectedProvider >= _llmApiConfigs.length && _llmApiConfigs.isNotEmpty) {
           _selectedProvider = _llmApiConfigs.length - 1;
+        } else if (_llmApiConfigs.isEmpty) {
+          _selectedProvider = 0; // Reset or handle no selection
         }
         _hasChanges = true;
       }
@@ -683,12 +687,23 @@ class _KeysSettingsState extends State<KeysSettings> {
                     constraints: const BoxConstraints(),
                     onPressed: () {
                       setState(() {
-                        _llmApiConfigs.removeAt(_selectedProvider);
-                        _controllers.removeAt(_selectedProvider);
-                        if (_selectedProvider >= _llmApiConfigs.length) {
-                          _selectedProvider = _llmApiConfigs.length - 1;
+                        // Ensure _selectedProvider is a valid index for both lists
+                        if (_selectedProvider >= 0 &&
+                            _selectedProvider < _llmApiConfigs.length &&
+                            _selectedProvider < _controllers.length) {
+
+                          final removedController = _controllers[_selectedProvider]; // Get ref before removal
+                          _llmApiConfigs.removeAt(_selectedProvider);
+                          _controllers.removeAt(_selectedProvider); // Actual removal
+                          removedController.dispose(); // Call dispose
+
+                          if (_selectedProvider >= _llmApiConfigs.length && _llmApiConfigs.isNotEmpty) {
+                            _selectedProvider = _llmApiConfigs.length - 1;
+                          } else if (_llmApiConfigs.isEmpty) {
+                            _selectedProvider = 0; // Reset or handle no selection
+                          }
+                          _hasChanges = true;
                         }
-                        _hasChanges = true;
                       });
                     },
                   ),
