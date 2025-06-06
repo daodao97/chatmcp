@@ -265,8 +265,13 @@ class AppColors {
   }
 
   // 链接颜色
-  static Color getLinkColor() {
-    return Colors.blue;
+  static Color getLinkColor(BuildContext context) {
+    // Reverted to expect context, actual theme logic will be re-added if this path fails.
+    // For now, let's assume the previous theme logic was correct if context is available.
+    final brightness = Theme.of(context).brightness;
+    return brightness == Brightness.light
+        ? Colors.blue
+        : Colors.lightBlueAccent[200]!;
   }
 
   // 输入区域相关颜色
@@ -322,5 +327,12 @@ class AppColors {
   static Color getInputAreaCursorColor(BuildContext context) {
     return getThemeColor(context,
         lightColor: Colors.grey.shade400, darkColor: Colors.grey.shade400);
+  }
+
+  // 消息气泡阴影颜色
+  static Color getMessageBubbleShadowColor(BuildContext context) {
+    return getThemeColor(context,
+        lightColor: Colors.black.withOpacity(0.05),
+        darkColor: Colors.black.withOpacity(0.2));
   }
 }
