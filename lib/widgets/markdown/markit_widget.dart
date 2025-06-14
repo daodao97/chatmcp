@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-// import 'markit.dart';
-
 import 'package:markdown_widget/markdown_widget.dart';
 import './widgets/latex.dart';
 import './widgets/link.dart';
@@ -20,7 +18,7 @@ class MarkitTestPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     String testMarkdown = r'''
-这张图片是一个数学题，涉及到一个学校教学楼的防滑地砖的计费计算。题目描述如下：
+This image is a math problem, involving the calculation of the cost of anti-slip tiles in a school building. The problem description is as follows:
 
 <think data-name="test1" age="18" start-time="2025-02-07 10:00:00"># test</think status="en">
 
@@ -31,12 +29,11 @@ class MarkitTestPage extends StatelessWidget {
 
 <think name="test" age="18">33333
 
-''' +
-        '\n${DateTime.now().toIso8601String()}';
+''' + '\n${DateTime.now().toIso8601String()}';
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Markit 测试'),
+        title: const Text('Markit Test'),
       ),
       body: Markit(data: testMarkdown),
     );

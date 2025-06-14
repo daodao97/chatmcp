@@ -4,7 +4,7 @@
 
 跨平台 `MacOS | Windows | Linux | iOS | Android` AI 聊天客户端
 
-[English](./README.md) | 简体中文
+[English](./README.md) | 简体中文 | [Türkçe](./README_TR.md)
 
 </div>
 

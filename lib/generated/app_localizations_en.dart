@@ -386,6 +386,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get chinese => 'Chinese';
 
   @override
+  String get turkish => 'Turkish';
+
+  @override
   String get functionRunning => 'Running Tool...';
 
   @override

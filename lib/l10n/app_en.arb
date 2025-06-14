@@ -114,6 +114,7 @@
     "loadDiagramFailed": "Failed to load diagram, please retry",
     "copiedToClipboard": "Copied to clipboard",
     "chinese": "Chinese",
+    "turkish": "Turkish",
     "functionRunning": "Running Tool...",
     "userCancelledToolCall": "Tool execution failed",
     "thinkingProcess": "Thinking",

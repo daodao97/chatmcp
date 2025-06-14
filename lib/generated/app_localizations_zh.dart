@@ -376,6 +376,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get chinese => '中文';
 
   @override
+  String get turkish => '土耳其语';
+
+  @override
   String get functionRunning => '正在执行工具...';
 
   @override

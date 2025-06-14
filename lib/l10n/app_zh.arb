@@ -113,6 +113,7 @@
     "loadDiagramFailed": "加载图表失败，请重试",
     "copiedToClipboard": "已复制到剪贴板",
     "chinese": "中文",
+    "turkish": "土耳其语",
     "functionRunning": "正在执行工具...",
     "userCancelledToolCall": "工具执行失败",
     "thinkingProcess": "思考中",

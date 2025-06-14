@@ -4,7 +4,7 @@
 
 Cross-platform `Macos | Windows | Linux | iOS | Android` AI Chat Client
 
-[English](./README.md) | [简体中文](./README_ZH.md)
+[English](./README.md) | [简体中文](./README_ZH.md) | [Türkçe](./README_TR.md)
 
 </div>
 
