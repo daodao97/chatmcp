@@ -39,26 +39,34 @@ This image is a math problem, involving the calculation of the cost of anti-slip
   }
 }
 
-class Markit extends StatelessWidget {
+class Markit extends StatefulWidget {
   final String data;
   final TextStyle? textStyle;
 
   const Markit({super.key, required this.data, this.textStyle});
 
   @override
-  Widget build(BuildContext context) => ConstrainedBox(
-        constraints: const BoxConstraints(
-          minHeight: 0,
-          maxHeight: double.infinity,
-        ),
-        child: buildMarkdown(context),
-      );
+  State<Markit> createState() => _MarkitState();
+}
 
-  Widget buildMarkdown(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final config =
-        isDark ? MarkdownConfig.darkConfig : MarkdownConfig.defaultConfig;
-    return SingleChildScrollView(
+class _MarkitState extends State<Markit> {
+  String _cachedData = '';
+  Widget? _cachedMarkdown;
+  Brightness? _cachedBrightness;
+
+  @override
+  Widget build(BuildContext context) {
+
+    final currentBrightness = Theme.of(context).brightness;
+    if (widget.data != _cachedData || _cachedMarkdown == null ||  _cachedBrightness != currentBrightness) {
+
+    _cachedData = widget.data;
+    _cachedBrightness = currentBrightness;
+
+    final isDark = currentBrightness == Brightness.dark;
+    final textStyle= widget.textStyle;
+    final data = _cachedData;
+    _cachedMarkdown = SingleChildScrollView(
       child: MarkdownBlock(
         data: data,
         config: MarkdownConfig(
@@ -125,5 +133,11 @@ class Markit extends StatelessWidget {
         ),
       ),
     );
+    }
+    return ConstrainedBox(
+        constraints: const BoxConstraints(
+          minHeight: 0,
+          maxHeight: double.infinity,),
+        child: _cachedMarkdown ?? const SizedBox());
   }
 }

@@ -13,7 +13,11 @@ import 'chat_message_action.dart';
 import 'package:chatmcp/generated/app_localizations.dart';
 import 'chat_loading.dart';
 
-// 文件附件组件
+/// Document attachment component is used to display the file attachment in the chat message.
+///
+/// - [path] The path of the file
+/// - [name] The name of the file
+/// - [fileType] The type of the file
 class FileAttachment extends StatelessWidget {
   final String path;
   final String name;
@@ -99,7 +103,10 @@ class FileAttachment extends StatelessWidget {
   }
 }
 
-// 移动端长按菜单
+/// Message long press menu is used to display the long press menu in the chat message.
+///
+/// - [message] The message
+/// - [onRetry] The function to retry the message
 class MessageLongPressMenu extends StatelessWidget {
   final ChatMessage message;
   final Function(ChatMessage) onRetry;
@@ -146,6 +153,11 @@ class MessageLongPressMenu extends StatelessWidget {
   }
 }
 
+/// Chat UI message is used to display the chat message in the chat page.
+///
+/// - [messages] The list of messages
+/// - [onRetry] The function to retry the message
+/// - [onSwitch] The function to switch the message
 class ChatUIMessage extends StatelessWidget {
   final List<ChatMessage> messages;
   final Function(ChatMessage) onRetry;
@@ -181,6 +193,7 @@ class ChatUIMessage extends StatelessWidget {
 
     if (filteredMessages.length == 1) {
       return ChatMessageContent(
+        key: ValueKey(filteredMessages[0].messageId),
         message: filteredMessages[0],
         onRetry: onRetry,
         position: BubblePosition.single,
@@ -202,6 +215,7 @@ class ChatUIMessage extends StatelessWidget {
               bottom: index == filteredMessages.length - 1 ? 0 : 1,
             ),
             child: ChatMessageContent(
+              key: ValueKey(filteredMessages[index].messageId),
               message: filteredMessages[index],
               onRetry: onRetry,
               position: _getMessagePosition(index, filteredMessages.length),
@@ -269,6 +283,12 @@ class ChatUIMessage extends StatelessWidget {
   }
 }
 
+/// Chat message content is used to display the chat message content in the chat message.
+///
+/// - [message] The message
+/// - [onRetry] The function to retry the message
+/// - [position] The position of the message
+/// - [useTransparentBackground] Whether to use transparent background
 class ChatMessageContent extends StatelessWidget {
   final ChatMessage message;
   final Function(ChatMessage) onRetry;
@@ -308,11 +328,12 @@ class ChatMessageContent extends StatelessWidget {
         ),
       );
     }
-
+    final bubbleKey = message.messageId;
     if ((message.role == MessageRole.user ||
             message.role == MessageRole.assistant) &&
         message.content != null) {
       messages.add(MessageBubble(
+        key: ValueKey('${bubbleKey}_content'),
         message: message,
         position: position,
         useTransparentBackground: useTransparentBackground,
@@ -321,6 +342,7 @@ class ChatMessageContent extends StatelessWidget {
 
     if (message.toolCalls != null && message.toolCalls!.isNotEmpty) {
       messages.add(MessageBubble(
+        key: ValueKey('${bubbleKey}_tool_calls'),
         message: message,
         position: position,
         useTransparentBackground: useTransparentBackground,
@@ -329,6 +351,7 @@ class ChatMessageContent extends StatelessWidget {
 
     if (message.role == MessageRole.tool && message.toolCallId != null) {
       messages.add(MessageBubble(
+        key: ValueKey('${bubbleKey}_tool_result'),
         message: message,
         position: position,
         useTransparentBackground: useTransparentBackground,
@@ -362,6 +385,12 @@ class ChatMessageContent extends StatelessWidget {
   }
 }
 
+/// Bubble position is used to determine the position of the bubble in the chat message.
+///
+/// - [first] The first bubble
+/// - [middle] The middle bubble
+/// - [last] The last bubble
+/// - [single] The single bubble
 enum BubblePosition {
   first,
   middle,
@@ -369,6 +398,11 @@ enum BubblePosition {
   single,
 }
 
+/// Message bubble is used to display the message bubble in the chat message.
+///
+/// - [message] The message
+/// - [position] The position of the message
+/// - [useTransparentBackground] Whether to use transparent background
 class MessageBubble extends StatelessWidget {
   final ChatMessage message;
   final BubblePosition position;
@@ -468,6 +502,9 @@ class MessageBubble extends StatelessWidget {
   }
 }
 
+/// Tool call widget is used to display the tool call in the chat message.
+///
+/// - [message] The message
 class ToolCallWidget extends StatelessWidget {
   final ChatMessage message;
 
@@ -509,6 +546,9 @@ class ToolCallWidget extends StatelessWidget {
   }
 }
 
+/// Tool result widget is used to display the tool result in the chat message.
+///
+/// - [message] The message
 class ToolResultWidget extends StatelessWidget {
   final ChatMessage message;
 
@@ -560,6 +600,9 @@ class ToolResultWidget extends StatelessWidget {
   }
 }
 
+/// Chat avatar is used to display the chat avatar in the chat message.
+///
+/// - [isUser] Whether the avatar is for the user
 class ChatAvatar extends StatelessWidget {
   final bool isUser;
 

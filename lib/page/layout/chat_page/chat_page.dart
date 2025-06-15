@@ -15,13 +15,13 @@ import 'package:chatmcp/dao/chat.dart';
 import 'package:uuid/uuid.dart';
 import 'chat_message_list.dart';
 import 'package:chatmcp/utils/color.dart';
-import 'package:chatmcp/widgets/widgets_to_image/utils.dart';
 import 'chat_message_to_image.dart';
 import 'package:chatmcp/utils/event_bus.dart';
 import 'chat_code_preview.dart';
 import 'package:chatmcp/generated/app_localizations.dart';
 import 'dart:convert';
 import 'package:chatmcp/mcp/models/json_rpc_message.dart';
+import 'dart:async';
 
 class ChatPage extends StatefulWidget {
   const ChatPage({super.key});
@@ -42,10 +42,9 @@ class _ChatPageState extends State<ChatPage> {
   String _parentMessageId = ''; // Parent message ID
   bool _isCancelled =
       false; // Indicates if the current operation has been cancelled by the user
-  bool _isWating =
+  bool _isWaiting =
       false; // Indicates if the system is waiting for a response from the LLM
 
-  WidgetsToImageController toImagecontroller = WidgetsToImageController();
   // Stores image bytes of the widget for sharing functionality
   Uint8List? bytes;
 
@@ -55,6 +54,10 @@ class _ChatPageState extends State<ChatPage> {
   bool _isRunningFunction = false;
 
   num _currentLoop = 0;
+
+  // https://stackoverflow.com/questions/51791501/how-to-debounce-textfield-onchange-in-dart
+  Timer? _debounce;
+  static const int _chatPageDebounceTime = 100;
 
   @override
   void initState() {
@@ -79,6 +82,7 @@ class _ChatPageState extends State<ChatPage> {
 
   @override
   void dispose() {
+    _debounce?.cancel();
     _removeListeners();
     super.dispose();
   }
@@ -402,7 +406,7 @@ class _ChatPageState extends State<ChatPage> {
 
     return Expanded(
       child: MessageList(
-        messages: _isWating
+        messages: _isWaiting
             ? [
                 ..._messages,
                 ChatMessage(content: '', role: MessageRole.loading)
@@ -500,7 +504,7 @@ class _ChatPageState extends State<ChatPage> {
         _messages.add(ChatMessage(
           messageId: msgId,
           content:
-              '<call_function_result name="$toolName">\nfailed to call function: $lastError\n</call_function_result>',
+              '<call_function_result name="$toolName">\n failed to call function: $lastError\n</call_function_result>',
           role: MessageRole.assistant,
           name: toolName,
           parentMessageId: _parentMessageId,
@@ -777,7 +781,7 @@ class _ChatPageState extends State<ChatPage> {
 
   Future<void> _processLLMResponse() async {
     setState(() {
-      _isWating = true;
+      _isWaiting = true;
     });
 
     List<ChatMessage> messageList = _prepareMessageList();
@@ -916,22 +920,31 @@ class _ChatPageState extends State<ChatPage> {
     await for (final chunk in stream) {
       if (isFirstChunk) {
         setState(() {
-          _isWating = false;
+          _isWaiting = false;
         });
         isFirstChunk = false;
       }
       if (_isCancelled) break;
-      setState(() {
-        _currentResponse += chunk.content ?? '';
-        if (_messages.isNotEmpty) {
-          _messages.last = ChatMessage(
-            content: _currentResponse,
-            role: MessageRole.assistant,
-            parentMessageId: _parentMessageId,
-          );
+      _currentResponse += chunk.content ?? '';
+      if (_messages.isNotEmpty) {
+        _messages.last = _messages.last.copyWith(
+          content: _currentResponse,
+        );
+      }
+
+      if (_debounce?.isActive ?? false) _debounce!.cancel();
+      _debounce = Timer(const Duration(milliseconds: _chatPageDebounceTime), () {
+        if (mounted) {
+          setState(() {});
         }
       });
     }
+
+    _debounce?.cancel();
+    if (mounted) {
+      setState(() {});
+    }
+
     _isCancelled = false;
   }
 
@@ -1141,7 +1154,7 @@ class _ChatPageState extends State<ChatPage> {
       _runFunctionEvents.clear();
       _isLoading = false;
       _isCancelled = false;
-      _isWating = false;
+      _isWaiting = false;
       _currentLoop = 0;
     });
   }

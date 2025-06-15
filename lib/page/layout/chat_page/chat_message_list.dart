@@ -5,7 +5,11 @@ import 'package:flutter/rendering.dart';
 import 'chat_message.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 
-
+/// Message list is used to display the list of messages in the chat page.
+///
+/// - [messages] The list of messages to display.
+/// - [onRetry] The function to retry the message.
+/// - [onSwitch] The function to switch the message to the another message.
 class MessageList extends StatefulWidget {
   final List<ChatMessage> messages;
   final Function(ChatMessage) onRetry;
@@ -34,7 +38,7 @@ class _MessageListState extends State<MessageList> {
   bool _isScrolledToBottom({double threshold = 1.0}) {
     if (!_scrollController.hasClients) return true;
     final currentScroll = _scrollController.offset;
-    // 允许1像素的误差
+    // Allow 1 pixel of error
     return (endScroll - currentScroll).abs() <= threshold;
   }
 
@@ -112,7 +116,7 @@ class _MessageListState extends State<MessageList> {
           _scrollToBottom();
         }
 
-        // 将消息分组
+        // Group messages
         List<List<ChatMessage>> groupedMessages = [];
         List<ChatMessage> currentGroup = [];
 
@@ -141,11 +145,12 @@ class _MessageListState extends State<MessageList> {
               controller: _scrollController,
               padding: const EdgeInsets.all(16.0),
               itemCount: groupedMessages.length,
-              // physics: const ClampingScrollPhysics(), // 禁用弹性效果
+              // physics: const ClampingScrollPhysics(), // Disable elastic effect
               itemBuilder: (context, index) {
                 final group = groupedMessages[index];
 
                 return ChatUIMessage(
+                  key: ValueKey(group.first.messageId),
                   messages: group,
                   onRetry: widget.onRetry,
                   onSwitch: widget.onSwitch,
