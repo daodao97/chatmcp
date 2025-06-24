@@ -266,8 +266,7 @@ class _InputAreaState extends State<InputArea> {
                       {required currentLength, required isFocused, maxLength}) {
                     return null;
                   },
-                  textInputAction:
-                      kIsMobile ? TextInputAction.newline : TextInputAction.done,
+                  textInputAction: TextInputAction.newline,
                   onSubmitted: null,
                   inputFormatters: [
                     TextInputFormatter.withFunction((oldValue, newValue) {
