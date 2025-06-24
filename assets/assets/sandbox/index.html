@@ -1,0 +1,112 @@
+<!-- preview.html -->
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Sandbox Preview</title>
+    <style>
+        /* 重置样式 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* 预览区布局 */
+        #root {
+            height: 100vh;
+        }
+
+        /* 错误提示样式 */
+        .error-overlay {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #ff5252;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 4px;
+            font-family: monospace;
+            max-width: 80vw;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .sp-preview-iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+    </style>
+</head>
+<!-- https://onecompiler.com/react !!!-->
+
+<!-- https://sandpack.codesandbox.io/docs/advanced-usage/client -->
+
+<body>
+    <div id="root">
+        <iframe id="sp-preview-iframe" class="sp-preview-iframe sp-c-fgviib" title="Sandpack Preview"
+            src="https://1-20-9-sandpack.codesandbox.io/"></iframe>
+    </div>
+</body>
+
+<script>
+    const iframe = document.getElementById('sp-preview-iframe');
+
+    iframe.onload = () => {
+
+        iframe.contentWindow.postMessage({
+            "type": "register-frame",
+            "origin": window.location.origin,
+            "id": 113370
+        }, "https://1-20-9-sandpack.codesandbox.io/")
+
+        //         updateCode(`export default function App() {
+        // return <h1>Hello World</h1>
+        // }
+        // `)
+    }
+
+    function updateCode(code) {
+        code = decodeURIComponent(code)
+        iframe.contentWindow.postMessage({
+            "$id": 113370,
+            "codesandbox": true,
+            "type": "compile",
+            "version": 3,
+            "modules": {
+                "/App.js": {
+                    "code": code,
+                    "path": "/App.js"
+                },
+                "/index.js": {
+                    "code": "import React, { StrictMode } from \"react\";\nimport { createRoot } from \"react-dom/client\";\nimport \"./styles.css\";\n\nimport App from \"./App\";\n\nconst root = createRoot(document.getElementById(\"root\"));\nroot.render(\n<StrictMode>\n  <App />\n</StrictMode>\n);",
+                    "path": "/index.js"
+                },
+                "/styles.css": {
+                    "code": "body {\nfont-family: sans-serif;\n-webkit-font-smoothing: auto;\n-moz-font-smoothing: auto;\n-moz-osx-font-smoothing: grayscale;\nfont-smoothing: auto;\ntext-rendering: optimizeLegibility;\nfont-smooth: always;\n-webkit-tap-highlight-color: transparent;\n-webkit-touch-callout: none;\n}\n\nh1 {\nfont-size: 1.5rem;\n}",
+                    "path": "/styles.css"
+                },
+                "/public/index.html": {
+                    "code": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"UTF-8\">\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n  <title>Document</title>\n</head>\n<body>\n  <div id=\"root\"></div>\n</body>\n</html>",
+                    "path": "/public/index.html"
+                },
+                "/package.json": {
+                    "code": "{\n  \"name\": \"sandpack-project\",\n  \"main\": \"/index.js\",\n  \"dependencies\": {\n    \"react\": \"^18.0.0\",\n    \"react-dom\": \"^18.0.0\",\n    \"react-scripts\": \"^4.0.0\"\n  },\n  \"devDependencies\": {}\n}",
+                    "path": "/package.json"
+                }
+            },
+            "externalResources": [],
+            "hasFileResolver": false,
+            "template": "create-react-app",
+            "showOpenInCodeSandbox": false,
+            "showErrorScreen": false,
+            "showLoadingScreen": false,
+            "skipEval": false,
+            "clearConsoleDisabled": true,
+            "logLevel": 30
+        }, "https://1-20-9-sandpack.codesandbox.io/")
+    }
+
+</script>
+
+</html>
