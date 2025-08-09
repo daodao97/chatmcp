@@ -24,3 +24,16 @@ startup_notify: true
 include:
   - libsqlite3.so.0
   - libsqlite3.so
+
+# Avoid bundling core system libraries that must be provided by the host.
+# Bundling these can introduce newer GLIBC symbol requirements (e.g. 2.36/2.38)
+# and break compatibility with Pop!_OS 22.04 (glibc 2.35).
+exclude:
+  - libc.so.6
+  - libpthread.so.0
+  - libdl.so.2
+  - libm.so.6
+  - libresolv.so.2
+  - librt.so.1
+  - libstdc++.so.6
+  - libgcc_s.so.1

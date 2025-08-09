@@ -74,13 +74,38 @@ jobs:
         if: matrix.os == 'ubuntu-22.04'
         run: |
           sudo apt-get update
-          sudo apt-get install -y ninja-build libgtk-3-dev locate libsqlite3-dev fuse libfuse2
+          sudo apt-get install -y ninja-build libgtk-3-dev locate libsqlite3-dev fuse libfuse2 libstdc++-12-dev patchelf
           sudo updatedb
           wget -O appimagetool "https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage"
           chmod +x appimagetool
           sudo mv appimagetool /usr/local/bin/
           fastforge release --name=linux
           fastforge release --name=android
+
+      - name: Verify AppImage GLIBC compatibility (Pop!_OS 22.04)
+        if: matrix.os == 'ubuntu-22.04'
+        run: |
+          set -e
+          shopt -s nullglob
+          found=0
+          for f in dist/**/*AppImage dist/*.AppImage; do
+            echo "Checking $f"
+            chmod +x "$f"
+            "$f" --appimage-extract >/dev/null 2>&1 || true
+            if [ -d squashfs-root/usr/lib ]; then
+              if strings squashfs-root/usr/lib/libstdc++.so.6 | grep -E 'GLIBC_2\.(36|37|38|39)' -q; then
+                echo "❌ $f contains libstdc++ requiring newer GLIBC" >&2
+                exit 1
+              fi
+            fi
+            rm -rf squashfs-root
+            found=1
+          done
+          if [ "$found" -eq 0 ]; then
+            echo "No AppImage files found under dist/. Skipping check."
+          else
+            echo "✅ AppImage libstdc++ is compatible with GLIBC 2.35 hosts."
+          fi
 
       - name: Setup Node.js for macOS
         if: matrix.os == 'macos-latest'

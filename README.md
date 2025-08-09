@@ -15,7 +15,7 @@ Cross-platform `Macos | Windows | Linux | iOS | Android | Web` AI Chat Client
 | [Release](https://github.com/daodao97/chatmcp/releases) | [Release](https://github.com/daodao97/chatmcp/releases) | [Release](https://github.com/daodao97/chatmcp/releases) ¹ | [TestFlight](https://testflight.apple.com/join/dCXksFJV) | [Release](https://github.com/daodao97/chatmcp/releases) | [GitHub Pages](https://daodao97.github.io/chatmcp) ² |
 
 ¹ **Linux Notes:** 
-- Install required dependencies: `sudo apt install libsqlite3-0 libsqlite3-dev` on Debian/Ubuntu and derivatives
+- See Linux requirements below for AppImage/DEB runtime dependencies on Ubuntu 22.04 and 24.04
 - Improved Experience: Latest versions include better dark theme support, unified data storage following [XDG Base Directory Specification](https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html), and optimized UI layout for Linux desktop environments is planned
 - Tested on major distributions: Ubuntu, Fedora, Arch Linux, openSUSE
 
@@ -73,6 +73,31 @@ curl -LsSf https://astral.sh/uv/install.sh | sh
 sudo apt update
 sudo apt install nodejs npm
 ```
+
+### Linux Requirements (Ubuntu 22.04 and 24.04)
+
+For running ChatMCP AppImage/DEB on Ubuntu and derivatives, install the following runtime packages:
+
+- AppImage (FUSE): `libfuse2`
+- GTK 3: `libgtk-3-0`
+- Graphics/EGL:
+  - Ubuntu 22.04: `libegl1-mesa`, `libgles2`, `libgl1-mesa-dri`, `libglx-mesa0`
+  - Ubuntu 24.04: `libegl1`, `libgles2`, `libgl1-mesa-dri`, `libglx-mesa0`
+- X11 utilities and SQLite: `libx11-6`, `xdg-utils`, `libsqlite3-0`
+
+Install commands:
+
+- Ubuntu 22.04:
+```bash
+sudo apt install -y libfuse2 libgtk-3-0 libegl1-mesa libgles2 libgl1-mesa-dri libglx-mesa0 libx11-6 xdg-utils libsqlite3-0
+```
+
+- Ubuntu 24.04:
+```bash
+sudo apt install -y libfuse2 libgtk-3-0 libegl1 libgles2 libgl1-mesa-dri libglx-mesa0 libx11-6 xdg-utils libsqlite3-0
+```
+
+Optional (recommended): `mesa-vulkan-drivers`, `mesa-utils` (for diagnostics like glxinfo)
 
 1. Configure Your LLM API Key and Endpoint in `Setting` Page
 2. Install MCP Server from `MCP Server` Page

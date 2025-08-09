@@ -14,12 +14,7 @@ Platformlar Arası <code>MacOS | Windows | Linux | iOS | Android | Web</code> Ya
 |-------------------------------------------------------|-------------------------------------------------------|---------------------------------------------------------|----------------------------------------------------------|-------------------------------------------------------|--------------------------------------------------------|
 | [İndir](https://github.com/daodao97/chatmcp/releases) | [İndir](https://github.com/daodao97/chatmcp/releases) | [İndir](https://github.com/daodao97/chatmcp/releases) ¹ | [TestFlight](https://testflight.apple.com/join/dCXksFJV) | [İndir](https://github.com/daodao97/chatmcp/releases) | [GitHub Pages](https://daodao97.github.io/chatmcp) ² |
 
-¹ Not: Linux'ta, `sqflite_common_ffi` paketinin çalışması için `libsqlite3-0` ve `libsqlite3-dev` kütüphanelerini kurmanız
-gerekir: https://pub.dev/packages/sqflite_common_ffi
-
-```bash
-sudo apt-get install libsqlite3-0 libsqlite3-dev
-```
+¹ Not: Linux gereksinimleri aşağıdadır (Ubuntu 22.04 ve 24.04)
 
 ² Not: Web sürümü tamamen tarayıcınızda çalışır ve sohbet geçmişi ile ayarlar için yerel depolama kullanır.
 
@@ -61,6 +56,31 @@ curl -LsSf https://astral.sh/uv/install.sh | sh
 sudo apt update
 sudo apt install nodejs npm
 ```
+
+### Linux Gereksinimleri (Ubuntu 22.04 ve 24.04)
+
+ChatMCP AppImage/DEB çalıştırmak için aşağıdaki paketlerin kurulu olması gerekir:
+
+- AppImage (FUSE): `libfuse2`
+- GTK 3: `libgtk-3-0`
+- Grafik/EGL:
+  - Ubuntu 22.04: `libegl1-mesa`, `libgles2`, `libgl1-mesa-dri`, `libglx-mesa0`
+  - Ubuntu 24.04: `libegl1`, `libgles2`, `libgl1-mesa-dri`, `libglx-mesa0`
+- X11 yardımcıları ve SQLite: `libx11-6`, `xdg-utils`, `libsqlite3-0`
+
+Kurulum komutları:
+
+- Ubuntu 22.04:
+```bash
+sudo apt install -y libfuse2 libgtk-3-0 libegl1-mesa libgles2 libgl1-mesa-dri libglx-mesa0 libx11-6 xdg-utils libsqlite3-0
+```
+
+- Ubuntu 24.04:
+```bash
+sudo apt install -y libfuse2 libgtk-3-0 libegl1 libgles2 libgl1-mesa-dri libglx-mesa0 libx11-6 xdg-utils libsqlite3-0
+```
+
+Opsiyonel (önerilir): `mesa-vulkan-drivers`, `mesa-utils` (glxinfo gibi teşhis araçları)
 
 1. Ayarlar sayfasında LLM API Anahtarınızı ve Uç Noktanızı (Endpoint) yapılandırın.
 2. MCP Sunucusu sayfasından bir MCP sunucusu kurun.

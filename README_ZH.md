@@ -14,16 +14,12 @@
 |-----------------------------------------------------------|---------------------------------------------------------------|---------------------------------------------------------------|
 | macOS                                                     | [Release](https://github.com/daodao97/chatmcp/releases)       |                                                               |
 | Windows                                                   | [Release](https://github.com/daodao97/chatmcp/releases)       |                                                               |
-| Linux                                                     | [Release](https://github.com/daodao97/chatmcp/releases)       | 需要安装 `libsqlite3-0` 和 `libsqlite3-dev` ¹                |
+| Linux                                                     | [Release](https://github.com/daodao97/chatmcp/releases)       | 请参见下方“Linux 运行环境需求” ¹                              |
 | iOS                                                       | [TestFlight](https://testflight.apple.com/join/dCXksFJV)      |                                                               |
 | Android                                                   | [Release](https://github.com/daodao97/chatmcp/releases)       |                                                               |
 | Web                                                       | [GitHub Pages](https://daodao97.github.io/chatmcp)           | 完全在浏览器中运行，使用本地存储保存聊天记录和设置 ²            |
 
-¹ 注意：在 Linux 系统上，您需要安装 `libsqlite3-0` 和 `libsqlite3-dev`，因为依赖包需要这些库：
-
-```bash
-sudo apt-get install libsqlite3-0 libsqlite3-dev
-```
+¹ 提示：请参见下方“Linux 运行环境需求（Ubuntu 22.04 与 24.04）”。
 
 ² 注意：Web 版本完全在您的浏览器中运行，使用本地存储保存聊天记录和设置。
 
@@ -60,6 +56,31 @@ brew install uv
 # npx
 brew install node 
 ```
+
+### Linux 运行环境需求（Ubuntu 22.04 与 24.04）
+
+在 Ubuntu 及其衍生发行版上运行 ChatMCP 的 AppImage/DEB，请确保安装以下运行时依赖：
+
+- AppImage（FUSE）：`libfuse2`
+- GTK 3：`libgtk-3-0`
+- 图形/EGL：
+  - Ubuntu 22.04：`libegl1-mesa`、`libgles2`、`libgl1-mesa-dri`、`libglx-mesa0`
+  - Ubuntu 24.04：`libegl1`、`libgles2`、`libgl1-mesa-dri`、`libglx-mesa0`
+- 其他：`libx11-6`、`xdg-utils`、`libsqlite3-0`
+
+安装命令示例：
+
+- Ubuntu 22.04：
+```bash
+sudo apt install -y libfuse2 libgtk-3-0 libegl1-mesa libgles2 libgl1-mesa-dri libglx-mesa0 libx11-6 xdg-utils libsqlite3-0
+```
+
+- Ubuntu 24.04：
+```bash
+sudo apt install -y libfuse2 libgtk-3-0 libegl1 libgles2 libgl1-mesa-dri libglx-mesa0 libx11-6 xdg-utils libsqlite3-0
+```
+
+可选（推荐）：`mesa-vulkan-drivers`、`mesa-utils`（如 glxinfo 等诊断工具）
 
 1. 在"设置"页面配置您的 LLM API 密钥和端点
 2. 从"MCP 服务器"页面安装 MCP 服务器

@@ -14,7 +14,7 @@ installed_size: 20000
 dependencies:
   - libgtk-3-0
   - libsqlite3-0
-  - libsqlite3-dev
+  # Runtime should not depend on -dev packages
 
 essential: false
 
