@@ -273,6 +273,15 @@ final List<LLMProviderSetting> defaultApiSettings = [
   ),
   LLMProviderSetting(
     apiKey: '',
+    apiEndpoint: 'https://router.requesty.ai/v1',
+    apiStyle: 'openai',
+    providerId: 'requesty',
+    providerName: 'Requesty',
+    icon: 'requesty',
+    custom: false,
+  ),
+  LLMProviderSetting(
+    apiKey: '',
     apiEndpoint: 'https://api.302.ai/v1',
     apiStyle: 'openai',
     providerId: '302.AI',
