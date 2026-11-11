@@ -132,6 +132,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get noServerConfigs => 'No server configurations found';
 
   @override
+  String get addMcpServer => 'Add MCP Server';
+
+  @override
   String get addProvider => 'Add Provider';
 
   @override

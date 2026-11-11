@@ -131,6 +131,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get noServerConfigs => '未找到服务器配置';
 
   @override
+  String get addMcpServer => '添加 MCP 服务器';
+
+  @override
   String get addProvider => '添加服务商';
 
   @override

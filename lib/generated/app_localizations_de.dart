@@ -132,6 +132,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get noServerConfigs => 'Keine Server-Konfigurationen gefunden';
 
   @override
+  String get addMcpServer => 'MCP-Server hinzufügen';
+
+  @override
   String get addProvider => 'Anbieter hinzufügen';
 
   @override

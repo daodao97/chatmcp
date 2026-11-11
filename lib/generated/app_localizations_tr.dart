@@ -131,6 +131,9 @@ class AppLocalizationsTr extends AppLocalizations {
   String get noServerConfigs => 'Sunucu yapılandırması bulunamadı.';
 
   @override
+  String get addMcpServer => 'MCP Sunucusu Ekle';
+
+  @override
   String get addProvider => 'Sağlayıcı Ekle';
 
   @override
