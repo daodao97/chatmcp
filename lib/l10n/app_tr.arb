@@ -40,6 +40,7 @@
     "mcpServerDesktopOnly": "MCP Sunucusu yalnızca masaüstü platformlarını (Windows, macOS, Linux) destekler.",
     "searchServer": "Sunucu ara...",
     "noServerConfigs": "Sunucu yapılandırması bulunamadı.",
+    "addMcpServer": "MCP Sunucusu Ekle",
     "addProvider": "Sağlayıcı Ekle",
     "refresh": "Yenile",
     "install": "Yükle",

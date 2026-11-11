@@ -40,6 +40,7 @@
     "mcpServerDesktopOnly": "MCP Server only supports desktop platforms (Windows, macOS, Linux)",
     "searchServer": "Search server...",
     "noServerConfigs": "No server configurations found",
+    "addMcpServer": "Add MCP Server",
     "addProvider": "Add Provider",
     "refresh": "Refresh",
     "install": "Install",

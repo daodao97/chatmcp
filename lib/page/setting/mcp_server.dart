@@ -134,7 +134,7 @@ class _McpServerState extends State<McpServer> {
                               children: [
                                 _buildActionButton(
                                   icon: CupertinoIcons.add,
-                                  tooltip: l10n.addProvider,
+                                  tooltip: l10n.addMcpServer,
                                   onPressed: () {
                                     final provider = ProviderManager.mcpServerProvider;
                                     _showEditDialog(context, '', provider, null);
@@ -170,7 +170,7 @@ class _McpServerState extends State<McpServer> {
                               children: [
                                 _buildActionButton(
                                   icon: CupertinoIcons.add,
-                                  tooltip: l10n.addProvider,
+                                  tooltip: l10n.addMcpServer,
                                   onPressed: () {
                                     final provider = ProviderManager.mcpServerProvider;
                                     _showEditDialog(context, '', provider, null);
@@ -579,7 +579,7 @@ class _McpServerState extends State<McpServer> {
           return AlertDialog(
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
             title: Text(
-              'MCP Server - ${serverName.isEmpty ? l10n.addProvider : serverName}',
+              serverName.isEmpty ? l10n.addMcpServer : serverName,
               style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
             ),
             content: SingleChildScrollView(
