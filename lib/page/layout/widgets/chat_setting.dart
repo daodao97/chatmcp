@@ -96,7 +96,7 @@ class ChatSetting extends StatelessWidget {
                       onPressed: () => _resetModelSettings(settingsProvider),
                       icon: Icon(CupertinoIcons.refresh_thin, size: 18, color: colorScheme.primary),
                       label: Text(
-                        'Reset',
+                        l10n.reset,
                         style: TextStyle(color: colorScheme.primary, fontWeight: FontWeight.w500),
                       ),
                       style: TextButton.styleFrom(
