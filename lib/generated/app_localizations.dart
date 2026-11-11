@@ -1785,4 +1785,100 @@ AppLocalizations lookupAppLocalizations(Locale locale) {
     'on GitHub with a reproducible sample app and the gen-l10n configuration '
     'that was used.',
   );
+  /// No description provided for @oauthRefreshToken.
+  ///
+  /// In en, this message translates to:
+  /// **'Refresh OAuth Token'**
+  String get oauthRefreshToken;
+
+  /// No description provided for @oauthAuthenticated.
+  ///
+  /// In en, this message translates to:
+  /// **'OAuth Authenticated'**
+  String get oauthAuthenticated;
+
+  /// No description provided for @oauthSignIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Authenticate with OAuth'**
+  String get oauthSignIn;
+
+  /// No description provided for @oauthTokenRefreshed.
+  ///
+  /// In en, this message translates to:
+  /// **'OAuth token refreshed'**
+  String get oauthTokenRefreshed;
+
+  /// No description provided for @oauthSignInSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'OAuth authentication successful'**
+  String get oauthSignInSuccess;
+
+  /// No description provided for @oauthError.
+  ///
+  /// In en, this message translates to:
+  /// **'OAuth error: {error}'**
+  String oauthError(Object error);
+
+  /// No description provided for @oauthChecking.
+  ///
+  /// In en, this message translates to:
+  /// **'Checking authentication requirements...'**
+  String get oauthChecking;
+
+  /// No description provided for @oauthLoginAfterSave.
+  ///
+  /// In en, this message translates to:
+  /// **'This server requires OAuth authentication. Sign in after saving.'**
+  String get oauthLoginAfterSave;
+
+  /// No description provided for @oauthSectionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Authentication'**
+  String get oauthSectionTitle;
+
+  /// No description provided for @oauthAutomaticLoginInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'After saving a server that requires authentication, you will be prompted to sign in.'**
+  String get oauthAutomaticLoginInfo;
+
+  /// No description provided for @oauthRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Authentication Required'**
+  String get oauthRequired;
+
+  /// No description provided for @oauthLoginPrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'This server requires OAuth authentication. Sign in now?'**
+  String get oauthLoginPrompt;
+
+  /// No description provided for @oauthLoginNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Log In'**
+  String get oauthLoginNow;
+
+  /// No description provided for @oauthSuccessForServer.
+  ///
+  /// In en, this message translates to:
+  /// **'Signed in to {serverName}'**
+  String oauthSuccessForServer(Object serverName);
+
+  /// No description provided for @oauthNoSuccessResponse.
+  ///
+  /// In en, this message translates to:
+  /// **'Authentication failed: no success response'**
+  String get oauthNoSuccessResponse;
+
+  /// No description provided for @oauthSignInFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Authentication failed: {error}'**
+  String oauthSignInFailed(Object error);
+
 }

@@ -275,5 +275,21 @@
   "newChat": "New Chat",
   "send": "Send",
   "more": "More",
-  "noMoreData": "No more data"
+  "noMoreData": "No more data",
+  "oauthRefreshToken": "Обновить OAuth-токен",
+  "oauthAuthenticated": "Вход через OAuth выполнен",
+  "oauthSignIn": "Войти через OAuth",
+  "oauthTokenRefreshed": "Токен обновлён",
+  "oauthSignInSuccess": "Авторизация выполнена",
+  "oauthError": "Ошибка OAuth: {error}",
+  "oauthChecking": "Проверка авторизации...",
+  "oauthLoginAfterSave": "Сервер требует авторизации через OAuth. После сохранения появится запрос на вход.",
+  "oauthSectionTitle": "Авторизация",
+  "oauthAutomaticLoginInfo": "Если сервер требует авторизации, после сохранения появится запрос на вход.",
+  "oauthRequired": "Требуется авторизация",
+  "oauthLoginPrompt": "Сервер требует авторизации через OAuth. Войти сейчас?",
+  "oauthLoginNow": "Войти",
+  "oauthSuccessForServer": "Вход на сервер «{serverName}» выполнен",
+  "oauthNoSuccessResponse": "Не удалось войти: нет подтверждения авторизации",
+  "oauthSignInFailed": "Не удалось войти: {error}"
 }

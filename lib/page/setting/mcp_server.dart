@@ -330,8 +330,8 @@ class _McpServerState extends State<McpServer> {
                         ? (needsRefresh ? CupertinoIcons.refresh : CupertinoIcons.checkmark_shield)
                         : CupertinoIcons.lock,
                       tooltip: isAuthenticated 
-                        ? (needsRefresh ? 'Refresh OAuth Token' : 'OAuth Authenticated')
-                        : 'Authenticate with OAuth',
+                        ? (needsRefresh ? l10n.oauthRefreshToken : l10n.oauthAuthenticated)
+                        : l10n.oauthSignIn,
                       onPressed: () async {
                         setState(() {
                           _serverLoading[serverName] = true;
@@ -340,12 +340,12 @@ class _McpServerState extends State<McpServer> {
                           if (needsRefresh) {
                             await provider.refreshServerToken(serverName);
                             ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('OAuth token refreshed successfully')),
+                              SnackBar(content: Text(l10n.oauthTokenRefreshed)),
                             );
                           } else if (!isAuthenticated) {
                             await provider.authenticateServer(serverName);
                             ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('OAuth authentication successful')),
+                              SnackBar(content: Text(l10n.oauthSignInSuccess)),
                             );
                           }
                           setState(() {
@@ -353,7 +353,7 @@ class _McpServerState extends State<McpServer> {
                           });
                         } catch (e) {
                           ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text('OAuth error: ${e.toString()}')),
+                            SnackBar(content: Text(l10n.oauthError(e.toString()))),
                           );
                         } finally {
                           if (mounted) {
@@ -707,7 +707,7 @@ class _McpServerState extends State<McpServer> {
                           ),
                           const SizedBox(width: 8),
                           Text(
-                            'Checking authentication requirements...',
+                            l10n.oauthChecking,
                             style: TextStyle(
                               color: Theme.of(context).colorScheme.onSurface.withAlpha(150),
                               fontSize: 13,
@@ -738,7 +738,7 @@ class _McpServerState extends State<McpServer> {
                             const SizedBox(width: 8),
                             Expanded(
                               child: Text(
-                                'This server requires OAuth authentication. You\'ll be prompted to login after saving.',
+                                l10n.oauthLoginAfterSave,
                                 style: TextStyle(
                                   color: Theme.of(context).colorScheme.onPrimaryContainer,
                                   fontSize: 13,
@@ -833,7 +833,7 @@ class _McpServerState extends State<McpServer> {
                                 ),
                                 const SizedBox(width: 8),
                                 Text(
-                                  'Authentication',
+                                  l10n.oauthSectionTitle,
                                   style: TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.w600,
@@ -844,7 +844,7 @@ class _McpServerState extends State<McpServer> {
                             ),
                             const SizedBox(height: 8),
                             Text(
-                              'Authentication is now handled automatically. When you enter a server URL that requires authentication, you\'ll be prompted to login after saving.',
+                              l10n.oauthAutomaticLoginInfo,
                               style: TextStyle(
                                 fontSize: 14,
                                 color: Theme.of(context).colorScheme.onSurface.withAlpha(200),
@@ -949,18 +949,18 @@ class _McpServerState extends State<McpServer> {
                       final shouldAuth = await showDialog<bool>(
                         context: context,
                         builder: (context) => AlertDialog(
-                          title: const Text('Authentication Required'),
+                          title: Text(l10n.oauthRequired),
                           content: Text(
-                            'This server requires OAuth authentication. Would you like to login now?',
+                            l10n.oauthLoginPrompt,
                           ),
                           actions: [
                             TextButton(
                               onPressed: () => Navigator.pop(context, false),
-                              child: const Text('Later'),
+                              child: Text(l10n.cancel),
                             ),
                             TextButton(
                               onPressed: () => Navigator.pop(context, true),
-                              child: const Text('Login Now'),
+                              child: Text(l10n.oauthLoginNow),
                             ),
                           ],
                         ),
@@ -978,14 +978,14 @@ class _McpServerState extends State<McpServer> {
                           if (success && mounted) {
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
-                                content: Text('Authentication successful for $saveServerName'),
+                                content: Text(l10n.oauthSuccessForServer(saveServerName)),
                                 backgroundColor: Colors.green,
                               ),
                             );
                           } else if (mounted) {
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
-                                content: Text('Authentication failed: No success response'),
+                                content: Text(l10n.oauthNoSuccessResponse),
                                 backgroundColor: Colors.orange,
                               ),
                             );
@@ -995,7 +995,7 @@ class _McpServerState extends State<McpServer> {
                           if (mounted) {
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
-                                content: Text('Authentication failed: ${e.toString()}'),
+                                content: Text(l10n.oauthSignInFailed(e.toString())),
                                 backgroundColor: Colors.red,
                                 duration: const Duration(seconds: 5),
                               ),

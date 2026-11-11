@@ -878,4 +878,58 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get noMoreData => 'No more data';
+  @override
+  String get oauthRefreshToken => 'Refresh OAuth Token';
+
+  @override
+  String get oauthAuthenticated => 'OAuth Authenticated';
+
+  @override
+  String get oauthSignIn => 'Authenticate with OAuth';
+
+  @override
+  String get oauthTokenRefreshed => 'OAuth token refreshed';
+
+  @override
+  String get oauthSignInSuccess => 'OAuth authentication successful';
+
+  @override
+  String oauthError(Object error) {
+    return 'OAuth error: $error';
+  }
+
+  @override
+  String get oauthChecking => 'Checking authentication requirements...';
+
+  @override
+  String get oauthLoginAfterSave => 'This server requires OAuth authentication. Sign in after saving.';
+
+  @override
+  String get oauthSectionTitle => 'Authentication';
+
+  @override
+  String get oauthAutomaticLoginInfo => 'After saving a server that requires authentication, you will be prompted to sign in.';
+
+  @override
+  String get oauthRequired => 'Authentication Required';
+
+  @override
+  String get oauthLoginPrompt => 'This server requires OAuth authentication. Sign in now?';
+
+  @override
+  String get oauthLoginNow => 'Log In';
+
+  @override
+  String oauthSuccessForServer(Object serverName) {
+    return 'Signed in to $serverName';
+  }
+
+  @override
+  String get oauthNoSuccessResponse => 'Authentication failed: no success response';
+
+  @override
+  String oauthSignInFailed(Object error) {
+    return 'Authentication failed: $error';
+  }
+
 }
