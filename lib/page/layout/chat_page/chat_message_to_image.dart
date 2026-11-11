@@ -1,3 +1,4 @@
+import 'package:chatmcp/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'dart:io' as io;
 import 'package:chatmcp/llm/model.dart';
@@ -30,7 +31,7 @@ class _ListViewToImageScreenState extends State<ListViewToImageScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Share Chat Image'),
+        title: Text(AppLocalizations.of(context)!.shareChatImage),
         leading: IconButton(icon: Icon(Icons.close), onPressed: () => Navigator.pop(context)),
         actions: [IconButton(icon: Icon(Icons.camera), onPressed: _captureListViewAsImage)],
       ),
@@ -85,7 +86,7 @@ class _ListViewToImageScreenState extends State<ListViewToImageScreen> {
                     Expanded(
                       child: Text(ProviderManager.chatProvider.activeChat!.title, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
                     ),
-                    Text("by ChatMcp", style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                    Text(AppLocalizations.of(context)!.createdWithChatMcp, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
                   ],
                 ),
               ),
@@ -162,7 +163,7 @@ class _ListViewToImageScreenState extends State<ListViewToImageScreen> {
 
       if (kIsDesktop) {
         final path = await FilePicker.platform.saveFile(
-          dialogTitle: ProviderManager.chatProvider.activeChat?.title ?? 'Save chat image',
+          dialogTitle: ProviderManager.chatProvider.activeChat?.title ?? AppLocalizations.of(context)!.saveChatImage,
           fileName: 'ChatMcp-${ProviderManager.chatProvider.activeChat?.title ?? DateTime.now().millisecondsSinceEpoch}.jpg',
           type: FileType.custom,
           allowedExtensions: ['jpg'],

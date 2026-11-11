@@ -227,7 +227,7 @@ class _CodeBlockState extends State<_CodeBlock> with AutomaticKeepAliveClientMix
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(11)),
       ),
       onPressed: _togglePreviewVisibility,
-      child: Text(_isPreviewVisible ? 'Code' : 'Preview', style: const TextStyle(fontSize: 9, height: 1)),
+      child: Text(_isPreviewVisible ? AppLocalizations.of(context)!.code : AppLocalizations.of(context)!.preview, style: const TextStyle(fontSize: 9, height: 1)),
     );
   }
 

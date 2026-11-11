@@ -208,7 +208,7 @@ class _McpServerState extends State<McpServer> {
                               children: [
                                 Icon(CupertinoIcons.exclamationmark_circle, size: 48, color: Theme.of(context).colorScheme.error),
                                 const SizedBox(height: 16),
-                                Text('Failed to load: ${snapshot.error}', style: TextStyle(color: Theme.of(context).colorScheme.error)),
+                                Text(l10n.loadFailed(snapshot.error.toString()), style: TextStyle(color: Theme.of(context).colorScheme.error)),
                               ],
                             ),
                           );
@@ -395,7 +395,7 @@ class _McpServerState extends State<McpServer> {
               ),
               const Gap(size: 10),
               if (provider.mcpServerIsRunning(serverName))
-                _buildActionButton(icon: CupertinoIcons.info_circle, tooltip: "info", onPressed: () => _showInfoDialog(context, serverName)),
+                _buildActionButton(icon: CupertinoIcons.info_circle, tooltip: l10n.serverToolsInfo, onPressed: () => _showInfoDialog(context, serverName)),
               const Gap(size: 10),
               _buildActionButton(
                 icon: CupertinoIcons.pencil,
@@ -431,7 +431,7 @@ class _McpServerState extends State<McpServer> {
                     final uri = Uri.tryParse(command);
                     final isHttpUrl = uri != null && (uri.scheme == 'http' || uri.scheme == 'https') && uri.host.isNotEmpty;
                     if (!isHttpUrl) {
-                      showErrorDialog(context, 'Server command must be a valid http(s) URL');
+                      showErrorDialog(context, l10n.mcpInvalidHttpUrl);
                       return;
                     }
                   } else if (!await isCommandAvailable(command)) {
@@ -897,11 +897,11 @@ class _McpServerState extends State<McpServer> {
 
                   if (kIsMobile && kIsWeb) {
                     if (type == "stdio") {
-                      showErrorDialog(dialogContext, 'Mobile only supports mcp sse and streamable servers');
+                      showErrorDialog(dialogContext, l10n.mcpMobileRemoteOnly);
                       return;
                     }
                     if (isRemote && !isUrl) {
-                      showErrorDialog(dialogContext, 'Server command must be a valid URL');
+                      showErrorDialog(dialogContext, l10n.mcpInvalidUrl);
                       return;
                     }
                   }

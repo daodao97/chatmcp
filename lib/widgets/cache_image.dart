@@ -1,3 +1,4 @@
+import 'package:chatmcp/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:logging/logging.dart';
@@ -15,7 +16,7 @@ class CacheImage extends StatelessWidget {
     final scaffoldContext = Navigator.of(context).context;
     try {
       if (!scaffoldContext.mounted) return;
-      ScaffoldMessenger.of(scaffoldContext).showSnackBar(const SnackBar(content: Text('start to save image...')));
+      ScaffoldMessenger.of(scaffoldContext).showSnackBar(SnackBar(content: Text(AppLocalizations.of(scaffoldContext)!.savingImage)));
 
       // 从缓存中获取文件
       var fileInfo = await DefaultCacheManager().getFileFromCache(imageUrl);
@@ -41,9 +42,9 @@ class CacheImage extends StatelessWidget {
         if (!scaffoldContext.mounted) return;
         ScaffoldMessenger.of(scaffoldContext).showSnackBar(
           SnackBar(
-            content: Text('image saved to download directory: $fileName'),
+            content: Text(AppLocalizations.of(scaffoldContext)!.imageSavedToDownloads(fileName)),
             action: SnackBarAction(
-              label: 'ok',
+              label: AppLocalizations.of(scaffoldContext)!.ok,
               onPressed: () {
                 ScaffoldMessenger.of(scaffoldContext).hideCurrentSnackBar();
               },
@@ -56,9 +57,9 @@ class CacheImage extends StatelessWidget {
       Logger.root.severe('save image failed: $e');
       ScaffoldMessenger.of(scaffoldContext).showSnackBar(
         SnackBar(
-          content: Text('save image failed: ${e.toString()}'),
+          content: Text(AppLocalizations.of(scaffoldContext)!.saveImageFailed(e.toString())),
           backgroundColor: Colors.red,
-          action: SnackBarAction(label: 'retry', textColor: Colors.white, onPressed: () => _downloadImage(scaffoldContext)),
+          action: SnackBarAction(label: AppLocalizations.of(scaffoldContext)!.retry, textColor: Colors.white, onPressed: () => _downloadImage(scaffoldContext)),
         ),
       );
     }

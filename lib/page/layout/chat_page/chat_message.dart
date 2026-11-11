@@ -378,7 +378,7 @@ class MessageBubble extends StatelessWidget {
               child,
               const SizedBox(height: 4),
               ExpansionTile(
-                title: const Text('Token Usage', style: TextStyle(fontSize: 12)),
+                title: Text(AppLocalizations.of(context)!.tokenUsage, style: TextStyle(fontSize: 12)),
                 controlAffinity: ListTileControlAffinity.leading,
                 children: <Widget>[ListTile(title: Markit(data: message.tokenUsage!.toMarkdown()))],
               ),

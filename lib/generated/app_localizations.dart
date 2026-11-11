@@ -8,6 +8,7 @@ import 'package:intl/intl.dart' as intl;
 import 'app_localizations_de.dart';
 import 'app_localizations_en.dart';
 import 'app_localizations_tr.dart';
+import 'app_localizations_ru.dart';
 import 'app_localizations_zh.dart';
 
 // ignore_for_file: type=lint
@@ -92,7 +93,7 @@ abstract class AppLocalizations {
   ];
 
   /// A list of this localizations delegate's supported locales.
-  static const List<Locale> supportedLocales = <Locale>[Locale('de'), Locale('en'), Locale('tr'), Locale('zh')];
+  static const List<Locale> supportedLocales = <Locale>[Locale('de'), Locale('en'), Locale('ru'), Locale('tr'), Locale('zh')];
 
   /// No description provided for @settings.
   ///
@@ -1749,42 +1750,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No more data'**
   String get noMoreData;
-}
-
-class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
-  const _AppLocalizationsDelegate();
-
-  @override
-  Future<AppLocalizations> load(Locale locale) {
-    return SynchronousFuture<AppLocalizations>(lookupAppLocalizations(locale));
-  }
-
-  @override
-  bool isSupported(Locale locale) => <String>['de', 'en', 'tr', 'zh'].contains(locale.languageCode);
-
-  @override
-  bool shouldReload(_AppLocalizationsDelegate old) => false;
-}
-
-AppLocalizations lookupAppLocalizations(Locale locale) {
-  // Lookup logic when only language code is specified.
-  switch (locale.languageCode) {
-    case 'de':
-      return AppLocalizationsDe();
-    case 'en':
-      return AppLocalizationsEn();
-    case 'tr':
-      return AppLocalizationsTr();
-    case 'zh':
-      return AppLocalizationsZh();
-  }
-
-  throw FlutterError(
-    'AppLocalizations.delegate failed to load unsupported locale "$locale". This is likely '
-    'an issue with the localizations generation tool. Please file an issue '
-    'on GitHub with a reproducible sample app and the gen-l10n configuration '
-    'that was used.',
-  );
   /// No description provided for @oauthRefreshToken.
   ///
   /// In en, this message translates to:
@@ -1880,5 +1845,234 @@ AppLocalizations lookupAppLocalizations(Locale locale) {
   /// In en, this message translates to:
   /// **'Authentication failed: {error}'**
   String oauthSignInFailed(Object error);
+  /// No description provided for @loadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load: {error}'**
+  String loadFailed(Object error);
 
+  /// No description provided for @noServersAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'No available servers'**
+  String get noServersAvailable;
+
+  /// No description provided for @serverToolsInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Server tools information'**
+  String get serverToolsInfo;
+
+  /// No description provided for @noResultsFound.
+  ///
+  /// In en, this message translates to:
+  /// **'No results found'**
+  String get noResultsFound;
+
+  /// No description provided for @loading.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading...'**
+  String get loading;
+
+  /// No description provided for @noCodePreview.
+  ///
+  /// In en, this message translates to:
+  /// **'No code preview'**
+  String get noCodePreview;
+
+  /// No description provided for @tokenUsage.
+  ///
+  /// In en, this message translates to:
+  /// **'Token Usage'**
+  String get tokenUsage;
+
+  /// No description provided for @shareChatImage.
+  ///
+  /// In en, this message translates to:
+  /// **'Share Chat Image'**
+  String get shareChatImage;
+
+  /// No description provided for @saveChatImage.
+  ///
+  /// In en, this message translates to:
+  /// **'Save chat image'**
+  String get saveChatImage;
+
+  /// No description provided for @invalidUrl.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid URL'**
+  String get invalidUrl;
+
+  /// No description provided for @fetchModelsFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to fetch models: {error}'**
+  String fetchModelsFailed(Object error);
+
+  /// No description provided for @deviceAuthorization.
+  ///
+  /// In en, this message translates to:
+  /// **'Device Authorization'**
+  String get deviceAuthorization;
+
+  /// No description provided for @userCode.
+  ///
+  /// In en, this message translates to:
+  /// **'User Code: {code}'**
+  String userCode(Object code);
+
+  /// No description provided for @enterCodeAt.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter this code at:'**
+  String get enterCodeAt;
+
+  /// No description provided for @deviceCodeFetched.
+  ///
+  /// In en, this message translates to:
+  /// **'Device code fetched successfully'**
+  String get deviceCodeFetched;
+
+  /// No description provided for @deviceCodeFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to fetch device code'**
+  String get deviceCodeFailed;
+
+  /// No description provided for @deviceCodeError.
+  ///
+  /// In en, this message translates to:
+  /// **'Error fetching device code: {error}'**
+  String deviceCodeError(Object error);
+
+  /// No description provided for @getDeviceCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Get Device Code'**
+  String get getDeviceCode;
+
+  /// No description provided for @tokenFetched.
+  ///
+  /// In en, this message translates to:
+  /// **'Token fetched successfully'**
+  String get tokenFetched;
+
+  /// No description provided for @tokenFetchFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to fetch token: {error}'**
+  String tokenFetchFailed(Object error);
+
+  /// No description provided for @getToken.
+  ///
+  /// In en, this message translates to:
+  /// **'Get Token'**
+  String get getToken;
+
+  /// No description provided for @mcpInvalidUrl.
+  ///
+  /// In en, this message translates to:
+  /// **'Server address must be a valid URL'**
+  String get mcpInvalidUrl;
+
+  /// No description provided for @mcpInvalidHttpUrl.
+  ///
+  /// In en, this message translates to:
+  /// **'Server address must be a valid HTTP(S) URL'**
+  String get mcpInvalidHttpUrl;
+
+  /// No description provided for @mcpMobileRemoteOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'Mobile supports only MCP SSE and Streamable servers'**
+  String get mcpMobileRemoteOnly;
+
+  /// No description provided for @alreadyUpToDate.
+  ///
+  /// In en, this message translates to:
+  /// **'You are using the latest version'**
+  String get alreadyUpToDate;
+
+  /// No description provided for @checkUpdatesFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not check for updates'**
+  String get checkUpdatesFailed;
+
+  /// No description provided for @savingImage.
+  ///
+  /// In en, this message translates to:
+  /// **'Saving image...'**
+  String get savingImage;
+
+  /// No description provided for @imageSavedToDownloads.
+  ///
+  /// In en, this message translates to:
+  /// **'Image saved to Downloads: {fileName}'**
+  String imageSavedToDownloads(Object fileName);
+
+  /// No description provided for @saveImageFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to save image: {error}'**
+  String saveImageFailed(Object error);
+
+  /// No description provided for @latexError.
+  ///
+  /// In en, this message translates to:
+  /// **'LaTeX error: {error}'**
+  String latexError(Object error);
+
+  /// No description provided for @errorType.
+  ///
+  /// In en, this message translates to:
+  /// **'Error type: {type}'**
+  String errorType(Object type);
+
+  /// No description provided for @createdWithChatMcp.
+  ///
+  /// In en, this message translates to:
+  /// **'Created with ChatMCP'**
+  String get createdWithChatMcp;
+
+}
+
+class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
+  const _AppLocalizationsDelegate();
+
+  @override
+  Future<AppLocalizations> load(Locale locale) {
+    return SynchronousFuture<AppLocalizations>(lookupAppLocalizations(locale));
+  }
+
+  @override
+  bool isSupported(Locale locale) => <String>['de', 'en', 'ru', 'tr', 'zh'].contains(locale.languageCode);
+
+  @override
+  bool shouldReload(_AppLocalizationsDelegate old) => false;
+}
+
+AppLocalizations lookupAppLocalizations(Locale locale) {
+  // Lookup logic when only language code is specified.
+  switch (locale.languageCode) {
+    case 'de':
+      return AppLocalizationsDe();
+    case 'en':
+      return AppLocalizationsEn();
+    case 'ru':
+      return AppLocalizationsRu();
+    case 'tr':
+      return AppLocalizationsTr();
+    case 'zh':
+      return AppLocalizationsZh();
+  }
+
+  throw FlutterError(
+    'AppLocalizations.delegate failed to load unsupported locale "$locale". This is likely '
+    'an issue with the localizations generation tool. Please file an issue '
+    'on GitHub with a reproducible sample app and the gen-l10n configuration '
+    'that was used.',
+  );
 }

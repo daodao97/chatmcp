@@ -838,7 +838,7 @@ class _QRScannerPageState extends State<QRScannerPage> {
           Navigator.of(context).pop(code);
         } else {
           // 无效URL，显示错误并重置扫描状态
-          ToastUtils.warn('Invalid URL');
+          ToastUtils.warn(AppLocalizations.of(context)!.invalidUrl);
           Future.delayed(const Duration(seconds: 2), () {
             if (mounted) {
               setState(() {

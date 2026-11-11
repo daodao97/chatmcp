@@ -957,7 +957,7 @@ class _KeysSettingsState extends State<KeysSettings> {
                       _hasChanges = true;
                     });
                   } catch (e) {
-                    ToastUtils.error('Failed to fetch models: $e');
+                    ToastUtils.error(l10n.fetchModelsFailed(e.toString()));
                   }
                 },
               ),
@@ -1153,6 +1153,7 @@ class _KeysSettingsState extends State<KeysSettings> {
   }
 
   Widget _copilotOAuthButtonList() {
+    final l10n = AppLocalizations.of(context)!;
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -1169,13 +1170,13 @@ class _KeysSettingsState extends State<KeysSettings> {
                       context: context,
                       builder: (context) {
                         return AlertDialog(
-                          title: const Text('Device Authorization'),
+                          title: Text(l10n.deviceAuthorization),
                           content: Column(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              SelectableText('User Code: ${githubCopilotOAuth.userCode ?? ""}', style: const TextStyle(fontWeight: FontWeight.bold)),
+                              SelectableText(l10n.userCode(githubCopilotOAuth.userCode ?? ''), style: const TextStyle(fontWeight: FontWeight.bold)),
                               const SizedBox(height: 12),
-                              Text('Please enter this code at:'),
+                              Text(l10n.enterCodeAt),
                               InkWell(
                                 child: Text(
                                   githubCopilotOAuth.verificationUri ?? 'https://github.com/login/device',
@@ -1188,20 +1189,20 @@ class _KeysSettingsState extends State<KeysSettings> {
                               ),
                             ],
                           ),
-                          actions: [TextButton(onPressed: () => Navigator.pop(context), child: const Text('OK'))],
+                          actions: [TextButton(onPressed: () => Navigator.pop(context), child: Text(l10n.ok))],
                         );
                       },
                     );
-                    ToastUtils.success('Device code fetched successfully');
+                    ToastUtils.success(l10n.deviceCodeFetched);
                   } else {
-                    ToastUtils.error('Failed to fetch device code');
+                    ToastUtils.error(l10n.deviceCodeFailed);
                   }
                 })
                 .catchError((error) {
-                  ToastUtils.error('Error fetching device code: $error');
+                  ToastUtils.error(l10n.deviceCodeError(error.toString()));
                 });
           },
-          child: const Text('Get Device Code'),
+          child: Text(l10n.getDeviceCode),
         ),
         const SizedBox(width: 12),
         ElevatedButton(
@@ -1215,13 +1216,13 @@ class _KeysSettingsState extends State<KeysSettings> {
                           _controllers[_selectedProvider].keyController.text = token;
                           _hasChanges = true;
                         });
-                        ToastUtils.success('Token fetched successfully');
+                        ToastUtils.success(l10n.tokenFetched);
                       })
                       .catchError((error) {
-                        ToastUtils.error('Failed to fetch token: $error');
+                        ToastUtils.error(l10n.tokenFetchFailed(error.toString()));
                       });
                 }, // Disabled
-          child: const Text('Get Token'),
+          child: Text(l10n.getToken),
         ),
       ],
     );

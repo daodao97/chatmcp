@@ -931,4 +931,120 @@ class AppLocalizationsTr extends AppLocalizations {
     return 'Authentication failed: $error';
   }
 
+
+  @override
+  String loadFailed(Object error) {
+    return 'Failed to load: $error';
+  }
+
+  @override
+  String get noServersAvailable => 'No available servers';
+
+  @override
+  String get serverToolsInfo => 'Server tools information';
+
+  @override
+  String get noResultsFound => 'No results found';
+
+  @override
+  String get loading => 'Loading...';
+
+  @override
+  String get noCodePreview => 'No code preview';
+
+  @override
+  String get tokenUsage => 'Token Usage';
+
+  @override
+  String get shareChatImage => 'Share Chat Image';
+
+  @override
+  String get saveChatImage => 'Save chat image';
+
+  @override
+  String get invalidUrl => 'Invalid URL';
+
+  @override
+  String fetchModelsFailed(Object error) {
+    return 'Failed to fetch models: $error';
+  }
+
+  @override
+  String get deviceAuthorization => 'Device Authorization';
+
+  @override
+  String userCode(Object code) {
+    return 'User Code: $code';
+  }
+
+  @override
+  String get enterCodeAt => 'Please enter this code at:';
+
+  @override
+  String get deviceCodeFetched => 'Device code fetched successfully';
+
+  @override
+  String get deviceCodeFailed => 'Failed to fetch device code';
+
+  @override
+  String deviceCodeError(Object error) {
+    return 'Error fetching device code: $error';
+  }
+
+  @override
+  String get getDeviceCode => 'Get Device Code';
+
+  @override
+  String get tokenFetched => 'Token fetched successfully';
+
+  @override
+  String tokenFetchFailed(Object error) {
+    return 'Failed to fetch token: $error';
+  }
+
+  @override
+  String get getToken => 'Get Token';
+
+  @override
+  String get mcpInvalidUrl => 'Server address must be a valid URL';
+
+  @override
+  String get mcpInvalidHttpUrl => 'Server address must be a valid HTTP(S) URL';
+
+  @override
+  String get mcpMobileRemoteOnly => 'Mobile supports only MCP SSE and Streamable servers';
+
+
+  @override
+  String get alreadyUpToDate => 'You are using the latest version';
+
+  @override
+  String get checkUpdatesFailed => 'Could not check for updates';
+
+  @override
+  String get savingImage => 'Saving image...';
+
+  @override
+  String imageSavedToDownloads(Object fileName) {
+    return 'Image saved to Downloads: $fileName';
+  }
+
+  @override
+  String saveImageFailed(Object error) {
+    return 'Failed to save image: $error';
+  }
+
+  @override
+  String latexError(Object error) {
+    return 'LaTeX error: $error';
+  }
+
+  @override
+  String errorType(Object type) {
+    return 'Error type: $type';
+  }
+
+  @override
+  String get createdWithChatMcp => 'Created with ChatMCP';
+
 }

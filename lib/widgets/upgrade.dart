@@ -117,18 +117,18 @@ class _UpgradeNoticeState extends State<UpgradeNotice> {
           }
         } else if (!widget.autoCheck && mounted) {
           // 手动检查模式下，如果没有新版本也要显示提示
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("已是最新版本"), duration: const Duration(seconds: 2)));
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(AppLocalizations.of(context)!.alreadyUpToDate), duration: const Duration(seconds: 2)));
         }
       } else {
         debugPrint('GitHub API请求失败，状态码: ${response.statusCode}');
         if (!widget.autoCheck && mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("检查更新失败"), duration: const Duration(seconds: 2)));
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(AppLocalizations.of(context)!.checkUpdatesFailed), duration: const Duration(seconds: 2)));
         }
       }
     } catch (e) {
       debugPrint('检查更新出错: $e');
       if (!widget.autoCheck && mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("检查更新失败"), duration: const Duration(seconds: 2)));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(AppLocalizations.of(context)!.checkUpdatesFailed), duration: const Duration(seconds: 2)));
       }
     } finally {
       if (mounted) {

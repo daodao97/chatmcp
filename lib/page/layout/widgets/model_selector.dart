@@ -1,3 +1,4 @@
+import 'package:chatmcp/generated/app_localizations.dart';
 import 'package:chatmcp/page/layout/widgets/llm_icon.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -99,7 +100,7 @@ class _ModelSelectorPopupState extends State<ModelSelectorPopup> {
     final modelsByProvider = _getFilteredModelsByProvider(searchText);
 
     if (modelsByProvider.isEmpty) {
-      return const PopupEmptyState(message: 'No results found');
+      return PopupEmptyState(message: AppLocalizations.of(context)!.noResultsFound);
     }
 
     final List<Widget> items = [];
@@ -150,11 +151,11 @@ class _ModelSelectorPopupState extends State<ModelSelectorPopup> {
   Widget build(BuildContext context) {
     final currentModel = widget.availableModels.firstWhere(
       (model) => widget.isCurrentModel(model),
-      orElse: () => llm_model.Model(name: '', label: 'Loading...', providerId: '', icon: '', providerName: '', apiStyle: ''),
+      orElse: () => llm_model.Model(name: '', label: AppLocalizations.of(context)!.loading, providerId: '', icon: '', providerName: '', apiStyle: ''),
     );
 
     return SearchablePopup(
-      searchHint: 'Search',
+      searchHint: AppLocalizations.of(context)!.search,
       contentBuilder: _buildModelList,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),

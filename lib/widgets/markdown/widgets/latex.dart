@@ -1,3 +1,4 @@
+import 'package:chatmcp/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:markdown_widget/markdown_widget.dart';
 import 'package:flutter_math_fork/flutter_math.dart';
@@ -117,7 +118,12 @@ class LatexNode extends SpanNode {
             textStyle: style.copyWith(
               fontSize: style.fontSize != null ? (isInline ? style.fontSize : style.fontSize! * 1.2) : (isInline ? 14.0 : 16.8),
             ),
-            onErrorFallback: (error) => Text('LaTeX Error: $error', style: style.copyWith(color: Colors.red)),
+            onErrorFallback: (error) => Builder(
+              builder: (context) => Text(
+                AppLocalizations.of(context)!.latexError(error.toString()),
+                style: style.copyWith(color: Colors.red),
+              ),
+            ),
           ),
         ),
       ),
