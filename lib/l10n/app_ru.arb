@@ -40,7 +40,7 @@
   "mcpServerDesktopOnly": "MCP-серверы доступны только на компьютере (Windows, macOS, Linux)",
   "searchServer": "Поиск серверов...",
   "noServerConfigs": "Серверы не найдены",
-    "addMcpServer": "Добавить сервер",
+  "addMcpServer": "Добавить MCP сервер",
   "addProvider": "Добавить провайдера",
   "refresh": "Обновить",
   "install": "Установить",
