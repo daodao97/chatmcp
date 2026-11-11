@@ -506,7 +506,7 @@ class ChatHistoryItem extends StatelessWidget {
       context: context,
       builder: (context) => AlertDialog(
         title: Text(l10n.confirmDelete),
-        content: Text('\${l10n.confirmThisChat}?'),
+        content: Text('${l10n.confirmThisChat}?'),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
         actions: [
           TextButton(onPressed: () => Navigator.pop(context), child: Text(l10n.cancel)),
