@@ -24,7 +24,7 @@
   "showAssistantAvatarDescription": "Отображать аватар ИИ-ассистента рядом с его сообщениями",
   "showUserAvatar": "Показывать мой аватар",
   "showUserAvatarDescription": "Отображать ваш аватар рядом с вашими сообщениями",
-  "systemPrompt": "Инструкции для ИИ",
+  "systemPrompt": "Системный промпт",
   "systemPromptDescription": "Определяет поведение и стиль ответов ИИ-ассистента",
   "llmKey": "LLM Key",
   "toolKey": "Tool Key",
