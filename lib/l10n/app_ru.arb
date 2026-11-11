@@ -18,7 +18,7 @@
   "themeSettings": "Оформление",
   "lightTheme": "Светлая тема",
   "darkTheme": "Тёмная тема",
-  "followSystem": "Использовать тему системы",
+  "followSystem": "Системная тема",
   "showAvatar": "Аватары в чате",
   "showAssistantAvatar": "Показывать аватар ассистента",
   "showAssistantAvatarDescription": "Отображать аватар ИИ-ассистента рядом с его сообщениями",
