@@ -506,7 +506,7 @@ class ChatHistoryItem extends StatelessWidget {
       context: context,
       builder: (context) => AlertDialog(
         title: Text(l10n.confirmDelete),
-        content: Text(l10n.confirmDeleteSelected),
+        content: Text('\${l10n.confirmThisChat}?'),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
         actions: [
           TextButton(onPressed: () => Navigator.pop(context), child: Text(l10n.cancel)),
@@ -515,7 +515,7 @@ class ChatHistoryItem extends StatelessWidget {
               chatProvider.deleteChat(chat.id);
               Navigator.pop(context);
             },
-            child: Text(l10n.ok),
+            child: Text(l10n.delete),
           ),
         ],
       ),
@@ -616,7 +616,7 @@ class SidebarToolbar extends StatelessWidget {
               chatProvider.deleteSelectedChats();
               Navigator.pop(context);
             },
-            child: Text(l10n.ok),
+            child: Text(l10n.delete),
           ),
         ],
       ),
