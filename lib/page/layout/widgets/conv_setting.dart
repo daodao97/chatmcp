@@ -433,7 +433,7 @@ class _ConvSettingState extends State<ConvSetting> {
       return [
         SizedBox(
           height: 40,
-          child: Center(child: Text('Load failed: $_error', style: Theme.of(context).textTheme.bodyMedium)),
+          child: Center(child: Text(AppLocalizations.of(context)!.loadFailed(_error!), style: Theme.of(context).textTheme.bodyMedium)),
         ),
       ];
     }

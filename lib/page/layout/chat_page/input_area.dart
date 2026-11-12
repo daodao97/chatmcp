@@ -350,7 +350,7 @@ class InputAreaState extends State<InputArea> {
                             widget.onCancel!();
                           }
                         : null,
-                    tooltip: AppLocalizations.of(context)!.cancel,
+                    tooltip: AppLocalizations.of(context)!.stop,
                   ),
                 ],
               ],

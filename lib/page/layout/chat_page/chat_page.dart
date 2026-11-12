@@ -968,7 +968,7 @@ class _ChatPageState extends State<ChatPage> {
                     style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.getErrorTextColor()),
                   ),
                   const SizedBox(height: 8),
-                  Text('error type: ${error.runtimeType}', style: TextStyle(fontSize: 12, color: AppColors.getErrorTextColor().withAlpha(128))),
+                  Text(AppLocalizations.of(context)!.errorType(error.runtimeType.toString()), style: TextStyle(fontSize: 12, color: AppColors.getErrorTextColor().withAlpha(128))),
                   if (error is LLMException)
                     Text(error.toString(), style: TextStyle(fontSize: 12, color: AppColors.getErrorTextColor().withAlpha(128))),
                 ],
@@ -1057,7 +1057,7 @@ class _ChatPageState extends State<ChatPage> {
       showModalCodePreview = true;
     });
 
-    const txtNoCodePreview = Text('No code preview', style: TextStyle(fontSize: 14, color: Colors.grey));
+    final txtNoCodePreview = Text(AppLocalizations.of(context)!.noCodePreview, style: TextStyle(fontSize: 14, color: Colors.grey));
 
     showModalBottomSheet(
       context: context,

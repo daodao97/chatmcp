@@ -56,7 +56,7 @@ class _HtmlViewState extends State<HtmlView> {
   Widget build(BuildContext context) {
     var t = AppLocalizations.of(context)!;
     if (_hasError) {
-      return const SizedBox(height: 100, child: Center(child: Text('加载内容失败，请重试')));
+      return SizedBox(height: 100, child: Center(child: Text(t.loadContentFailed)));
     }
 
     return SizedBox(

@@ -1,3 +1,4 @@
+import 'package:chatmcp/generated/app_localizations.dart';
 import 'package:chatmcp/utils/color.dart';
 import 'package:chatmcp/widgets/ink_icon.dart';
 import 'package:flutter/cupertino.dart';
@@ -98,6 +99,7 @@ class _McpToolsState extends State<McpTools> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Consumer<McpServerProvider>(
       builder: (context, mcpServerProvider, child) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -113,9 +115,9 @@ class _McpToolsState extends State<McpTools> {
           content: _isLoading
               ? const Center(child: SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2)))
               : _error != null
-              ? PopupEmptyState(message: 'Load failed: $_error')
+              ? PopupEmptyState(message: l10n.loadFailed(_error!))
               : _cachedServers == null || _cachedServers!.isEmpty
-              ? const PopupEmptyState(message: 'No available servers')
+              ? PopupEmptyState(message: l10n.noServersAvailable)
               : SingleChildScrollView(
                   child: Column(mainAxisSize: MainAxisSize.min, children: _buildMenuItems(context)),
                 ),
@@ -123,7 +125,7 @@ class _McpToolsState extends State<McpTools> {
             builder: (context, stateProvider, _) {
               return InkIcon(
                 icon: CupertinoIcons.hammer,
-                tooltip: 'MCP Server',
+                tooltip: l10n.mcpServers,
                 child: stateProvider.enabledCount > 0 ? Text(' ${stateProvider.enabledCount}', style: const TextStyle(fontSize: 12)) : null,
               );
             },
@@ -152,7 +154,7 @@ class _McpToolsState extends State<McpTools> {
       return [
         SizedBox(
           height: 40,
-          child: Center(child: Text('Load failed: $_error', style: Theme.of(context).textTheme.bodyMedium)),
+          child: Center(child: Text(l10n.loadFailed(_error!), style: Theme.of(context).textTheme.bodyMedium)),
         ),
       ];
     }
@@ -162,7 +164,7 @@ class _McpToolsState extends State<McpTools> {
       return [
         SizedBox(
           height: 40,
-          child: Center(child: Text('No available servers', style: Theme.of(context).textTheme.bodyMedium)),
+          child: Center(child: Text(l10n.noServersAvailable, style: Theme.of(context).textTheme.bodyMedium)),
         ),
       ];
     }
@@ -202,7 +204,7 @@ class _McpToolsState extends State<McpTools> {
                         if (isRunning)
                           IconButton(
                             icon: const Icon(Icons.info_outline, size: 18, color: Colors.blue),
-                            tooltip: 'Show server tools info',
+                            tooltip: l10n.serverToolsInfo,
                             onPressed: () {
                               showDialog(
                                 context: context,

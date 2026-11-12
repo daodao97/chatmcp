@@ -142,7 +142,7 @@ class _MermaidDiagramViewState extends State<MermaidDiagramView> {
   Widget build(BuildContext context) {
     var t = AppLocalizations.of(context)!;
     if (_hasError) {
-      return const SizedBox(height: 100, child: Center(child: Text('load diagram failed, please try again')));
+      return SizedBox(height: 100, child: Center(child: Text(t.loadDiagramFailed)));
     }
 
     return SizedBox(
