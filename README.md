@@ -109,6 +109,19 @@ Optional (recommended): `mesa-vulkan-drivers`, `mesa-utils` (for diagnostics lik
 - sse mcp server
   ![](./docs/mcp_sse.png)
 
+Example remote Streamable HTTP server (Lantern Works: hosted, free, no-key GPU rental prices; https://thelanternworks.com/api/):
+
+```json
+{
+    "mcpServers": {
+        "lantern-works": {
+            "type": "streamable",
+            "command": "https://lantern-works-mcp.lantern-works.workers.dev/mcp?ref=chatmcp"
+        }
+    }
+}
+```
+
 ## Data Storage
 
 ChatMCP follows platform-specific best practices for data storage:
