@@ -57,6 +57,8 @@ Make sure you have installed `uvx` or `npx` in your system
 
 ```bash
 # uvx
+
+[![Protodex Verified](https://img.shields.io/badge/Protodex-Verified_MCP-2DD9E0?style=flat-square&logo=github)](https://protodex.io/servers/daodao97-chatmcp.html)
 brew install uv
 
 # npx
